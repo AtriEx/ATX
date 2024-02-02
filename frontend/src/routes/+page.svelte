@@ -1,2 +1,17 @@
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p>
+<svelte:head>
+	<title>ATX</title>
+	<meta name="description" content="Get addicted to selling stocks." />
+</svelte:head>
+
+<p class="text-center font-semibold text-2xl">
+	Welcome to <a
+		target="_blank"
+		href="https://github.com/AtriEx/ATX"
+		class="text-orange-500">ATX</a
+	>!
+</p>
+<p class="text-center font-semibold text-2xl">
+	Visit <a target="_blank" href="https://kit.svelte.dev" class="text-orange-500"
+		>kit.svelte.dev</a
+	> to read the documentation
+</p>
