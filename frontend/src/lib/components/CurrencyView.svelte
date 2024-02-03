@@ -5,7 +5,7 @@
     let currency = 1000;
 </script>
 
-<div class="flex flex-row text-zinc-300 mx-5 items-center">
-    <span class="mx-2">{currency}</span>
+<div class="flex flex-row text-green-300 items-center">
+    <span class="mr-2">{currency}</span>
     <Fa icon={faCoins}/>
 </div>
