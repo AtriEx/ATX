@@ -28,9 +28,10 @@
     </button>
     {#if isDropdownVisible}
     <div class="absolute top-16 right-0 bg-blue-950 rounded-b-lg drop-shadow-lg" transition:slide={{ delay: 0, duration: 300}}>
-        <div class="flex flex-col p-3 items-start space-y-5">
-            <a class="hover:text-white" href="/settings">Account Settings</a>
-            <a class="text-red-300 hover:text-red-500" href="">Sign Out</a>
+        <div class="flex flex-col items-start">
+            <a class="hover:text-white hover:bg-slate-800 cursor-pointer w-full" href="/profile/{$username}"><div class="m-2">Profile</div></a>
+            <a class="hover:text-white hover:bg-slate-800 cursor-pointer w-full" href="/settings"><div class="m-2">Account Settings</div></a>
+            <div class="hover:text-white bg-slate-900 hover:bg-slate-950 w-full p-2 rounded-b-lg cursor-pointer"><a  href="">Sign Out</a></div>
         </div>
     </div>
     {/if}

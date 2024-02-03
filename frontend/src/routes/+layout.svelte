@@ -4,7 +4,7 @@
 	import MobileNavigationBar from "$lib/components/MobileNavigationBar.svelte";
 </script>
 
-<div class="max-w-full">
+<div class="w-full">
     <Header />
     <slot />
     <MobileNavigationBar />
