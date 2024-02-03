@@ -47,7 +47,7 @@
         </div>
         <div class="mt-4">
             <a href="/profile/{$username}" class="block text-gray-400 hover:text-white">Profile</a>
-            <a href="/settings" class="block text-gray-400 hover:text-white">Account settings</a>
+            <a href="/settings" class="mt-2 block text-gray-400 hover:text-white">Account settings</a>
             <a href="#" class="mt-2 block text-gray-400 hover:text-white">Sign out</a>
         </div>
     </div>
