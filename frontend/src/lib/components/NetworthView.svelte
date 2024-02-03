@@ -2,10 +2,10 @@
 	import Fa from "svelte-fa";
     import {faSackDollar} from '@fortawesome/free-solid-svg-icons'
 
-    let currency = 2000;
+    import {netWorth} from '$lib/stores/userData.js';
 </script>
 
 <div class="flex flex-row text-green-500 items-center">
-    <span class="mr-2">{currency}</span>
+    <span class="mr-2">{$netWorth}</span>
     <Fa icon={faSackDollar}/>
 </div>
