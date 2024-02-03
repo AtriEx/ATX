@@ -4,7 +4,7 @@
     import {currency} from '$lib/stores/userData.js';
 </script>
 
-<div class="flex flex-row text-green-300 items-center">
+<div class="flex flex-row text-yellow-300 items-center">
     <span class="mr-2">{$currency}</span>
     <Fa icon={faCoins}/>
 </div>
