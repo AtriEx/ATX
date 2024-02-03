@@ -42,8 +42,8 @@
     </div>
     <div class="sm:hidden absolute top-16 right-0 px-4 py-5 border-t bg-blue-950 border-gray-800" transition:slide={{ delay: 0, duration: 300}}>
         <div class="flex items-center">
-            <img class="h-8 w-8 rounded-full border-2 border-gray-600 object-cover" src="https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=256&q=80" alt="Your avatar">
-            <span class="ml-3 font-semibold text-white">Jane Doe</span>
+            <img class="h-8 w-8 rounded-full border-2 border-gray-600 object-cover" src={$userPfp} alt="The user's twitch profile.">
+            <span class="ml-3 font-semibold text-white">GlizzMeister</span>
         </div>
         <div class="mt-4">
             <a href="/profile/{$username}" class="block text-gray-400 hover:text-white">Profile</a>
