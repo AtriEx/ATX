@@ -6,7 +6,7 @@
 
 </script>
 
-<div id="container">
+<div class="max-width" id="container">
     <div>
         <CurrencyView />
         <NetworthView />
@@ -21,6 +21,5 @@
         position:absolute;
         bottom: 0px;
         left: 0px;
-        width: 100%;
     }
 </style>

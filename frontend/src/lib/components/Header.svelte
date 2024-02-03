@@ -9,22 +9,18 @@
     let isMobile : Boolean = false;
 </script>
 
-<div>
-    <span>ATX</span>
+<div class="py-2 px-3 max-width bg-blue-950 flex flex-row flex-nowrap items-center">
+    <img class="h-8" src="/logos/ATX_NameWhite.svg" alt="The ATX logo." />
     {#if !isMobile}
-    <NavigationBar />
-    <CurrencyView />
-    <NetworthView />
+    <NavigationBar/>
+    <div class="flex flex-row">
+        <CurrencyView />
+        <NetworthView />
+    </div>
     {/if}
     <HeaderUserView />
 </div>
 
 <style>
-    div{
-        position: relative;
-        width:100%;
-        left: 0px;
-        top:0px;
-        background-color: silver;
-    }
+
 </style>
