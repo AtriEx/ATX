@@ -1,7 +1,19 @@
 import type { Badge, OwnedStock, UserData } from '$lib/types';
+import { createClient } from '@supabase/supabase-js';
 import type { LayoutServerLoad } from './$types';
+import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { PRIVATE_SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
+
+const adminSupabase = createClient(PUBLIC_SUPABASE_URL, PRIVATE_SUPABASE_SERVICE_ROLE_KEY);
 
 export const load = (async () => {
+	const {
+		data: { session }
+	} = await adminSupabase.auth.getSession();
+	if (!session) return { profile: null, session: null };
+
+	// TODO: Fetch user's profile from the database
+	// const { data: profile, error } = await adminSupabase.from<UserData>('profiles').select('*').eq('id', session.user.id);
 	const stocksOwned: OwnedStock[] = [
 		{
 			symbol: 'AAPL',
@@ -40,7 +52,7 @@ export const load = (async () => {
 	];
 
 	const profile: UserData = {
-		userName: 'GHEwing',
+		userName: session.user.user_metadata.name,
 		joinDate: new Date('2021-01-01'),
 		netWorth,
 		profileImage:
@@ -49,6 +61,7 @@ export const load = (async () => {
 		badges
 	};
 	return {
-		profile: profile as UserData | null
+		profile: profile as UserData | null,
+		session
 	};
 }) satisfies LayoutServerLoad;
