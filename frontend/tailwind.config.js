@@ -18,8 +18,7 @@ export default {
 				'dark-primary': '#31c4d8',
 				'dark-secondary': '#315054',
 				'dark-accent': '#00abc2',
-			},
-
+			}
 		}
 	},
 	variants: {
