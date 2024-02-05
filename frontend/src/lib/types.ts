@@ -16,10 +16,12 @@ export type Badge = {
 };
 
 export type UserData = {
-	userName: string;
-	joinDate: Date;
-	profileImage?: string;
-	netWorth: number;
+	joined_at: Date;
+	username: string;
+	balance: number;
+	networth: number;
+	userId: string;
+	image: string;
 	stocks: OwnedStock[];
 	badges: Badge[];
 };

@@ -26,26 +26,26 @@
 </script>
 
 <svelte:head>
-	<title>{profile.userName}'s Profile</title>
-	<meta name="description" content="{profile.userName}'s profile page" />
+	<title>{profile.username}'s Profile</title>
+	<meta name="description" content="{profile.username}'s profile page" />
 </svelte:head>
 
 {#if profile}
 	<header class="m-5 p-5 bg-white rounded-lg shadow-lg flex">
 		<div class="flex items-center space-x-5 w-full">
-			{#if profile.profileImage}
+			{#if profile.image}
 				<img
-					src={profile.profileImage}
-					alt="{profile.userName} Image"
+					src={profile.image}
+					alt="{profile.username} Image"
 					class="w-8 h-8 md:w-16 md:h-16 rounded-full bg-gray-300 border-violet-300 border-2"
 				/>
 			{:else}
 				<div class="w-8 h-8 md:w-16 md:h-16 rounded-full bg-gray-300 border-violet-300 border-2" />
 			{/if}
 			<div class="flex-grow">
-				<h1 class="text-xl md:text-3xl font-bold text-violet-700">{profile.userName}</h1>
+				<h1 class="text-xl md:text-3xl font-bold text-violet-700">{profile.username}</h1>
 				<p class="text-slate-500 mt-1 text-xs md:text-base">
-					Joined {formatDate(profile.joinDate)}
+					Joined {formatDate(profile.joined_at)}
 				</p>
 			</div>
 		</div>
@@ -54,9 +54,9 @@
 		<div class="flex justify-between">
 			<p class="text-sm md:text-lg font-bold text-slate-700 inline-block">
 				Current net worth:
-				<span class="font-bold text-green-500">{formatNumber(profile.netWorth)}</span>
+				<span class="font-bold text-green-500">{formatNumber(profile.networth)}</span>
 			</p>
-			<ShareProfile userName={profile.userName} />
+			<ShareProfile userName={profile.username} />
 		</div>
 		<div class="flex flex-col md:flex-row">
 			<div class="mt-5 w-full md:w-3/5">

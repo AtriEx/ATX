@@ -52,13 +52,15 @@ export const load = (async () => {
 	];
 
 	const profile: UserData = {
-		userName: session.user.user_metadata.name,
-		joinDate: new Date('2021-01-01'),
-		netWorth,
-		profileImage:
+		username: session.user.user_metadata.name,
+		joined_at: new Date('2021-01-01'),
+		networth: netWorth,
+		image:
 			'https://static-cdn.jtvnw.net/jtv_user_pictures/6c45032c-a049-46c7-bfc9-f9ac2fc8c47e-profile_image-70x70.png',
 		stocks: stocksOwned,
-		badges
+		badges,
+		balance: 10_000,
+		userId: session.user.id
 	};
 	return {
 		profile: profile as UserData | null,
