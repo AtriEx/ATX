@@ -40,6 +40,7 @@
 		"clsx": "^2.1.0",
 		"lucide-svelte": "^0.321.0",
 		"tailwind-merge": "^2.2.1",
-		"tailwind-variants": "^0.1.20"
+		"tailwind-variants": "^0.1.20",
+		"@supabase/supabase-js": "^2.39.3"
 	}
 }
