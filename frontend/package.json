@@ -34,5 +34,12 @@
 		"vite": "^5.0.3",
 		"vitest": "^1.2.0"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"bits-ui": "^0.16.0",
+		"clsx": "^2.1.0",
+		"lucide-svelte": "^0.321.0",
+		"tailwind-merge": "^2.2.1",
+		"tailwind-variants": "^0.1.20"
+	}
 }

@@ -3,11 +3,11 @@
 	import RewardButton from '$lib/components/RewardButton.svelte';
 	import ShareProfile from '$lib/components/ShareProfile.svelte';
 	import StockCard from '$lib/components/StockCard.svelte';
-	import type { PageData } from './$types';
+	import type { LayoutServerData } from './$types';
 	import * as Dialog from '$lib/components/ui/dialog';
 
-	export let data: PageData;
-	$: profile = data.userProfile;
+	export let data: LayoutServerData;
+	$: profile = data.profile;
 
 	function formatDate(date: Date) {
 		return date.toLocaleDateString('en-US', {
@@ -20,14 +20,11 @@
 	function formatNumber(num: number) {
 		return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
 	}
-
-	let modal = true;
-	$: () => console.log(modal);
 </script>
 
 <svelte:head>
-	<title>{profile.userName}'s Profile</title>
-	<meta name="description" content="{profile.userName}'s profile page" />
+	<title>Your Profile</title>
+	<meta name="description" content="Your profile page" />
 </svelte:head>
 
 {#if profile}
@@ -48,19 +45,22 @@
 					Joined {formatDate(profile.joinDate)}
 				</p>
 			</div>
+			<div class="flex-shrink-0">
+				<RewardButton />
+			</div>
 		</div>
 	</header>
 	<main class="m-5 p-5 bg-white rounded-lg shadow-lg">
 		<div class="flex justify-between">
-			<p class="text-sm md:text-lg font-bold text-slate-700 inline-block">
-				Current net worth:
+			<p class="text-sm md:text-lg font-bold text-black inline-block">
+				Your current net worth:
 				<span class="font-bold text-green-500">{formatNumber(profile.netWorth)}</span>
 			</p>
 			<ShareProfile userName={profile.userName} />
 		</div>
 		<div class="flex flex-col md:flex-row">
 			<div class="mt-5 w-full md:w-3/5">
-				<h2 class="text-lg md:text-2xl font-bold text-black">Stocks Owned</h2>
+				<h2 class="text-lg md:text-2xl font-bold text-black">Your Stocks</h2>
 				<div class="h-96 overflow-y-scroll">
 					{#each profile.stocks as stock}
 						<StockCard {...stock} />
