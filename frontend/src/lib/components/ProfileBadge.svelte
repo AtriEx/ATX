@@ -1,32 +1,39 @@
 <script lang="ts">
-	export let name: string;
-	export let dateObtained: Date;
-	export let iconImage: string | undefined = undefined;
+	import Badge from './ui/badge/badge.svelte';
+	import * as HoverCard from './ui/hover-card';
 
-	$: formattedDate = dateObtained.toLocaleDateString('en-US', {
-		year: 'numeric',
-		month: 'long',
-		day: 'numeric'
-	});
+	export let name: string;
+	export let image: string | null = null;
+	export let description: string | null = null;
 </script>
 
-<div
-	class="bg-white rounded-lg shadow-md p-2 sm:p-4 my-3 mx-auto flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 max-w-lg"
->
-	{#if iconImage}
-		<img
-			src={iconImage}
-			alt="{name} Icon"
-			class="w-8 h-8 rounded-full bg-gray-200 border-violet-500 border-2 p-2"
-		/>
-	{:else}
-		<div class="w-12 h-12 rounded-full bg-gray-200 border-violet-500 border-2 p-2" />
-	{/if}
-	<div class="flex flex-col items-start space-y-1 w-full">
-		<h1 class="text-xl font-semibold text-gray-800">{name}</h1>
-		<p class="text-sm text-gray-600">
-			Achieved on:
-			<span class="text-violet-600 font-medium">{formattedDate}</span>
-		</p>
-	</div>
-</div>
+<HoverCard.Root>
+	<HoverCard.Trigger>
+		<Badge class="first:pl-0">
+			<img
+				src={image}
+				alt="{name} Badge"
+				class="w-6 h-6 md:w-10 md:h-10 rounded-full bg-gray-200 dark:bg-gray-600 border-light-accent dark:border-dark-accent border-2 shadow"
+			/>
+		</Badge>
+	</HoverCard.Trigger>
+	<HoverCard.Content
+		class="p-6 bg-light-primary dark:bg-dark-background/80 rounded-lg shadow-lg w-full max-w-lg"
+	>
+		<div class="flex items-center space-x-4">
+			<img
+				src={image}
+				alt="{name} Badge"
+				class="w-10 h-10 md:w-16 md:h-16 rounded-full bg-gray-200 dark:bg-gray-600 border-light-accent dark:border-dark-accent border-2 shadow"
+			/>
+			<div class="flex-grow text-light-text dark:text-dark-text">
+				<h1 class="text-2xl md:text-3xl font-bold">
+					{name}
+				</h1>
+				<p class="text-md md:text-lg mt-2">
+					{description}
+				</p>
+			</div>
+		</div>
+	</HoverCard.Content>
+</HoverCard.Root>

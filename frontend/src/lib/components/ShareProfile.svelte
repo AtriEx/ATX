@@ -30,6 +30,6 @@
 </script>
 
 <button
-	class="bg-violet-500 hover:bg-violet-600 text-white px-3 py-1 rounded transition ease-in-out active:scale-95 active:shadow-inner active:bg-violet-700"
+	class="bg-light-secondary dark:bg-dark-secondary text-light-text dark:text-dark-text px-3 py-1 rounded transition ease-in-out active:scale-95 active:shadow-inner"
 	on:click={copyToClipboard}>{buttonText}</button
 >

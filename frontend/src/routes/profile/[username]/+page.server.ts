@@ -1,40 +1,39 @@
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import type { UserData } from '$lib/types';
 import { createClient } from '@supabase/supabase-js';
 import { PRIVATE_SUPABASE_SERVICE_ROLE_KEY } from '$env/static/private';
 import { PUBLIC_SUPABASE_URL } from '$env/static/public';
+import { type Database } from '$lib/supabase.types';
+import { error } from '@sveltejs/kit';
 
-// PersonalProfile represents the data of the currently logged in user
-// UserProfile represents the data of the user whose profile is being viewed
+const adminSupabase = createClient<Database>(
+	PUBLIC_SUPABASE_URL,
+	PRIVATE_SUPABASE_SERVICE_ROLE_KEY
+);
 
-const adminSupabase = createClient(PUBLIC_SUPABASE_URL, PRIVATE_SUPABASE_SERVICE_ROLE_KEY);
-
-export const load = (async ({ parent, params }) => {
-	//TODO - fetch user data from database
-	const data = await parent();
-	const username = params.username;
-	if (username === '') throw error(404, 'User not found');
-
+export const load = (async ({ params }) => {
+	// Check if the username is empty
+	if (!params.username || params.username === '') error(404, 'Profile not found');
 	const { data: profile } = await adminSupabase
 		.from('profiles')
-		.select('*')
-		.eq('username', username)
+		.select()
+		.eq('username', params.username)
 		.single();
-	console.log(profile);
 
-	const userData: UserData = {
-		...profile,
-		joined_at: new Date(),
-		badges: data.profile?.badges || [],
-		stocks: data.profile?.stocks || []
-	};
+	if (!profile) error(404, 'Profile not found');
 
-	console.log(userData);
-	if (!userData) throw error(404, 'User not found');
+	// Get the badges, achievements, and stocks
+	const { data: flags } = await adminSupabase.from('flags').select();
+	const { data: stocks } = await adminSupabase.from('stockInfo').select();
+
+	const badges = flags?.filter((flag) => flag.type === 'badge') || [];
+	const achievements = flags?.filter((flag) => flag.type === 'achievement') || [];
 
 	return {
-		personalProfile: data.profile,
-		userProfile: { ...userData, joined_at: new Date(), username } satisfies UserData
+		profile: {
+			...profile,
+			badges,
+			achievements,
+			stocks: stocks || []
+		}
 	};
 }) satisfies PageServerLoad;

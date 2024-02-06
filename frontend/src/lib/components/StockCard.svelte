@@ -1,40 +1,26 @@
 <script lang="ts">
-	export let symbol: string;
 	export let name: string;
-	export let price: number;
-	export let quantity: number;
-	export let change: number;
+	export let totalShares: number;
+	export let image: string | null = null;
 </script>
 
 <div
-	class="bg-white rounded-lg shadow-md p-4 sm:p-5 my-4 flex flex-col md:flex-row items-center space-y-4 md:space-y-0"
+	class="bg-light-background dark:bg-dark-background rounded-lg shadow-md p-4 sm:p-5 my-4 flex flex-col md:flex-row items-center space-y-4 md:space-y-0"
 >
 	<div class="flex flex-col items-start space-y-3 w-full">
 		<a
-			href="/{symbol}"
-			class="text-xl font-semibold text-sky-600 hover:text-sky-700 hover:underline transition ease-in-out duration-200 active:scale-95"
-			>{symbol}</a
+			href="/{name}"
+			class="text-xl font-semibold text-light-primary dark:text-dark-primary hover:underline transition ease-in-out duration-200 active:scale-95"
+			>{name}</a
 		>
-		<h3 class="text-lg font-medium text-gray-800">{name}</h3>
+		<img
+			src={image}
+			alt="{name} Icon"
+			class="w-12 h-12 rounded-full bg-gray-200 border-light-accent dark:border-dark-accent border-2 p-2"
+		/>
 		<div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-			<p class="text-md font-medium text-gray-800">
-				Price: <span class="text-green-600"
-					>${price.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span
-				>
-			</p>
-			<p class="text-md font-medium text-gray-800">
-				Shares: <span class="text-gray-600">{quantity}</span>
-			</p>
-			<p class="text-md font-medium text-gray-800 animate-pulse" class:animate-pulse={change !== 0}>
-				Change:
-				<span class:text-green-600={change > 0} class:text-red-600={change < 0}>
-					{change}
-					{#if change > 0}
-						▲
-					{:else if change < 0}
-						▼
-					{/if}
-				</span>
+			<p class="text-md font-medium text-light-text dark:text-dark-text">
+				Shares: <span class="text-light-text/80 dark:text-dark-text/80">{totalShares}</span>
 			</p>
 		</div>
 		<div class="flex items-center space-x-3">
