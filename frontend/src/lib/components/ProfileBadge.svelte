@@ -9,12 +9,8 @@
 
 <HoverCard.Root>
 	<HoverCard.Trigger>
-		<Badge class="first:pl-0">
-			<img
-				src={image}
-				alt="{name} Badge"
-				class="w-6 h-6 md:w-10 md:h-10 rounded-full bg-gray-200 dark:bg-gray-600 border-light-accent dark:border-dark-accent border-2 shadow"
-			/>
+		<Badge class="">
+			{name}
 		</Badge>
 	</HoverCard.Trigger>
 	<HoverCard.Content

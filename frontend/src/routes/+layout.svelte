@@ -1,5 +1,5 @@
 <script>
-    import "../app.css";
+	import '../app.css';
 </script>
 
 <svelte:head>
@@ -7,4 +7,6 @@
 	<meta name="description" content="Get addicted to selling stocks." />
 </svelte:head>
 
-<slot />
+<div class="absolute top-0 left-0 dark:bg-dark-background bg-light-background w-screen h-screen">
+	<slot />
+</div>

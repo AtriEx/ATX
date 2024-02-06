@@ -8,5 +8,5 @@ export function formatDate(date: string | Date) {
 }
 
 export function formatNumber(num: number) {
-	return num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+	return num.toLocaleString('en-US');
 }

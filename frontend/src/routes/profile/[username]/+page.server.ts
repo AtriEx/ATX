@@ -5,35 +5,79 @@ import { PUBLIC_SUPABASE_URL } from '$env/static/public';
 import { type Database } from '$lib/supabase.types';
 import { error } from '@sveltejs/kit';
 
+interface StockInfo {
+	name: string;
+	image: string;
+	description: string;
+	quantity: number;
+	price: number;
+}
+
+interface Portfolio {
+	stockId: string;
+	quantity: number;
+	stockInfo: StockInfo;
+}
+
+interface ProfileData {
+	networth: number;
+	balance: number;
+	username: string;
+	image: string;
+	joined_at: Date;
+	portfolio: Portfolio[];
+	flags: any[]; // Define this more precisely based on your actual flags structure
+}
+
+// Initialize the Supabase client
 const adminSupabase = createClient<Database>(
 	PUBLIC_SUPABASE_URL,
 	PRIVATE_SUPABASE_SERVICE_ROLE_KEY
 );
 
-export const load = (async ({ params }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	// Check if the username is empty
 	if (!params.username || params.username === '') error(404, 'Profile not found');
-	const { data: profile } = await adminSupabase
+
+	// Perform a combined query to fetch profile, portfolio, and flags
+	const { data, error: fetchError } = (await adminSupabase
 		.from('profiles')
-		.select()
+		.select(
+			`
+        networth,
+        balance,
+        username,
+        image,
+        joined_at,
+        portfolio(stockId, quantity, stockInfo:stockId(name, image, description, price)),
+        flags(id, name, image, description, type)
+    `
+		)
 		.eq('username', params.username)
-		.single();
+		.single()
+		.throwOnError()) as { data: ProfileData | null; error: any };
 
-	if (!profile) error(404, 'Profile not found');
+	console.log('data', data);
 
-	// Get the badges, achievements, and stocks
-	const { data: flags } = await adminSupabase.from('flags').select();
-	const { data: stocks } = await adminSupabase.from('stockInfo').select();
+	// Handle potential errors from the fetch operation
+	if (fetchError) error(404, 'Profile not found');
+	if (!data) error(404, 'Profile not found');
 
-	const badges = flags?.filter((flag) => flag.type === 'badge') || [];
-	const achievements = flags?.filter((flag) => flag.type === 'achievement') || [];
-
-	return {
-		profile: {
-			...profile,
-			badges,
-			achievements,
-			stocks: stocks || []
-		}
+	// Structure the data to include in the load response
+	const profile = {
+		...data,
+		badges: data.flags?.filter((flag) => flag.type === 'badge') || [],
+		achievements: data.flags?.filter((flag) => flag.type === 'achievement') || [],
+		stocks:
+			data.portfolio?.map((item) => ({
+				name: item.stockInfo.name,
+				image: item.stockInfo.image,
+				description: item.stockInfo.description,
+				price: item.stockInfo.price,
+				quantity: item.quantity
+			})) || []
 	};
-}) satisfies PageServerLoad;
+
+	// Return the structured profile data
+	return { profile };
+};
