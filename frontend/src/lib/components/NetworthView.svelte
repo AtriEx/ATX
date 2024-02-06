@@ -1,11 +1,10 @@
 <script lang="ts">
-	import Fa from "svelte-fa";
-    import {faSackDollar} from '@fortawesome/free-solid-svg-icons'
-
     import {netWorth} from '$lib/stores/userData.js';
 </script>
 
-<div class="flex flex-row text-green-500 items-center">
-    <span class="mr-2">{$netWorth}</span>
-    <Fa icon={faSackDollar}/>
-</div>
+<p class="block sm:px-2 text-light-text dark:text-dark-text font-medium select-none max-lg:text-sm">
+    Net-Worth: 
+    <span class="font-normal text-light-accent dark:text-dark-accent">
+        4812
+    </span>
+</p>
