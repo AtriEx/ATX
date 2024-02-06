@@ -5,9 +5,9 @@
     export let label : string;
     export let link : string;
 </script>
-  
+
 <a href={link}>
-    <div class="flex flex-col items-center text-zinc-300 bg-blue-900 hover:bg-blue-600 rounded p-1 pt-2 text-xl w-20">
+    <div class="flex flex-col items-center text-light-text dark:bg-dark-accent dark:hover:bg-dark-primary rounded p-1 pt-2 text-xl w-20">
         <Fa icon={faIcon} />
         <span class="text-xs">{label}</span>
     </div>
