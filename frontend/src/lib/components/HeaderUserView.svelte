@@ -9,7 +9,6 @@
     let isDropdownVisible : boolean = false;
 
     function toggleDropdown(e: Event) {
-        console.log(e);
         isDropdownVisible = !isDropdownVisible;
     }
 </script>
@@ -40,7 +39,7 @@
             <div class="hover:text-white bg-slate-900 hover:bg-slate-950 w-full p-2 rounded-b-lg cursor-pointer"><a  href="">Sign Out</a></div>
         </div>
     </div>
-    <div class="sm:hidden absolute top-16 right-0 px-4 py-5 border-t bg-blue-950 border-gray-800" transition:slide={{ delay: 0, duration: 300}}>
+    <div class="sm:hidden absolute top-16 right-0 px-4 py-5 border-t bg-blue-950 border-gray-800 rounded-b-lg" transition:slide={{ delay: 0, duration: 300}}>
         <div class="flex items-center">
             <img class="h-8 w-8 rounded-full border-2 border-gray-600 object-cover" src={$userPfp} alt="The user's twitch profile.">
             <span class="ml-3 font-semibold text-white">{$username}</span>
