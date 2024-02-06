@@ -1,9 +1,9 @@
-<<<<<<< HEAD
 <!--
     Usage notes:
         - Graph component will fill the container that it's put in, and update reactively if the size changes.
 -->
 <script lang="ts">
+    
     import { Line } from 'svelte-chartjs'
     import GraphOptionsBar from './GraphOptionsBar.svelte';
 
@@ -123,12 +123,3 @@
         border-radius: 10px;
     }
 </style>
-=======
-<script>
-
-</script>
-
-<div>
-    I'm a graph!
-</div>
->>>>>>> 9ba831b619eb5d1d8083ee874fcbca625cd9dd12
