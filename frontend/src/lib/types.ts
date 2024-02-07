@@ -25,3 +25,18 @@ export type UserData = {
 	stocks: OwnedStock[];
 	badges: Badge[];
 };
+
+export type Profile = {
+	username: string;
+	image: string;
+	joined_at: Date;
+	networth: number;
+	balance: number;
+};
+
+export type Flags = {
+	name: string;
+	image: string;
+	description: string;
+	type: string;
+};
