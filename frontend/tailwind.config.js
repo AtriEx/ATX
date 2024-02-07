@@ -22,6 +22,9 @@ export default {
 		}
 	},
 	variants: {
+		extends: {
+			display: ['dark']
+		},
 		backgroundColor: ['responsive', 'hover', 'focus', 'active']
 	},
 	plugins: []
