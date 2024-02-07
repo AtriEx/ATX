@@ -6,7 +6,7 @@
 	import { loginDialog, debugMenu } from '$lib/stores/uiStates';
 	import { onMount } from 'svelte';
 	import { supabase, onLogin, onLogout } from '$lib/supabase';
-	import { PUBLIC_ENVORONMENT } from '$env/static/public';
+	import { PUBLIC_ENVIRONMENT } from '$env/static/public';
 	import DebugMenu from '$lib/components/DebugMenu.svelte';
 
 	onMount(() => {
@@ -48,7 +48,7 @@
 	<DebugMenu />
 {/if}
 
-{#if PUBLIC_ENVORONMENT === 'development'}
+{#if PUBLIC_ENVIRONMENT === 'development'}
 	<div class="fixed bottom-0 right-0 p-2">
 		<button
 			class="bg-red-500 text-white p-2 rounded-md"
