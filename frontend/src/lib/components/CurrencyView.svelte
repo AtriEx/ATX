@@ -1,10 +1,10 @@
 <script lang="ts">
-	import Fa from 'svelte-fa';
-	import { faCoins } from '@fortawesome/free-solid-svg-icons';
-	import { profile } from '$lib/stores/userData.js';
+	import { currency } from '$lib/stores/userData';
 </script>
 
-<div class="flex flex-row text-yellow-300 items-center">
-	<span class="mr-2">{$profile?.balance}</span>
-	<Fa icon={faCoins} />
-</div>
+<p
+	class="block sm:px-2 mr-3 text-light-text dark:text-dark-text font-medium select-none max-lg:text-sm"
+>
+	AtriCoins:
+	<span class="font-normal text-light-accent dark:text-dark-accent"> 3012 </span>
+</p>

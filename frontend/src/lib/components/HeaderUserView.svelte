@@ -14,18 +14,24 @@
 	}
 </script>
 
-<div class="text-zinc-300 flex flex-row">
-	{#if $loggedIn}
-		<div class="flex flex-col mr-5">
+{#if $isLoggedIn}
+	<div class="sm:hidden {isDropdownVisible == true ? 'hidden' : 'block'}">
+		<NetworthView />
+	</div>
+{/if}
+
+<div class="flex flex-row justify-between items-center">
+	{#if $isLoggedIn}
+		<div class="flex flex-row items-center mr-5 max-sm:hidden">
 			<CurrencyView />
 			<NetworthView />
 		</div>
 		<button class="max-sm:hidden flex flex-row items-center" on:click={toggleDropdown}>
 			<!-- This is the anchor that can open the dropdown.-->
 			<div class="flex flex-row items-center space-x-2">
-				<span class="text-light-text dark:text-dark-text">{$profile?.username}</span>
+				<span class="text-light-text dark:text-dark-text">{$username}</span>
 				<img
-					src={$profile?.image}
+					src={$userPfp}
 					class="rounded-full border-solid border-2 border-light-secondary dark:border-dark-secondary object-fill h-10"
 					alt="The user's twitch profile."
 				/>
@@ -57,7 +63,7 @@
 				<div class="flex flex-col items-start">
 					<a
 						class="text-light-text hover:text-light-primary hover:bg-light-background dark:text-dark-text dark:hover:text-dark-primary dark:hover:bg-dark-background cursor-pointer w-full"
-						href="/profile/{$profile?.username}"><div class="m-2">Profile</div></a
+						href="/profile/{$username}"><div class="m-2">Profile</div></a
 					>
 					<a
 						class="text-light-text hover:text-light-primary hover:bg-light-background dark:text-dark-text dark:hover:text-dark-primary dark:hover:bg-dark-background cursor-pointer w-full"
@@ -66,27 +72,31 @@
 					<div
 						class="text-light-text hover:text-light-primary hover:bg-light-background dark:text-dark-text dark:hover:text-dark-primary dark:hover:bg-dark-background w-full p-2 rounded-b-lg cursor-pointer"
 					>
-						<button on:click={logout}>Sign Out</button>
+						<a href="">Sign Out</a>
 					</div>
 				</div>
 			</div>
 			<div
-				class="sm:hidden absolute top-16 right-0 px-4 py-5 bg-light-background dark:bg-dark-background dark:border-dark-secondary rounded-bl-lg border-0 dark:border-l-[1px] dark:border-b-[1px]"
+				class="sm:hidden absolute top-12 right-0 px-4 pb-4 bg-light-background dark:bg-dark-background dark:border-dark-secondary rounded-bl-lg border-0 dark:border-l-[1px] dark:border-b-[1px]"
 				transition:slide={{ delay: 0, duration: 300 }}
 			>
-				<div class="flex items-center">
+				<div class="flex items-center pt-2">
 					<img
 						class="h-8 w-8 rounded-full border-2 border-light-secondary dark:border-dark-secondary object-cover"
-						src={$profile?.image}
+						src={$userPfp}
 						alt="The user's twitch profile."
 					/>
-					<span class="ml-3 font-semibold text-light-text dark:text-dark-text"
-						>{$profile?.username}</span
-					>
+					<span class="ml-3 font-semibold text-light-text dark:text-dark-text">{$username}</span>
 				</div>
-				<div class="mt-4">
+				<div
+					class="flex flex-col mt-3 py-2 border-t border-light-secondary dark:border-dark-secondary"
+				>
+					<CurrencyView />
+					<NetworthView />
+				</div>
+				<div class="pt-2 border-t border-light-secondary dark:border-dark-secondary">
 					<a
-						href="/profile/{$profile?.username}"
+						href="/profile/{$username}"
 						class="block text-light-text hover:text-light-primary dark:text-dark-text dark:hover:text-dark-primary"
 						>Profile</a
 					>
