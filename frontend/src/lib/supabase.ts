@@ -89,5 +89,6 @@ export async function onLogout() {
 	if (!tempUser) {
 		loggedIn.set(false);
 		user.set(null);
+		profile.set(null);
 	}
 }
