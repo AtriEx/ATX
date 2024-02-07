@@ -36,22 +36,28 @@ export async function getUser() {
 	try {
 		const tempUser = await supabase.auth.getUser();
 		console.log('tempUser:', tempUser);
-		user.set(tempUser);
+		user.set(tempUser.data.user);
 		return tempUser;
 	} catch (error) {
 		console.error('Error getting user:', error);
 	}
 }
 
-export async function getProfile(userId: string) {
+export async function getProfile() {
 	try {
 		if (get(user) === null) {
 			return null;
 		}
-		const { data: tempProfile } = await supabase
+		console.log('getProfile', get(user));
+
+		const { data: tempProfile } = (await supabase
 			.from('profiles')
 			.select('username, image, joined_at, networth, balance')
-			.eq('userId', userId);
+			.eq('userId', get(user)?.id)
+			.single()
+			.throwOnError()) as { data: Profile };
+		console.log('tempProfile:', tempProfile);
+
 		profile.set(tempProfile);
 		return profile;
 	} catch (error) {
@@ -68,6 +74,8 @@ export async function onLogin() {
 	}
 	const user = await getUser();
 	if (user) {
+		console.log('user in onlogin:', user);
+		getProfile();
 		loggedIn.set(true);
 	}
 }

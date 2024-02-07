@@ -4,7 +4,8 @@
 	import CurrencyView from './CurrencyView.svelte';
 	import NetworthView from './NetworthView.svelte';
 
-	import { loggedIn, username, userPfp } from '$lib/stores/userData.js';
+	import { loggedIn, profile } from '$lib/stores/userData.js';
+	import { logout } from '$lib/supabase';
 
 	let isDropdownVisible: boolean = false;
 
@@ -22,9 +23,9 @@
 		<button class="max-sm:hidden flex flex-row items-center" on:click={toggleDropdown}>
 			<!-- This is the anchor that can open the dropdown.-->
 			<div class="flex flex-row items-center space-x-2">
-				<span class="text-light-text dark:text-dark-text">{$username}</span>
+				<span class="text-light-text dark:text-dark-text">{$profile?.username}</span>
 				<img
-					src={$userPfp}
+					src={$profile?.image}
 					class="rounded-full border-solid border-2 border-light-secondary dark:border-dark-secondary object-fill h-10"
 					alt="The user's twitch profile."
 				/>
@@ -56,7 +57,7 @@
 				<div class="flex flex-col items-start">
 					<a
 						class="text-light-text hover:text-light-primary hover:bg-light-background dark:text-dark-text dark:hover:text-dark-primary dark:hover:bg-dark-background cursor-pointer w-full"
-						href="/profile/{$username}"><div class="m-2">Profile</div></a
+						href="/profile/{$profile?.username}"><div class="m-2">Profile</div></a
 					>
 					<a
 						class="text-light-text hover:text-light-primary hover:bg-light-background dark:text-dark-text dark:hover:text-dark-primary dark:hover:bg-dark-background cursor-pointer w-full"
@@ -65,7 +66,7 @@
 					<div
 						class="text-light-text hover:text-light-primary hover:bg-light-background dark:text-dark-text dark:hover:text-dark-primary dark:hover:bg-dark-background w-full p-2 rounded-b-lg cursor-pointer"
 					>
-						<a href="">Sign Out</a>
+						<button on:click={logout}>Sign Out</button>
 					</div>
 				</div>
 			</div>
@@ -76,14 +77,16 @@
 				<div class="flex items-center">
 					<img
 						class="h-8 w-8 rounded-full border-2 border-light-secondary dark:border-dark-secondary object-cover"
-						src={$userPfp}
+						src={$profile?.image}
 						alt="The user's twitch profile."
 					/>
-					<span class="ml-3 font-semibold text-light-text dark:text-dark-text">{$username}</span>
+					<span class="ml-3 font-semibold text-light-text dark:text-dark-text"
+						>{$profile?.username}</span
+					>
 				</div>
 				<div class="mt-4">
 					<a
-						href="/profile/{$username}"
+						href="/profile/{$profile?.username}"
 						class="block text-light-text hover:text-light-primary dark:text-dark-text dark:hover:text-dark-primary"
 						>Profile</a
 					>

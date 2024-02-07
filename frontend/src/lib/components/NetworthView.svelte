@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Fa from "svelte-fa";
-    import {faSackDollar} from '@fortawesome/free-solid-svg-icons'
+	import Fa from 'svelte-fa';
+	import { faSackDollar } from '@fortawesome/free-solid-svg-icons';
 
-    import {netWorth} from '$lib/stores/userData.js';
+	import { profile } from '$lib/stores/userData.js';
 </script>
 
 <div class="flex flex-row text-green-500 items-center">
-    <span class="mr-2">{$netWorth}</span>
-    <Fa icon={faSackDollar}/>
+	<span class="mr-2">{$profile?.networth}</span>
+	<Fa icon={faSackDollar} />
 </div>
