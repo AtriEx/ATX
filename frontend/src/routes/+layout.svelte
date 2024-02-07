@@ -1,5 +1,7 @@
-<script>
+<script lang="ts">
 	import '../app.css';
+	import Header from '$lib/components/Header.svelte';
+	import MobileNavigationBar from '$lib/components/MobileNavigationBar.svelte';
 </script>
 
 <svelte:head>
@@ -7,6 +9,8 @@
 	<meta name="description" content="Get addicted to selling stocks." />
 </svelte:head>
 
-<div class="absolute top-0 left-0 dark:bg-dark-background bg-light-background w-screen h-screen">
+<div class="w-full">
+	<Header />
 	<slot />
+	<MobileNavigationBar />
 </div>
