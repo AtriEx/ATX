@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { slide } from 'svelte/transition';
-
+	import { faTwitch } from '@fortawesome/free-brands-svg-icons';
+	import Fa from 'svelte-fa';
 	import CurrencyView from './CurrencyView.svelte';
 	import NetworthView from './NetworthView.svelte';
 
@@ -125,10 +126,11 @@
 		<!-- This is where the dropdown goes, that has more settings. -->
 	{:else}
 		<button
-			class="bg-violet-900 rounded p-2 border-violet-600 border-4"
+			class="bg-twitch text-dark-text rounded p-2 flex-row flex items-center"
 			on:click={() => ($loginDialog = true)}
 		>
-			Login via Twitch
+			<Fa icon={faTwitch} class="mr-2" />
+			<span>Login via Twitch</span>
 		</button>
 	{/if}
 </div>
