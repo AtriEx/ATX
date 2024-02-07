@@ -40,7 +40,7 @@ export async function logout() {
 export async function getUser() {
 	try {
 		const { data: userData } = await supabase.auth.getUser();
-		console.log('Current user:', userData);
+		console.log('Current user:', userData.user);
 		user.set(userData.user);
 		return userData;
 	} catch (error) {
