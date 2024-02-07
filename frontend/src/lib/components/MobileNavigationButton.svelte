@@ -2,7 +2,6 @@
     import Fa from 'svelte-fa'
     
     export let faIcon : any;
-    export let label : string;
     export let link : string;
 </script>
 
