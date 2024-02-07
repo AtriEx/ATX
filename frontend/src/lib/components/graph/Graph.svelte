@@ -1,9 +1,17 @@
 <!--
     Usage notes:
         - Graph component will fill the container that it's put in, and update reactively if the size changes.
+
+    TODO:
+    - Implement 'Last Updated' label.
+    - Implement 'Time Scale' feature.
+        - Pretty easy now. All I have to do is read the date/timestamp of the last bit of data, and create ticks accordingly.
+        - Need to keep in mind that it wont be 1 axis label per data point, like it is by default.
+    - Implement live data updating.
+    - Use the 'DataLabels' plugin to track the live price of the stock, like shown here: https://stackoverflow.com/questions/63702504/charts-js-display-data-label-only-for-the-last-value
 -->
 <script lang="ts">
-    
+
     import { Line } from 'svelte-chartjs'
     import GraphOptionsBar from './GraphOptionsBar.svelte';
 
@@ -30,7 +38,7 @@
   );
 
     let data = {
-        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September'],
         datasets: [
         {
             data: [65.52, 59.51, 80.80, 51.91, 56.1, 55, 31.99, 55.52, 72],
@@ -85,7 +93,7 @@
     }
 </script>
   
-<div class="w-full">
+<div>
     <Line {data} options={{ responsive: true, maintainAspectRatio: false, 
         scales:{
             x:{
@@ -95,9 +103,7 @@
                 grid: {
                     color: 'silver',
                     tickColor: 'silver'
-                },
-                min: 2,
-                max:11
+                }
             },
             y:{
                 border:{
@@ -107,8 +113,9 @@
                     color: 'silver',
                     tickColor: 'silver'
                 },
-                min: 0,
-                max: 100,
+                position: 'right',
+                /*min: 0,
+                max: 100,*/
             }
         }}} />
     
@@ -117,6 +124,9 @@
 
 <style>
     div {
+        display: flex;
+        flex-direction: column;
+        width:100%;
         height:100%;
         background-color: white;
         padding:10px;

@@ -11,8 +11,8 @@
 
 <style>
     div {
-        width:300px;
-        height:200px;
+        width:600px;
+        height:400px;
     }
     :global(body) {
         background-color: rgba(100,100,100,1);

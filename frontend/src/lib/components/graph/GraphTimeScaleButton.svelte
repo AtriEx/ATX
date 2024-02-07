@@ -18,8 +18,11 @@
 
 <style>
     button {
-        background-color: white;
+        background-color: rgb(233, 247, 255);
+        border-radius: 2px;
         border:none;
+        margin:0px 10px;
+        cursor: pointer;
     }
 
     button:hover {
