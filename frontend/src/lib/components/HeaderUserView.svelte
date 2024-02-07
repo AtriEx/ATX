@@ -4,7 +4,7 @@
     import CurrencyView from "./CurrencyView.svelte";
 	import NetworthView from "./NetworthView.svelte";
 
-    import { isLoggedIn, username, userPfp} from '$lib/stores/userData.js';
+    import { isLoggedIn, username, userPfp} from '$lib/stores/userData';
 
     let isDropdownVisible : boolean = false;
 

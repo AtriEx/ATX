@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {netWorth} from '$lib/stores/userData.js';
+    import {netWorth} from '$lib/stores/userData';
 </script>
 
 <p class="block sm:px-2 text-light-text dark:text-dark-text font-medium select-none max-lg:text-sm">

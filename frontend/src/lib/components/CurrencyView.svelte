@@ -1,5 +1,5 @@
 <script lang="ts">
-    import {currency} from '$lib/stores/userData.js';
+    import {currency} from '$lib/stores/userData';
 </script>
 
 <p class="block sm:px-2 mr-3 text-light-text dark:text-dark-text font-medium select-none max-lg:text-sm">
