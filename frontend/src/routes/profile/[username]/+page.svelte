@@ -15,7 +15,10 @@
 
 <svelte:head>
 	<title>{profile.username}'s Profile</title>
-	<meta name="description" content="{profile.username}'s profile page" />
+	<meta
+		name="description"
+		content="{profile.username}'s profile page \n Networth: {profile.networth} \n Balance: {profile.balance}"
+	/>
 </svelte:head>
 
 <div class="dark:bg-dark-background bg-light-background flex-1">
@@ -71,7 +74,9 @@
 			</h2>
 			<div class="h-80 md:h-96 overflow-y-auto transparent-scrollbar mt-3 rounded p-2">
 				{#if profile?.stocks.length === 0}
-					<p class="text-center text-light-text dark:text-dark-text">No stocks owned</p>
+					<p class="text-center text-light-text dark:text-dark-text mt-24 font-bold text-lg">
+						{profile?.username} doesn't own any stocks yet (poor)
+					</p>
 				{:else}
 					{#each profile?.stocks as stock}
 						<StockCard {stock} />
