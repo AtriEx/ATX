@@ -12,7 +12,7 @@ const adminSupabase = createClient<Database>(
 
 export type Query = {
 	query?: string;
-	orderBy?: 'id' | 'name' | 'description' | 'image' | 'price' | 'totalShares';
+	orderBy?: 'name' | 'description' | 'image' | 'price' | 'totalShares';
 	order?: 'asc' | 'desc';
 };
 
@@ -21,7 +21,7 @@ export const load = (async ({ url }) => {
 	const orderBy = (url.searchParams.get('orderBy') as Query['orderBy']) || 'name';
 	const order = (url.searchParams.get('order') as Query['order']) || 'asc';
 
-	let builder = adminSupabase.from('stockInfo').select('id, name, image, price, totalShares');
+	let builder = adminSupabase.from('stockInfo').select('name, image, price, totalShares');
 
 	if (query) builder = builder.ilike('name', `*${query}*`);
 	builder = builder.order(orderBy, { ascending: order === 'asc' });

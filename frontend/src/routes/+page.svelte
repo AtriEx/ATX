@@ -4,6 +4,7 @@
 	import StockTableHeader from '$lib/components/StockTableHeader.svelte';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
+	import StockTableRow from '$lib/components/StockTableRow.svelte';
 
 	export let data: PageData;
 
@@ -50,26 +51,7 @@
 			</thead>
 			<tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
 				{#each data.stockInfo as stock}
-					<tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-						<td class="px-6 py-4 whitespace-nowrap">
-							<div class="flex items-center">
-								<div class="flex-shrink-0 h-10 w-10">
-									<img class="h-10 w-10 rounded-full" src={stock.image} alt={stock.name} />
-								</div>
-							</div>
-						</td>
-						<td
-							class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white"
-						>
-							{stock.name}
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-							{stock.price} coin(s)
-						</td>
-						<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-							{stock.totalShares}
-						</td>
-					</tr>
+					<StockTableRow {stock} />
 				{/each}
 			</tbody>
 		</table>

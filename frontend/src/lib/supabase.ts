@@ -3,7 +3,10 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { loggedIn, user, profile } from './stores/userData';
 import { loginDialog } from './stores/uiStates';
 import { get } from 'svelte/store';
-import type { Profile } from './types';
+import type { Database } from './supabase.types';
+
+export type Row<T extends keyof Database['public']['Tables']> =
+	Database['public']['Tables'][T]['Row'];
 
 // Initialize Supabase client
 export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
