@@ -19,7 +19,7 @@
 			if (!value) queryParams.delete('query');
 			else queryParams.set('query', value);
 			if (browser) goto('?' + queryParams.toString(), { replaceState: true });
-		}, 750);
+		}, 500);
 	}
 
 	const headers = ['name', 'price', 'totalShares'] as const;
@@ -42,9 +42,7 @@
 				<tr>
 					<th
 						class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-					>
-						Image
-					</th>
+					/>
 					{#each headers as header}
 						<StockTableHeader {order} orderBy={header} />
 					{/each}
