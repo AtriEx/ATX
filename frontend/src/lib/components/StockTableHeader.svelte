@@ -23,7 +23,8 @@
 
 <th
 	scope="col"
-	class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase cursor-pointer"
+	class="px-6 py-3 text-left text-xs text-gray-500 dark:text-gray-300 uppercase cursor-pointer hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+	class:underline={orderBy === $page.url.searchParams.get('orderBy')}
 	on:click={changeOrder}
 >
 	{#if orderBy === 'totalShares'}
