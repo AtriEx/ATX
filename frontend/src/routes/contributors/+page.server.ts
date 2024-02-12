@@ -26,8 +26,6 @@ export const load = async() => {
         `
         ))
 
-    console.log('data: ', data);
-
     // Handle potential errors from the fetch operation
     if (fetchError) error(404, 'Unable to retrieve contributors');
     if (!data) error(404, 'Unable to retrieve contributors');
