@@ -1,5 +1,5 @@
 Install FastAPI and Uvicorn using:
-python -m pip install fastapi uvicorn[standard]
+pip install -r requirements.txt
 
 To run the server, use the line:
 uvicorn main:app --reload
