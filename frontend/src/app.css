@@ -2,22 +2,60 @@
 @tailwind components;
 @tailwind utilities;
 
-/* custom scrollbar */
+/* Firefox Light Theme Scrollbar */
+@supports (-moz-appearance: none) {
+	:root {
+		scrollbar-color: #3de8ff #fbfbfe;
+		scrollbar-width: thin;
+	}
+}
+
+/* Firefox Dark Theme Scrollbar */
+@media (prefers-color-scheme: dark) {
+	@supports (-moz-appearance: none) {
+		:root {
+			scrollbar-color: #00abc2 #010104;
+			scrollbar-width: thin;
+		}
+	}
+}
+
+/* Chromium Light Theme Scrollbar */
 ::-webkit-scrollbar {
-	width: 20px;
+	width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-	background: transparent;
+	background: #fbfbfe;
+	border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: #d6dee1;
-	border-radius: 20px;
-	border: 6px solid transparent;
-	background-clip: content-box;
+	background: #3de8ff;
+	border-radius: 5px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-	background-color: #a8bbbf;
+	background: #27bace;
+}
+
+/* Chromium Dark Theme Scrollbar */
+@media (prefers-color-scheme: dark) {
+	::-webkit-scrollbar {
+		width: 10px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: #010104;
+		border-radius: 5px;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background: #00abc2;
+		border-radius: 5px;
+	}
+
+	::-webkit-scrollbar-thumb:hover {
+		background: #31c4d8;
+	}
 }
