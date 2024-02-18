@@ -24,18 +24,18 @@ def fetchUserData(
 
     Args:
         user_id (str): The ID of the user
-        portfolio_or_profiles (str): Specifies the table to fetch from.
+        portfolioOrProfiles (str): Specifies the table to fetch from.
             Must be 'portfolio' or 'profiles'.
 
     Raises:
-        ValueError: If portfolio_or_profiles is not 'porfolio' or 'profiles'.
+        ValueError: If portfolioOrProfiles is not 'porfolio' or 'profiles'.
 
     Returns: dictionary of the values
     """
 
     if portfolioOrProfiles not in ["portfolio", "profiles"]:
         raise ValueError(
-            "portfolio_or_profiles must be either 'portfolio' or 'profiles'."
+            "portfolioOrProfiles must be either 'portfolio' or 'profiles'."
         )
 
     return (
