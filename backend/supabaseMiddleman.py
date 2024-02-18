@@ -16,8 +16,8 @@ SUPABASE: Client = create_client(URL, KEY)
 #     pass
 
 
-def fetch_user_data(
-    user_id: str, portfolio_or_profiles: Literal["portfolio", "profiles"]
+def fetchUserData(
+    userId: str, portfolioOrProfiles: Literal["portfolio", "profiles"]
 ) -> dict:
     """
     Fetches user data from either Portfolio or profiles table using userId
@@ -33,15 +33,15 @@ def fetch_user_data(
     Returns: dictionary of the values
     """
 
-    if portfolio_or_profiles not in ["portfolio", "profiles"]:
+    if portfolioOrProfiles not in ["portfolio", "profiles"]:
         raise ValueError(
             "portfolio_or_profiles must be either 'portfolio' or 'profiles'."
         )
 
     return (
-        SUPABASE.table(f"{portfolio_or_profiles}")
+        SUPABASE.table(f"{portfolioOrProfiles}")
         .select("*")
-        .eq("userId", user_id)
+        .eq("userId", userId)
         .execute()
         .data
     )

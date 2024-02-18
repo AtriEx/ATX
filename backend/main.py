@@ -5,7 +5,7 @@ from fastapi import FastAPI
 
 # pylint: disable=no-name-in-module
 from supabase import Client, create_client
-from backend import supabase_middleman
+from backend import supabaseMiddleman
 
 APP = FastAPI()
 
@@ -18,26 +18,26 @@ SUPABASE: Client = create_client(URL, KEY)
 
 # @app.get('quick_buy')
 @APP.get("/")
-async def quick_buy():
+async def quickBuy():
     """
     Assuming someone has chosen to 'quick buy' a stock of quantity 1
     """
 
-    buyer_id = "572a902e-de7a-4739-adfe-f4af32a3f18b"
+    buyerId = "572a902e-de7a-4739-adfe-f4af32a3f18b"
     # Return state by looking for the one with the biggest ID
-    is_open = (
+    isOpen = (
         SUPABASE.table("market_State")
         .select("state")
         .order("id", desc=True)
         .limit(1)
         .execute()
     )
-    if not is_open:
+    if not isOpen:
         # If the market is closed
         return "The market is closed"
 
     # If the market is open
-    active_buy_sell_entry = (
+    activeBuySellEntry = (
         SUPABASE.table("active_buy_sell")
         .select("*")
         .eq("buy_or_sell", "TRUE")
@@ -46,26 +46,26 @@ async def quick_buy():
         .data
     )
 
-    if not active_buy_sell_entry:
+    if not activeBuySellEntry:
         return "There is nothing in the active_buy_sell"
 
     # return active_buy_sell_entry
 
-    seller_id = active_buy_sell_entry[0]["userId"]
-    active_buy_sell_entry[0].pop("id")
+    sellerId = activeBuySellEntry[0]["userId"]
+    activeBuySellEntry[0].pop("id")
 
     # FIXME: unused
     # buyer_profile = supabaseMiddleman.fetch_user_data(buyer_id, "profiles")
     print("BuyerProfile Got")
-    seller_profile = supabase_middleman.fetch_user_data(seller_id, "profiles")
+    sellerProfile = supabaseMiddleman.fetchUserData(sellerId, "profiles")
     print("SellerProfile Got")
-    buyer_portfolio = supabase_middleman.fetch_user_data(buyer_id, "portfolio")
+    buyerPortfolio = supabaseMiddleman.fetchUserData(buyerId, "portfolio")
     print("BuyerPortfolio Got")
     # FIXME: unused
     # sellerPortfolio = supabaseMiddleman.fetch_user_data(seller_id,"portfolio")
     # print("SellerPortfolio Got")
 
-    SUPABASE.table("inactive_buy_sell").insert(active_buy_sell_entry).execute()
+    SUPABASE.table("inactive_buy_sell").insert(activeBuySellEntry).execute()
     # Need to create a second entry from the buyers perspective
 
     print("Entry succesfully inserted")
@@ -81,15 +81,15 @@ async def quick_buy():
     #     "balance": buyer_profile[0]["balance"] - active_buy_sell_entry[0]["price"]
     # }
 
-    add_to_balance = {
-        "balance": seller_profile[0]["balance"] + active_buy_sell_entry[0]["price"]
+    addToBalance = {
+        "balance": sellerProfile[0]["balance"] + activeBuySellEntry[0]["price"]
     }
     # for stock in buyerPortfolio:
     #     if stock['stockID'] ==
 
     print("Checking if the user already has the stock")
     # return buyerPortfolio[0]
-    if buyer_portfolio[0]["stockId"] == active_buy_sell_entry[0]["stockId"]:
+    if buyerPortfolio[0]["stockId"] == activeBuySellEntry[0]["stockId"]:
         print("User does have the stock")
         # FIXME: unused
         # add_to_portfolio = {
@@ -99,16 +99,16 @@ async def quick_buy():
         print("User did  have the stock, added more quantity to their portfolio")
 
     else:
-        new_stock_insert = {
+        newStockInsert = {
             "stockID": 123,
-            "userId": buyer_id,
+            "userId": buyerId,
             "quantity": 1,
-            "price": active_buy_sell_entry[0]["price"],
+            "price": activeBuySellEntry[0]["price"],
         }
-        SUPABASE.table("portfolio").insert(new_stock_insert).execute()
+        SUPABASE.table("portfolio").insert(newStockInsert).execute()
         print("User did not have the stock, added a new entry to their portfolio")
 
-    SUPABASE.table("profiles").update(add_to_balance).eq("userId", buyer_id).execute()
+    SUPABASE.table("profiles").update(addToBalance).eq("userId", buyerId).execute()
 
     return "User has succesfully bought the stock"
 
