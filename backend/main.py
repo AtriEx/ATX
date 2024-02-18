@@ -10,44 +10,66 @@ app = FastAPI()
 load_dotenv()
 
 url = "https://wxskoymvdulyscwhebze.supabase.co"
-key = os.getenv('SUPABASE_KEY')
+key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
-# Assuming someone has chosen to 'quick buy' a stock of quantity 1
+
 # @app.get('quick_buy')
 
 
-@app.get('/')
+@app.get("/")
 async def quickBuy():
     # Return state by looking for the one with the biggest ID
-    isOpen = supabase.table('market_State').select('state').order('id', desc=True).limit(1).execute()
+    isOpen = (
+        supabase.table("market_State")
+        .select("state")
+        .order("id", desc=True)
+        .limit(1)
+        .execute()
+    )
     if isOpen:
-        buyInfo = {"buyerId": "572a902e-de7a-4739-adfe-f4af32a3f18b",
-                   "buy_or_sell": True,
-                   "stockId": 2,
-                   "price": 15,
-                   "quantity": 1,
-                   "time_posted": datetime.now().isoformat(),
-                   "expirey": (datetime.now() + timedelta(hours=1)).isoformat()  # This is a test value; users will input an expiry date
-                   }
+        buyInfo = {
+            "buyerId": "572a902e-de7a-4739-adfe-f4af32a3f18b",
+            "buy_or_sell": True,
+            "stockId": 2,
+            "price": 15,
+            "quantity": 1,
+            "time_posted": datetime.now().isoformat(),
+            "expirey": (
+                datetime.now() + timedelta(hours=1)
+            ).isoformat(),  # This is a test value; users will input an expiry date
+        }
         # If the market is open, get all active sells for the stock <= buy_price, ordered by price
-        validSells = supabase.table('active_buy_sell').select("*").match({'buy_or_sell': False, 'stockId': buyInfo["stockId"]}).lte('price', buyInfo["price"]).order('price').execute().data
+        validSells = (
+            supabase.table("active_buy_sell")
+            .select("*")
+            .match({"buy_or_sell": False, "stockId": buyInfo["stockId"]})
+            .lte("price", buyInfo["price"])
+            .order("price")
+            .execute()
+            .data
+        )
         if validSells:
             cheapestSale = validSells[-1]
             saleId = cheapestSale["id"]
-            sellInfo = {"sellerId": cheapestSale["userId"],
-                        "buy_or_sell": False,
-                        "stockId": cheapestSale["stockId"],
-                        "price": cheapestSale["price"],
-                        "quantity": 1,
-                        "time_posted": cheapestSale["time_posted"],
-                        "expirey": cheapestSale["expirey"]
-                        }
+            sellInfo = {
+                "sellerId": cheapestSale["userId"],
+                "buy_or_sell": False,
+                "stockId": cheapestSale["stockId"],
+                "price": cheapestSale["price"],
+                "quantity": 1,
+                "time_posted": cheapestSale["time_posted"],
+                "expirey": cheapestSale["expirey"],
+            }
             # Get Buyer and Seller user info and their holdings of the stock being traded
             buyerProfile = supabaseMiddleman.fetchProfile(buyInfo["buyerId"])
-            buyerPortfolio = supabaseMiddleman.fetchPortfolio(buyInfo["buyerId"], buyInfo["stockId"])
+            buyerPortfolio = supabaseMiddleman.fetchPortfolio(
+                buyInfo["buyerId"], buyInfo["stockId"]
+            )
             sellerProfile = supabaseMiddleman.fetchProfile(sellInfo["sellerId"])
-            sellerPortfolio = supabaseMiddleman.fetchPortfolio(sellInfo["sellerId"], sellInfo["stockId"])
+            sellerPortfolio = supabaseMiddleman.fetchPortfolio(
+                sellInfo["sellerId"], sellInfo["stockId"]
+            )
             print("Transaction profiles and portfolios fetched")
 
             # Exchange the stock by altering balances and stock holdings of buyer & seller (disabled for testing)
@@ -67,6 +89,7 @@ async def quickBuy():
     else:
         # If the market is closed
         return "The market is closed"
+
 
 # my_list = [datetime.now(), False, 20, None, 1, 1, '36d22a68-ca25-4110-b769-44cf5b4a1c89']
 
