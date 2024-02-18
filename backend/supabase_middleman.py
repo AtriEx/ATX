@@ -11,36 +11,36 @@ def fetch_entries():
 
 
 def fetch_user_data(
-    userID: str, portfolioOrProfiles: Literal["portfolio", "profiles"]
+    user_id: str, portfolio_or_profiles: Literal["portfolio", "profiles"]
 ) -> dict:
     """
     Fetches user data from either Portfolio or profiles table using userId
 
     Args:
-        userID (str): The ID of the user
-        portfolioOrProfiles (str): Specifies the table to fetch from. Must be 'portfolio' or 'profiles'.
+        user_id (str): The ID of the user
+        portfolio_or_profiles (str): Specifies the table to fetch from. Must be 'portfolio' or 'profiles'.
 
     Raises:
-        ValueError: If portfolioOrProfiles is not 'Porfolio' or 'profiles'.
+        ValueError: If portfolio_or_profiles is not 'porfolio' or 'profiles'.
 
     Returns: dictionary of the values
     """
 
-    if portfolioOrProfiles not in ["Portfolio", "profiles"]:
+    if portfolio_or_profiles not in ["portfolio", "profiles"]:
         raise ValueError(
-            "portfolioOrProfiles must be either 'Portfolio' or 'profiles'."
+            "portfolio_or_profiles must be either 'portfolio' or 'profiles'."
         )
 
     return (
-        supabase.table(f"{portfolioOrProfiles}")
+        supabase.table(f"{portfolio_or_profiles}")
         .select("*")
-        .eq("userId", userID)
+        .eq("userId", user_id)
         .execute()
         .data
     )
 
 
-def insert_stock_in_portfolio(portfolioSupabase, quantity, userID):
+def insert_stock_in_portfolio(portfolio_supabase, quantity, user_id):
     pass
 
 

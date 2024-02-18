@@ -51,10 +51,10 @@ async def quick_buy():
     print("BuyerProfile Got")
     seller_profile = supabase_middleman.fetch_user_data(seller_id, "profiles")
     print("SellerProfile Got")
-    buyer_portfolio = supabase_middleman.fetch_user_data(buyer_id, "Portfolio")
+    buyer_portfolio = supabase_middleman.fetch_user_data(buyer_id, "portfolio")
     print("BuyerPortfolio Got")
     # FIXME: unused
-    # sellerPortfolio = supabaseMiddleman.fetch_user_data(seller_id,"Portfolio")
+    # sellerPortfolio = supabaseMiddleman.fetch_user_data(seller_id,"portfolio")
     # print("SellerPortfolio Got")
 
     supabase.table("inactive_buy_sell").insert(active_buy_sell_entry).execute()
