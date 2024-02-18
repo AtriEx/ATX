@@ -5,6 +5,7 @@ from datetime import datetime
 
 from dotenv import load_dotenv
 
+# supabase being a repo-level folder confuses pylint
 # pylint: disable=no-name-in-module
 from supabase import Client, create_client
 

@@ -5,10 +5,11 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from fastapi import FastAPI
 
+# supabase being a repo-level folder confuses pylint
 # pylint: disable=no-name-in-module
 from supabase import Client, create_client
 
-from backend import supabaseMiddleman
+import supabaseMiddleman
 
 APP = FastAPI()
 load_dotenv()
