@@ -5,11 +5,11 @@ pip install -r requirements.txt
 
 **Run the server using:**
 ```bash
-uvicorn main:app --reload
+uvicorn main:APP --reload
 ```
 **If the line above doesn't work, try using:**
 ```bash
-python -m uvicorn main:app --reload
+python -m uvicorn main:APP --reload
 ```
 
 > [!NOTE]
