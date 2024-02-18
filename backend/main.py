@@ -10,16 +10,16 @@ from supabase import Client, create_client
 
 from backend import supabaseMiddleman
 
-app = FastAPI()
+APP = FastAPI()
 load_dotenv()
 
-url = "https://wxskoymvdulyscwhebze.supabase.co"
-key = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+URL = "https://wxskoymvdulyscwhebze.supabase.co"
+KEY = os.getenv("SUPABASE_KEY")
+SUPABASE: Client = create_client(URL, KEY)
 
 
 # @app.get('quick_buy')
-@app.get("/")
+@APP.get("/")
 async def quickBuy():
     """
     This endpoint places a buy order for exactly one share of a stock
@@ -27,7 +27,7 @@ async def quickBuy():
     """
     # Return state by looking for the one with the biggest ID
     isOpen = (
-        supabase.table("market_State")
+        SUPABASE.table("market_State")
         .select("state")
         .order("id", desc=True)
         .limit(1)
@@ -50,7 +50,7 @@ async def quickBuy():
 
     # If the market is open, get all active sells for the stock <= buy_price, ordered by price
     validSells = (
-        supabase.table("active_buy_sell")
+        SUPABASE.table("active_buy_sell")
         .select("*")
         .match({"buy_or_sell": False, "stockId": buyInfo["stockId"]})
         .lte("price", buyInfo["price"])

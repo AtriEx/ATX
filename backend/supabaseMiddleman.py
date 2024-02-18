@@ -10,9 +10,9 @@ from supabase import Client, create_client
 
 load_dotenv()
 
-url = "https://wxskoymvdulyscwhebze.supabase.co"
-key = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+URL = "https://wxskoymvdulyscwhebze.supabase.co"
+KEY = os.getenv("SUPABASE_KEY")
+SUPABASE: Client = create_client(URL, KEY)
 
 
 # def fetch_entries():
@@ -29,7 +29,7 @@ def fetchProfile(userID: str) -> dict:
     Returns: profile dictionary
     """
 
-    return supabase.table("profiles").select("*").eq("userId", userID).execute().data[0]
+    return SUPABASE.table("profiles").select("*").eq("userId", userID).execute().data[0]
 
 
 def fetchPortfolio(userID: str, stockID: int) -> dict:
@@ -43,7 +43,7 @@ def fetchPortfolio(userID: str, stockID: int) -> dict:
     Returns: Dictionary describing a user's holding of a stock
     """
     portfolios = (
-        supabase.table("Portfolio")
+        SUPABASE.table("Portfolio")
         .select("*")
         .match({"userId": userID, "stockId": stockID})
         .execute()
@@ -53,14 +53,14 @@ def fetchPortfolio(userID: str, stockID: int) -> dict:
         return portfolios[0]
 
     stock = (
-        supabase.table("stock_price")
+        SUPABASE.table("stock_price")
         .select("stock_price")
         .eq("stockId", stockID)
         .execute()
         .data
     )
     portfolio = (
-        supabase.table("Portfolio")
+        SUPABASE.table("Portfolio")
         .select("Portfolio_ID")
         .eq("userId", userID)
         .order("Portfolio_ID", desc=True)
@@ -106,14 +106,14 @@ def exchangeStock(
     Returns: None
     """
     buyerPortfolio["quantity"] += 1
-    supabase.table("Portfolio").upsert(buyerPortfolio)
-    supabase.table("profiles").update(
+    SUPABASE.table("Portfolio").upsert(buyerPortfolio)
+    SUPABASE.table("profiles").update(
         {"balance": buyerProfile["balance"] - stockPrice}
     ).eq("userId", buyerProfile["userId"])
 
     sellerPortfolio["quantity"] -= 1
-    supabase.table("Portfolio").upsert(sellerPortfolio)
-    supabase.table("profiles").update(
+    SUPABASE.table("Portfolio").upsert(sellerPortfolio)
+    SUPABASE.table("profiles").update(
         {"balance": sellerProfile["balance"] + stockPrice}
     ).eq("userId", sellerProfile["userId"])
 
@@ -129,7 +129,7 @@ def logTransaction(buyInfo: dict, sellInfo: dict) -> None:
     Returns: None
     """
     latestRow = (
-        supabase.table("inactive_buy_sell")
+        SUPABASE.table("inactive_buy_sell")
         .select("id")
         .order("id", desc=True)
         .limit(1)
@@ -139,7 +139,7 @@ def logTransaction(buyInfo: dict, sellInfo: dict) -> None:
     latestId = latestRow[0]["id"]
 
     latestId += 1
-    supabase.table("inactive_buy_sell").insert(
+    SUPABASE.table("inactive_buy_sell").insert(
         {
             "id": latestId,
             "delisted_time": datetime.now().isoformat(),
@@ -155,7 +155,7 @@ def logTransaction(buyInfo: dict, sellInfo: dict) -> None:
     ).execute()
 
     latestId += 1
-    supabase.table("inactive_buy_sell").insert(
+    SUPABASE.table("inactive_buy_sell").insert(
         {
             "id": latestId,
             "delisted_time": datetime.now().isoformat(),
@@ -181,7 +181,7 @@ def logUnfulfilledBuy(buyInfo: dict) -> None:
     Returns: None
     """
     latestRow = (
-        supabase.table("active_buy_sell")
+        SUPABASE.table("active_buy_sell")
         .select("id")
         .order("id", desc=True)
         .limit(1)
@@ -191,7 +191,7 @@ def logUnfulfilledBuy(buyInfo: dict) -> None:
     latestId = latestRow[0]["id"]
 
     latestId += 1
-    supabase.table("active_buy_sell").insert(
+    SUPABASE.table("active_buy_sell").insert(
         {
             "id": latestId,
             "time_posted": buyInfo["time_posted"],
