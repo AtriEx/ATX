@@ -3,11 +3,14 @@ from datetime import datetime, timedelta
 from fastapi import FastAPI
 from supabase import create_client, Client
 import supabaseMiddleman
+from dotenv import load_dotenv
+import os
 
 app = FastAPI()
+load_dotenv()
 
 url = "https://wxskoymvdulyscwhebze.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4c2tveW12ZHVseXNjd2hlYnplIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNjY2NTAzMywiZXhwIjoyMDIyMjQxMDMzfQ.HaBk3QEcnHJaJ284RmHK49fMXmEPzTJHDvzwoQ-eRt0"
+key = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(url, key)
 
 # Assuming someone has chosen to 'quick buy' a stock of quantity 1
