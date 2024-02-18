@@ -1,24 +1,32 @@
+"""Main API file for the backend."""
+
 # from routers import items, users
-from backend import supabase_middleman
 from fastapi import FastAPI
 
+# pylint: disable=no-name-in-module
 from supabase import Client, create_client
+from backend import supabase_middleman
 
-app = FastAPI()
+APP = FastAPI()
 
-url = "https://wxskoymvdulyscwhebze.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4c2tveW12ZHVseXNjd2hlYnplIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNjY2NTAzMywiZXhwIjoyMDIyMjQxMDMzfQ.HaBk3QEcnHJaJ284RmHK49fMXmEPzTJHDvzwoQ-eRt0"
-supabase: Client = create_client(url, key)
+URL = "https://wxskoymvdulyscwhebze.supabase.co"
+# TODO: put in config?
+# pylint: disable=line-too-long
+KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4c2tveW12ZHVseXNjd2hlYnplIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNjY2NTAzMywiZXhwIjoyMDIyMjQxMDMzfQ.HaBk3QEcnHJaJ284RmHK49fMXmEPzTJHDvzwoQ-eRt0"
+SUPABASE: Client = create_client(URL, KEY)
 
 
-# Assuming someone has chosen to 'quick buy' a stock of quantity 1
 # @app.get('quick_buy')
-@app.get("/")
+@APP.get("/")
 async def quick_buy():
+    """
+    Assuming someone has chosen to 'quick buy' a stock of quantity 1
+    """
+
     buyer_id = "572a902e-de7a-4739-adfe-f4af32a3f18b"
     # Return state by looking for the one with the biggest ID
     is_open = (
-        supabase.table("market_State")
+        SUPABASE.table("market_State")
         .select("state")
         .order("id", desc=True)
         .limit(1)
@@ -30,7 +38,7 @@ async def quick_buy():
 
     # If the market is open
     active_buy_sell_entry = (
-        supabase.table("active_buy_sell")
+        SUPABASE.table("active_buy_sell")
         .select("*")
         .eq("buy_or_sell", "TRUE")
         .order("price", desc=True)
@@ -57,13 +65,15 @@ async def quick_buy():
     # sellerPortfolio = supabaseMiddleman.fetch_user_data(seller_id,"portfolio")
     # print("SellerPortfolio Got")
 
-    supabase.table("inactive_buy_sell").insert(active_buy_sell_entry).execute()
+    SUPABASE.table("inactive_buy_sell").insert(active_buy_sell_entry).execute()
     # Need to create a second entry from the buyers perspective
 
     print("Entry succesfully inserted")
 
     # Disabled for testing purposes
-    # supabase.table('active_buy_sell').delete().match({'id':active_buy_sell_entry[0]['id']}).execute()
+    # supabase.table("active_buy_sell").delete().match(
+    #     {"id": active_buy_sell_entry[0]["id"]}
+    # ).execute()
     print("Entry succesfully deleted")
 
     # FIXME: unused
@@ -95,15 +105,18 @@ async def quick_buy():
             "quantity": 1,
             "price": active_buy_sell_entry[0]["price"],
         }
-        supabase.table("portfolio").insert(new_stock_insert).execute()
+        SUPABASE.table("portfolio").insert(new_stock_insert).execute()
         print("User did not have the stock, added a new entry to their portfolio")
 
-    supabase.table("profiles").update(add_to_balance).eq("userId", buyer_id).execute()
+    SUPABASE.table("profiles").update(add_to_balance).eq("userId", buyer_id).execute()
 
     return "User has succesfully bought the stock"
 
-    #     if insertInactive.error:
-    #         raise HTTPException(status_code = 400, detail= f"Error inserting into inactive_buy_sell: {insertInactive}")
+    # if insertInactive.error:
+    #     raise HTTPException(
+    #         status_code=400,
+    #         detail=f"Error inserting into inactive_buy_sell: {insertInactive}",
+    #     )
 
 
 # my_list = [datetime.now(), False, 20, None, 1, 1, '36d22a68-ca25-4110-b769-44cf5b4a1c89']
