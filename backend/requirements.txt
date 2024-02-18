@@ -1,4 +1,2 @@
 fastapi
 uvicorn[standard]
-
-make sure you use camelCase
