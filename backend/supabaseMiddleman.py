@@ -1,11 +1,17 @@
 """This module implements commonly-used supabase operations as functions."""
 
-from typing import Literal
+import os
 from datetime import datetime
-from supabase import create_client, Client
+
+from dotenv import load_dotenv
+
+# pylint: disable=no-name-in-module
+from supabase import Client, create_client
+
+load_dotenv()
 
 url = "https://wxskoymvdulyscwhebze.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4c2tveW12ZHVseXNjd2hlYnplIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNjY2NTAzMywiZXhwIjoyMDIyMjQxMDMzfQ.HaBk3QEcnHJaJ284RmHK49fMXmEPzTJHDvzwoQ-eRt0"
+key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 
@@ -45,37 +51,39 @@ def fetchPortfolio(userID: str, stockID: int) -> dict:
     )
     if portfolios:
         return portfolios[0]
-    else:
-        stock = (
-            supabase.table("stock_price")
-            .select("stock_price")
-            .eq("stockId", stockID)
-            .execute()
-            .data
-        )
-        portfolio = (
-            supabase.table("Portfolio")
-            .select("Portfolio_ID")
-            .eq("userId", userID)
-            .order("Portfolio_ID", desc=True)
-            .limit(1)
-            .execute()
-            .data
-        )
-        if not stock:
-            stock = [{"stock_price": 0}]
-        if not portfolio:
-            portfolio = [{"Portfolio_ID": 0}]
 
-        stock = stock[0]
-        portfolio = portfolio[0]
-        return {
-            "stockId": stockID,
-            "quantity": 0,
-            "userId": userID,
-            "Price": stock["stock_price"],
-            "Portfolio_ID": portfolio["Portfolio_ID"] + 1,
-        }
+    stock = (
+        supabase.table("stock_price")
+        .select("stock_price")
+        .eq("stockId", stockID)
+        .execute()
+        .data
+    )
+    portfolio = (
+        supabase.table("Portfolio")
+        .select("Portfolio_ID")
+        .eq("userId", userID)
+        .order("Portfolio_ID", desc=True)
+        .limit(1)
+        .execute()
+        .data
+    )
+
+    if not stock:
+        stock = [{"stock_price": 0}]
+    if not portfolio:
+        portfolio = [{"Portfolio_ID": 0}]
+
+    stock = stock[0]
+    portfolio = portfolio[0]
+
+    return {
+        "stockId": stockID,
+        "quantity": 0,
+        "userId": userID,
+        "Price": stock["stock_price"],
+        "Portfolio_ID": portfolio["Portfolio_ID"] + 1,
+    }
 
 
 def exchangeStock(
@@ -197,5 +205,5 @@ def logUnfulfilledBuy(buyInfo: dict) -> None:
     ).execute()
 
 
-def update_entry():
+def updateEntry():
     pass
