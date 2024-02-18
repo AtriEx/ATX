@@ -23,7 +23,7 @@ def fetchUserData(
     Fetches user data from either Portfolio or profiles table using userId
 
     Args:
-        user_id (str): The ID of the user
+        userId (str): The ID of the user
         portfolioOrProfiles (str): Specifies the table to fetch from.
             Must be 'portfolio' or 'profiles'.
 
