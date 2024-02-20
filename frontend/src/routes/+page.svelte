@@ -1,59 +1,31 @@
 <script lang="ts">
+	import StockSearch from './../lib/components/StockSearch.svelte';
 	import type { PageData } from './$types';
-	import { page } from '$app/stores';
-	import StockTableHeader from '$lib/components/StockTableHeader.svelte';
-	import { goto } from '$app/navigation';
-	import { browser } from '$app/environment';
-	import StockTableRow from '$lib/components/StockTableRow.svelte';
+	import StockTable from '$lib/components/StockTable.svelte';
 
 	export let data: PageData;
-
-	$: order = ($page.url.searchParams.get('order') || 'asc') as 'asc' | 'desc';
-
-	let timer: NodeJS.Timeout;
-	let value = $page.url.searchParams.get('query');
-
-	$: {
-		clearTimeout(timer);
-		timer = setTimeout(() => {
-			const queryParams = new URLSearchParams($page.url.searchParams);
-			if (!value) queryParams.delete('query');
-			else queryParams.set('query', value);
-			if (browser) goto('?' + queryParams.toString(), { replaceState: true });
-		}, 500);
-	}
-
-	const headers = ['name', 'price', 'totalShares'] as const;
 </script>
 
 <main class="bg-white dark:bg-gray-900 p-4 md:p-8">
 	<h1 class="text-3xl md:text-4xl font-bold text-center text-gray-900 dark:text-gray-100 mb-6">
 		Markets
 	</h1>
-	<input
-		type="text"
-		class="w-full p-3 mb-4 rounded-lg border border-gray-300 dark:border-gray-700 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-		bind:value
-		autofocus
-		placeholder="Search by name"
-	/>
+	<StockSearch />
 	<div class="overflow-x-auto rounded-lg">
-		<table class="w-full min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-			<thead class="bg-gray-100 dark:bg-gray-700">
-				<tr>
-					<th
-						class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
-					/>
-					{#each headers as header}
-						<StockTableHeader {order} orderBy={header} />
-					{/each}
-				</tr>
-			</thead>
-			<tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-				{#each data.stockInfo as stock}
-					<StockTableRow {stock} />
-				{/each}
-			</tbody>
-		</table>
+		<StockTable stockInfo={data.stockInfo} />
+	</div>
+	<div class="md:flex justify-evenly p-2 pt-5">
+		<div class="md:mr-4 md:w-1/2">
+			<h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+				Hottest Stocks
+			</h2>
+			<StockTable stockInfo={data.hottest} />
+		</div>
+		<div class="md:mr-4 md:w-1/2">
+			<h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+				Biggest Losers
+			</h2>
+			<StockTable stockInfo={data.losers} />
+		</div>
 	</div>
 </main>

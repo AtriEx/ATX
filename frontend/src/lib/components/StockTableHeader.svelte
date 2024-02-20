@@ -8,7 +8,7 @@
 
 	type Query = {
 		query?: string;
-		orderBy?: 'id' | 'name' | 'description' | 'image' | 'price' | 'totalShares';
+		orderBy?: 'id' | 'name' | 'description' | 'image' | 'price' | 'total_shares';
 		order?: 'asc' | 'desc';
 	};
 
@@ -27,7 +27,7 @@
 	class:underline={orderBy === $page.url.searchParams.get('orderBy')}
 	on:click={changeOrder}
 >
-	{#if orderBy === 'totalShares'}
+	{#if orderBy === 'total_shares'}
 		Total Shares
 	{:else}
 		{orderBy}

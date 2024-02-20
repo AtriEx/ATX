@@ -1,7 +1,8 @@
 <script lang="ts">
 	import type { Row } from '$lib/supabase';
+	import type { PageData } from '../../routes/$types';
 
-	type Stock = Omit<Row<'stockInfo'>, 'description' | 'id'>;
+	type Stock = PageData['stockInfo'][number];
 
 	export let stock: Stock;
 </script>
@@ -20,9 +21,9 @@
 		</a>
 	</td>
 	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-		{stock.price} coin(s)
+		{stock.stock_price?.stock_price || 0} coin(s)
 	</td>
 	<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-		{stock.totalShares}
+		{stock.total_shares}
 	</td>
 </tr>
