@@ -1,14 +1,26 @@
+import os
+from dotenv import load_dotenv
 from typing import Literal
 from datetime import datetime
 from supabase import create_client, Client
 
-url = "https://wxskoymvdulyscwhebze.supabase.co"
-key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Ind4c2tveW12ZHVseXNjd2hlYnplIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwNjY2NTAzMywiZXhwIjoyMDIyMjQxMDMzfQ.HaBk3QEcnHJaJ284RmHK49fMXmEPzTJHDvzwoQ-eRt0"
+load_dotenv("env/.env")
+url = os.getenv("PUBLIC_SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 
 def fetch_entries():
     pass
+
+def isMarketOpen() -> bool:
+    """
+    Checks if the market is open
+
+    Returns: True if the market is open, False otherwise
+    """
+    isOpen = supabase.table("market_State").select("state").order("id", desc=True).limit(1).execute().data
+    return isOpen
 
 
 def fetchProfile(userID: str) -> dict:
