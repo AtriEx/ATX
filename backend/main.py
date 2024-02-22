@@ -9,8 +9,8 @@ import os
 app = FastAPI()
 load_dotenv()
 
-url = "https://wxskoymvdulyscwhebze.supabase.co"
-key = os.getenv('SUPABASE_KEY')
+url = os.getenv("PUBLIC_SUPABASE_URL")
+key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 # Assuming someone has chosen to 'quick buy' a stock of quantity 1
