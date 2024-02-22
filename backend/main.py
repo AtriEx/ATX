@@ -9,18 +9,33 @@ import os
 app = FastAPI()
 load_dotenv()
 
-url = "https://wxskoymvdulyscwhebze.supabase.co"
+url = os.getenv('PUBLIC_SUPABASE_URL')
 key = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(url, key)
 
 # Assuming someone has chosen to 'quick buy' a stock of quantity 1
 # @app.get('quick_buy')
 
+@app.get('/testEntry')
+async def testEntry():
+    # Insert a test entry into the active_buy_sell table
+    testEntry = {"userId": "572a902e-de7a-4739-adfe-f4af32a3f18b",
+                 "buy_or_sell": True,
+                 "stockId": 2,
+                 "price": 15,
+                 "quantity": 1,
+                 "time_posted": datetime.now().isoformat(),
+                 "expirey": (datetime.now() + timedelta(hours=1)).isoformat()  # This is a test value; users will input an expiry date
+                 }
+    supabase.table('active_buy_sell').insert(testEntry).execute()
+    return "Test entry inserted"
+
 
 @app.get('/')
 async def quickBuy():
     # Return state by looking for the one with the biggest ID
-    isOpen = supabase.table('market_State').select('state').order('id', desc=True).limit(1).execute()
+    #isOpen = supabaseMiddleman.isMarketOpen()
+    isOpen = supabase.table("market_State").select("state").order("id", desc=True).limit(1).execute()
     if isOpen:
         buyInfo = {"buyerId": "572a902e-de7a-4739-adfe-f4af32a3f18b",
                    "buy_or_sell": True,
