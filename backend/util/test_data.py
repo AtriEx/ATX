@@ -12,7 +12,7 @@ def test_entry_1() -> dict:
         "userId": "d8a7ae82-1704-41bf-96a3-9347a5c022c8",
         "buy_or_sell": True,
         "stockId": 2,
-        "price": 33,
+        "price": 15,
         "quantity": 1,
         "time_posted": datetime.now().isoformat(),
         "expirey": (
