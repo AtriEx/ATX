@@ -1,24 +1,24 @@
-import os
-from fastapi import FastAPI
-from supabase import create_client, Client
-from dotenv import load_dotenv
-from datetime import datetime, timedelta
-from util.ext import test_data
+"""Helper functions to create test orders"""
+
 from database import supabase_middleman
-
-app=FastAPI()
-load_dotenv()
+from util import test_data
 
 
-#
 def create_buy_order():
-    # Insert a test entry into the active_buy_sell table
+    """
+    Inserst a test buy entry into active_buy_sell table.
+
+    Returns: None
+    """
     test_entry = test_data.test_entry_1()
-    supabase_middleman.insert_entry('active_buy_sell', test_entry)
-    return 
+    supabase_middleman.insert_entry("active_buy_sell", test_entry)
+
 
 def create_sell_order():
-    # Insert a test entry into the active_buy_sell table
+    """
+    Inserts a test sell entry into active_buy_sell table.
+
+    Returns: None
+    """
     test_entry = test_data.test_entry_2()
-    supabase_middleman.insert_entry('active_buy_sell', test_entry)
-    return
+    supabase_middleman.insert_entry("active_buy_sell", test_entry)
