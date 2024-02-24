@@ -23,16 +23,14 @@ def buy_order():
     if not is_open:
         # If the market is closed
         return "The market is closed"
-
     # These are test values
     # We will have a function that returns this data using API call parameters
     buy_info = test_data.test_entry_1()
-
     # If the market is open, get all active sells for the stock <= buy_price
     # Active sells are ordered by price and time_posted (descending)
     valid_sells = (
         supabase.table("active_buy_sell")
-        .select("userId", "time_posted", "price", "stockId", "quantity", "expirey")
+        .select("*")
         .match({"buy_or_sell": False, "stockId": buy_info["stockId"]})
         .lte("price", buy_info["price"])
         .order("price")
@@ -71,6 +69,8 @@ def buy_order():
         supabase_middleman.resolve_price_diff(buy_info["userId"], buy_diff)
         supabase_middleman.resolve_price_diff(sell_info["userId"], sell_diff)
 
+    # Deletes sell order used in the active_buy_sell table
+    supabase_middleman.delete_processed_order(sell_info["Id"])
     # Logs transaction in the inactive_buy_sell table
     supabase_middleman.log_transaction(buy_info, sell_info)
-    return "Conducted and logged transaction"
+    return "Conducted and logged transaction; deleted active order"
