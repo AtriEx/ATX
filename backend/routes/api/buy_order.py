@@ -3,8 +3,8 @@ from fastapi import FastAPI
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from APIFiles import testData
-from APIFiles import supabaseMiddleman
+from util.ext import test_data
+from database.supabase.store import supabase_middleman
 
 
 app=FastAPI()
@@ -15,11 +15,11 @@ key = os.getenv('SUPABASE_KEY')
 supabase: Client = create_client(url, key)
 
 
-async def buyMethod():
+def buy_order():
     # Return state by looking for the one with the biggest ID
-    isOpen = supabaseMiddleman.isMarketOpen()
-    if isOpen:
-        buyInfo = {"userId": "572a902e-de7a-4739-adfe-f4af32a3f18b",
+    is_open = supabase_middleman.is_market_open()
+    if is_open:
+        buy_info = {"userId": "572a902e-de7a-4739-adfe-f4af32a3f18b",
                    "buy_or_sell": True,
                    "stockId": 2,
                    "price": 15,
@@ -28,38 +28,37 @@ async def buyMethod():
                    "expirey": (datetime.now() + timedelta(hours=1)).isoformat()  # This is a test value; users will input an expiry date
                    }
         # If the market is open, get all active sells for the stock <= buy_price, ordered by price
-        print("pre call 1")
 
-        validSells = supabase.table('active_buy_sell').select("*").match({'buy_or_sell': False, 'stockId': buyInfo["stockId"]}).lte('price', buyInfo["price"]).order('price').execute().data
-        if validSells:
-            cheapestSale = validSells[0]
-            saleId = cheapestSale["Id"]
-            sellInfo = {"userId": cheapestSale["userId"],
+        valid_sells = supabase.table('active_buy_sell').select("*").match({'buy_or_sell': False, 'stockId': buy_info["stockId"]}).lte('price', buy_info["price"]).order('price').execute().data
+        if valid_sells:
+            cheapest_sale = valid_sells[0]
+            saleId = cheapest_sale["Id"]
+            sell_info = {"userId": cheapest_sale["userId"],
                         "buy_or_sell": False,
-                        "stockId": cheapestSale["stockId"],
-                        "price": cheapestSale["price"],
+                        "stockId": cheapest_sale["stockId"],
+                        "price": cheapest_sale["price"],
                         "quantity": 1,
-                        "time_posted": cheapestSale["time_posted"],
-                        "expirey": cheapestSale["expirey"]
+                        "time_posted": cheapest_sale["time_posted"],
+                        "expirey": cheapest_sale["expirey"]
                         }
             # Get Buyer and Seller user info and their holdings of the stock being traded
-            buyerProfile = supabaseMiddleman.fetchProfile(buyInfo["userId"])
-            buyerPortfolio = supabaseMiddleman.fetchPortfolio(buyInfo["userId"], buyInfo["stockId"])
-            sellerProfile = supabaseMiddleman.fetchProfile(sellInfo["userId"])
-            sellerPortfolio = supabaseMiddleman.fetchPortfolio(sellInfo["userId"], sellInfo["stockId"])
+            buyer_profile = supabase_middleman.fetch_profile(buy_info["userId"])
+            buyer_portfolio = supabase_middleman.fetch_portfolio(buy_info["userId"], buy_info["stockId"])
+            seller_profile = supabase_middleman.fetch_profile(sell_info["userId"])
+            seller_portfolio = supabase_middleman.fetch_portfolio(sell_info["userId"], sell_info["stockId"])
             return "Transaction profiles and portfolios fetched"
 
             # Exchange the stock by altering balances and stock holdings of buyer & seller (disabled for testing)
-            # supabaseMiddleman.exchangeStock(buyerProfile, buyerPortfolio, sellerProfile, sellerPortfolio, sell_price)
+            # supabaseMiddleman.exchange_stock(buyer_profile, buyer_portfolio, seller_profile, seller_portfolio, sell_price)
 
             # Log the transactions by inserting them into the inactive_buy_sell table
-            # supabaseMiddleman.logTransaction(buyInfo, sellInfo)
+            # supabaseMiddleman.log_transaction(buy_info, sell_info)
 
             # Delete active sell order that was just fufilled (disabled for testing)
             # supabase.table("active_buy_sell").delete().eq("id",saleId)
         else:
             # Insert the buy order into active_buy_sell if it can't be fufilled
-            # supabaseMiddleman.logUnfulfilledBuy(buyInfo)
+            # supabaseMiddleman.log_unfulfilled_buy(buy_info)
             return "No valid sale for this transaction"
         #     if insertInactive.error:
         #         raise HTTPException(status_code = 400, detail= f"Error inserting into inactive_buy_sell: {insertInactive}")
