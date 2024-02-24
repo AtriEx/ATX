@@ -119,41 +119,9 @@ def fetch_portfolio(user_id: str, stock_id: int) -> dict:
         "portfolio_ID": portfolio["portfolio_ID"] + 1,
     }
 
-
 # unreviewed
-def exchange_stock(
-    buyer_profile: dict,
-    buyer_portfolio: dict,
-    seller_profile: dict,
-    seller_portfolio: dict,
-    stock_price: float,
-) -> None:
-    """
-    Updates buyer and seller profiles & portfolios when a stock is transacted
-
-    Args:
-        buyer_profile (dict): The buyer's profile data, includes balance and net worth
-        buyer_portfolio (dict): Data related to the buyer's holdings of a certain stock
-        seller_profile (dict): The seller's profile data, includes balance and net worth
-        seller_portfolio (dict): Data related to the seller's holdings of a certain stock
-        stock_price (float): The curent sell price of the transacted stock
-
-    Returns: None
-    """
-    buyer_portfolio["quantity"] += 1
-    supabase.table("portfolio").upsert(buyer_portfolio)
-    supabase.table("profiles").update(
-        {"balance": buyer_profile["balance"] - stock_price}
-    ).eq("userId", buyer_profile["userId"])
-
-    seller_portfolio["quantity"] -= 1
-    supabase.table("portfolio").upsert(seller_portfolio)
-    supabase.table("profiles").update(
-        {"balance": seller_profile["balance"] + stock_price}
-    ).eq("userId", seller_profile["userId"])
 
 
-# unreviewed
 def log_transaction(buy_info: dict, sell_info: dict) -> None:
     """
     Logs buy and sell tansaction info in the inactive_buy_sell
@@ -164,85 +132,138 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
 
     Returns: None
     """
-    latest_row = (
-        supabase.table("inactive_buy_sell")
-        .select("id")
-        .order("id", desc=True)
-        .limit(1)
-        .execute()
-        .data
-    )
-    latest_id = latest_row[0]["id"]
-
-    latest_id += 1
-    supabase.table("inactive_buy_sell").insert(
-        {
-            "id": latest_id,
-            "delisted_time": datetime.now().isoformat(),
-            "userId": buy_info["buyerId"],
-            "buy_or_sell": buy_info["buy_or_sell"],
-            "time_posted": buy_info["time_posted"],
-            "price": buy_info["price"],
-            "expirey": buy_info["expirey"],
-            "quantity": buy_info["quantity"],
-            "completed": True,
-            "stockId": buy_info["stockId"],
-        }
-    ).execute()
-
-    latest_id += 1
-    supabase.table("inactive_buy_sell").insert(
-        {
-            "id": latest_id,
-            "delisted_time": datetime.now().isoformat(),
-            "userId": sell_info["sellerId"],
-            "buy_or_sell": sell_info["buy_or_sell"],
-            "time_posted": sell_info["time_posted"],
-            "price": sell_info["price"],
-            "expirey": sell_info["expirey"],
-            "quantity": sell_info["quantity"],
-            "completed": True,
-            "stockId": sell_info["stockId"],
-        }
-    ).execute()
+    supabase.table("inactive_buy_sell").insert(buy_info).execute()
+    supabase.table("inactive_buy_sell").insert(sell_info).execute()
 
 
 # unreviewed
-def log_unfulfilled_buy(buy_info: dict) -> None:
+def log_unfulfilled_buy(order_info: dict) -> None:
     """
-    Logs info of a buy order if it cannot be fulfilled
+    Logs info of a order if it cannot be fulfilled
 
     Args:
-        buy_info (dict): Data related to the buy side of a transaction
+        order_info (dict): Data related to the buy side of a transaction
 
     Returns: None
     """
-    latest_row = (
-        supabase.table("active_buy_sell")
-        .select("id")
-        .order("id", desc=True)
-        .limit(1)
-        .execute()
-        .data
-    )
-    latest_id = latest_row[0]["id"]
-
-    latest_id += 1
-    supabase.table("active_buy_sell").insert(
-        {
-            "id": latest_id,
-            "time_posted": buy_info["time_posted"],
-            "buy_or_sell": buy_info["buy_or_sell"],
-            "price": buy_info["price"],
-            "expirey": buy_info["expirey"],
-            "qunatity": buy_info["qunatity"],
-            "stockId": buy_info["stockId"],
-            "userId": buy_info["userId"],
-        }
-    ).execute()
+    supabase.table("active_buy_sell").insert(order_info).execute()
 
 
 def update_entry():
     """
     Updates an entry in a table
     """
+
+
+def fetch_stock_price(stock_id: int) -> int:
+    """
+    Gets the current stock price of the given stock_id
+
+    Args:
+        stock_id (int): The id of the stock you want to get the price of
+
+    Returns: The price of the stock 
+    """
+
+    stock_price = (supabase.table("stock_price")
+                   .select("stock_price")
+                   .eq("stockId", stock_id)
+                   .execute()
+                   .data
+                   .pop()
+                   )
+    return stock_price["stock_price"]
+
+
+def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
+    """
+    Sells a user's stock at the order_price
+    (Assumes the user has a portfolio of that stock)
+
+    Args:
+        user_id (str): The user on the sell side of a stock transaction
+        stock_id(int): The ID of the stock being sold
+        order_price(int): Price closest to current stock price presented by the buyer or seller
+
+    Returns: None
+    """
+
+    seller_stock = (supabase.table("portfolio")
+                    .select("quantity")
+                    .match({"userId": user_id, "stockId": stock_id})
+                    .execute()
+                    .data
+                    .pop()
+                    )
+    seller_profile = (supabase.table("profiles")
+                      .select("balance")
+                      .eq("userId", user_id)
+                      .execute()
+                      .data
+                      .pop()
+                      )
+
+    seller_quantity = seller_stock["quantity"]
+    seller_balance = seller_profile["balance"]
+
+    supabase.table("portfolio").update({"quantity": seller_quantity - 1}).match({"userId": user_id, "stockId": stock_id})
+    supabase.table("profiles").update({"balance": seller_balance + order_price}).eq("userId", user_id)
+
+
+def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
+    """
+    Buys a stock for the user_id stock at the order_price
+    (Assumes the user has a portfolio of that stock)
+
+    Args:
+        user_id (str): The user on the buy side of a stock transaction
+        stock_id(int): The ID of the stock being bought
+        order_price(int): Price closest to current stock price presented by the buyer or seller
+
+    Returns: None
+    """
+
+    buyer_stock = (supabase.table("portfolio")
+                   .select("quantity")
+                   .match({"userId": user_id, "stockId": stock_id})
+                   .execute()
+                   .data
+                   .pop()
+                   )
+
+    buyer_profile = (supabase.table("profiles")
+                     .select("balance")
+                     .eq("userId", user_id)
+                     .execute()
+                     .data
+                     .pop()
+                     )
+
+    buyer_quantity = buyer_stock["quantity"]
+    buyer_balance = buyer_profile["balance"]
+
+    supabase.table("portfolio").update({"quantity": buyer_quantity + 1}).match({"userId": user_id, "stockId": stock_id})
+    supabase.table("profiles").update({"balance": buyer_balance - order_price}).eq("userId", user_id)
+
+
+def resolve_price_diff(user_id: str, price_diff: int) -> None:
+    """
+    Handles difference in desired prices between the buyer and seller
+
+    Args:
+        user_id: The user who's balance will be handled
+        price_diff: The amount to be refunded/ rewarded back to the user
+
+    Returns: None
+    """
+
+    user_profile = (supabase.table("profiles")
+                    .select("balance")
+                    .eq("userId", user_id)
+                    .execute()
+                    .data
+                    .pop()
+                    )
+
+    user_balance = user_profile["balance"]
+    supabase.table("profiles").update({"balance": user_balance + price_diff}).eq("userId", user_id)
