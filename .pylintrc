@@ -1,6 +1,0 @@
-[MAIN]
-variable-naming-style=camelCase
-argument-naming-style=camelCase
-attr-naming-style=camelCase
-module-naming-style=camelCase
-function-naming-style=camelCase
