@@ -8,7 +8,6 @@ from routes import buy_order
 from dotenv import load_dotenv
 import os
 
-
 app = FastAPI()
 
 
