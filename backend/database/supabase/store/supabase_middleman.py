@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from typing import Literal
 from datetime import datetime
+# pylint: disable=no-name-in-module # it's looking in the supabase folder in project root
 from supabase import create_client, Client
 
 load_dotenv("env/.env")
@@ -14,10 +15,11 @@ def fetch_entries():
     pass
 
 
-#needs a lot more checks and error handling
+# needs a lot more checks and error handling
 def insert_entry(tableName: str, entry: dict) -> None:
     supabase.table(tableName).insert(entry).execute()
     return
+
 
 def is_market_open() -> bool:
     """
@@ -25,7 +27,14 @@ def is_market_open() -> bool:
 
     Returns: True if the market is open, False otherwise
     """
-    is_open = supabase.table("market_State").select("state").order("id", desc=True).limit(1).execute().data
+    is_open = (
+        supabase.table("market_State")
+        .select("state")
+        .order("id", desc=True)
+        .limit(1)
+        .execute()
+        .data
+    )
     return is_open
 
 
@@ -41,7 +50,8 @@ def fetch_profile(userID: str) -> dict:
 
     return supabase.table("profiles").select("*").eq("userId", userID).execute().data[0]
 
-#unreviewed
+
+# unreviewed
 def fetch_portfolio(userID: str, stockID: int) -> dict:
     """
     Fetches stock data from portfolio table using userID and stockID
@@ -52,12 +62,32 @@ def fetch_portfolio(userID: str, stockID: int) -> dict:
 
     Returns: Dictionary describing a user's holding of a stock
     """
-    portfolios = supabase.table("portfolio").select("*").match({"userId": userID, "stockId": stockID}).execute().data
+    portfolios = (
+        supabase.table("portfolio")
+        .select("*")
+        .match({"userId": userID, "stockId": stockID})
+        .execute()
+        .data
+    )
     if portfolios:
         return portfolios[0]
     else:
-        stock = supabase.table("stock_price").select("stock_price").eq("stockId", stockID).execute().data
-        portfolio = supabase.table("portfolio").select("portfolio_ID").eq("userId", userID).order("portfolio_ID", desc=True).limit(1).execute().data
+        stock = (
+            supabase.table("stock_price")
+            .select("stock_price")
+            .eq("stockId", stockID)
+            .execute()
+            .data
+        )
+        portfolio = (
+            supabase.table("portfolio")
+            .select("portfolio_ID")
+            .eq("userId", userID)
+            .order("portfolio_ID", desc=True)
+            .limit(1)
+            .execute()
+            .data
+        )
         if not stock:
             stock = [{"stock_price": 0}]
         if not portfolio:
@@ -65,10 +95,23 @@ def fetch_portfolio(userID: str, stockID: int) -> dict:
 
         stock = stock[0]
         portfolio = portfolio[0]
-        return {"stockId": stockID, "quantity": 0, "userId": userID, "Price": stock["stock_price"], "portfolio_ID": portfolio["portfolio_ID"]+1}
+        return {
+            "stockId": stockID,
+            "quantity": 0,
+            "userId": userID,
+            "Price": stock["stock_price"],
+            "portfolio_ID": portfolio["portfolio_ID"] + 1,
+        }
 
-#unreviewed
-def exchange_stock(buyer_profile: dict, buyer_portfolio: dict, seller_profile: dict, seller_portfolio: dict, stockPrice: float) -> None:
+
+# unreviewed
+def exchange_stock(
+    buyer_profile: dict,
+    buyer_portfolio: dict,
+    seller_profile: dict,
+    seller_portfolio: dict,
+    stockPrice: float,
+) -> None:
     """
     Updates buyer and seller profiles & portfolios when a stock is transacted
 
@@ -83,13 +126,18 @@ def exchange_stock(buyer_profile: dict, buyer_portfolio: dict, seller_profile: d
     """
     buyer_portfolio["quantity"] += 1
     supabase.table("portfolio").upsert(buyer_portfolio)
-    supabase.table("profiles").update({"balance": buyer_profile["balance"]-stockPrice}).eq("userId", buyer_profile["userId"])
+    supabase.table("profiles").update(
+        {"balance": buyer_profile["balance"] - stockPrice}
+    ).eq("userId", buyer_profile["userId"])
 
     seller_portfolio["quantity"] -= 1
     supabase.table("portfolio").upsert(seller_portfolio)
-    supabase.table("profiles").update({"balance": seller_profile["balance"] + stockPrice}).eq("userId", seller_profile["userId"])
+    supabase.table("profiles").update(
+        {"balance": seller_profile["balance"] + stockPrice}
+    ).eq("userId", seller_profile["userId"])
 
-#unreviewed
+
+# unreviewed
 def log_transaction(buyInfo: dict, sellInfo: dict) -> None:
     """
     Logs buy and sell tansaction info in the inactive_buy_sell
@@ -100,38 +148,50 @@ def log_transaction(buyInfo: dict, sellInfo: dict) -> None:
 
     Returns: None
     """
-    latest_row = supabase.table("inactive_buy_sell").select("id").order("id", desc=True).limit(1).execute().data
+    latest_row = (
+        supabase.table("inactive_buy_sell")
+        .select("id")
+        .order("id", desc=True)
+        .limit(1)
+        .execute()
+        .data
+    )
     latestId = latest_row[0]["id"]
 
     latestId += 1
-    supabase.table("inactive_buy_sell").insert({"id": latestId,
-                                                "delisted_time": datetime.now().isoformat(),
-                                                "userId": buyInfo["buyerId"],
-                                                "buy_or_sell": buyInfo["buy_or_sell"],
-                                                "time_posted": buyInfo["time_posted"],
-                                                "price": buyInfo["price"],
-                                                "expirey": buyInfo["expirey"],
-                                                "quantity": buyInfo["quantity"],
-                                                "completed": True,
-                                                "stockId": buyInfo["stockId"]
-                                                }
-                                               ).execute()
+    supabase.table("inactive_buy_sell").insert(
+        {
+            "id": latestId,
+            "delisted_time": datetime.now().isoformat(),
+            "userId": buyInfo["buyerId"],
+            "buy_or_sell": buyInfo["buy_or_sell"],
+            "time_posted": buyInfo["time_posted"],
+            "price": buyInfo["price"],
+            "expirey": buyInfo["expirey"],
+            "quantity": buyInfo["quantity"],
+            "completed": True,
+            "stockId": buyInfo["stockId"],
+        }
+    ).execute()
 
     latestId += 1
-    supabase.table("inactive_buy_sell").insert({"id": latestId,
-                                                "delisted_time": datetime.now().isoformat(),
-                                                "userId": sellInfo["sellerId"],
-                                                "buy_or_sell": sellInfo["buy_or_sell"],
-                                                "time_posted": sellInfo["time_posted"],
-                                                "price": sellInfo["price"],
-                                                "expirey": sellInfo["expirey"],
-                                                "quantity": sellInfo["quantity"],
-                                                "completed": True,
-                                                "stockId": sellInfo["stockId"]
-                                                }
-                                               ).execute()
+    supabase.table("inactive_buy_sell").insert(
+        {
+            "id": latestId,
+            "delisted_time": datetime.now().isoformat(),
+            "userId": sellInfo["sellerId"],
+            "buy_or_sell": sellInfo["buy_or_sell"],
+            "time_posted": sellInfo["time_posted"],
+            "price": sellInfo["price"],
+            "expirey": sellInfo["expirey"],
+            "quantity": sellInfo["quantity"],
+            "completed": True,
+            "stockId": sellInfo["stockId"],
+        }
+    ).execute()
 
-#unreviewed
+
+# unreviewed
 def log_unfulfilled_buy(buyInfo: dict) -> None:
     """
     Logs info of a buy order if it cannot be fulfilled
@@ -141,20 +201,29 @@ def log_unfulfilled_buy(buyInfo: dict) -> None:
 
     Returns: None
     """
-    latest_row = supabase.table("active_buy_sell").select("id").order("id", desc=True).limit(1).execute().data
+    latest_row = (
+        supabase.table("active_buy_sell")
+        .select("id")
+        .order("id", desc=True)
+        .limit(1)
+        .execute()
+        .data
+    )
     latestId = latest_row[0]["id"]
 
     latestId += 1
-    supabase.table("active_buy_sell").insert({"id": latestId,
-                                              "time_posted": buyInfo["time_posted"],
-                                              "buy_or_sell": buyInfo["buy_or_sell"],
-                                              "price": buyInfo["price"],
-                                              "expirey": buyInfo["expirey"],
-                                              "qunatity": buyInfo["qunatity"],
-                                              "stockId": buyInfo["stockId"],
-                                              "userId": buyInfo["userId"]
-                                              }
-                                             ).execute()
+    supabase.table("active_buy_sell").insert(
+        {
+            "id": latestId,
+            "time_posted": buyInfo["time_posted"],
+            "buy_or_sell": buyInfo["buy_or_sell"],
+            "price": buyInfo["price"],
+            "expirey": buyInfo["expirey"],
+            "qunatity": buyInfo["qunatity"],
+            "stockId": buyInfo["stockId"],
+            "userId": buyInfo["userId"],
+        }
+    ).execute()
 
 
 def update_entry():
