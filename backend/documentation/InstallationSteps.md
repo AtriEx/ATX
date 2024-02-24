@@ -1,3 +1,9 @@
+Firstly, make sure you create a .env file in backend/env/.env with the values:
+- `PUBLIC_SUPABASE_URL`
+- `SUPABASE_KEY`
+
+For more info on the database, [click here](database.md)
+
 **Install FastAPI and Uvicorn using:**
 ```bash
 pip install -r requirements.txt
