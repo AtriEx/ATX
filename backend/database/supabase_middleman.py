@@ -53,34 +53,6 @@ def is_market_open() -> bool:
     return is_open["state"]
 
 
-# unreviewed
-def log_transaction(buy_info: dict, sell_info: dict) -> None:
-    """
-    Logs buy and sell tansaction info in the inactive_buy_sell
-
-    Args:
-        buy_info (dict): Data related to the buy side of the transaction
-        sell_info (dict): Data relatedto the sell side of the transaction
-
-    Returns: None
-    """
-    supabase.table("inactive_buy_sell").insert(buy_info).execute()
-    supabase.table("inactive_buy_sell").insert(sell_info).execute()
-
-
-# unreviewed
-def log_unfulfilled_order(order_info: dict) -> None:
-    """
-    Logs info of a order if it cannot be fulfilled
-
-    Args:
-        order_info (dict): Data related to the buy side of a transaction
-
-    Returns: None
-    """
-    supabase.table("active_buy_sell").insert(order_info).execute()
-
-
 def update_entry():
     """
     Updates an entry in a table
@@ -120,7 +92,7 @@ def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
     Returns: None
     """
 
-    seller_stock = (supabase.table("Portfolio")
+    seller_stock = (supabase.table("portfolio")
                     .select("quantity")
                     .match({"userId": user_id, "stockId": stock_id})
                     .execute()
@@ -138,14 +110,14 @@ def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
     seller_quantity = seller_stock["quantity"]
     seller_balance = seller_profile["balance"]
 
-    supabase.table("Portfolio").update({"quantity": seller_quantity - 1}).match({"userId": user_id, "stockId": stock_id}).execute()
+    supabase.table("portfolio").update({"quantity": seller_quantity - 1}).match({"userId": user_id, "stockId": stock_id}).execute()
     supabase.table("profiles").update({"balance": seller_balance + order_price}).eq("userId", user_id).execute()
 
 
 def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
     """
     Buys a stock for the user_id stock at the order_price
-    (Assumes the user has a Portfolio of that stock)
+    (Assumes the user has a portfolio of that stock)
 
     Args:
         user_id (str): The user on the buy side of a stock transaction
@@ -161,22 +133,23 @@ def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
                      .data
                      .pop()
                      )
-    buyer_stock = (supabase.table("Portfolio")
+    buyer_stock = (supabase.table("portfolio")
                    .select("quantity")
                    .match({"userId": user_id, "stockId": stock_id})
                    .execute()
                    .data
                    )
-    # Handles the case where the user doesn't have an entry for that stock yet in the Portfolio table
+    # Handles the case where the user doesn't have an entry for that stock yet in the portfolio table
     if not buyer_stock:
         buyer_stock = {"userId": user_id, "stockId": stock_id, "quantity": 0, "price_avg": float(0)}
+        supabase.table("portfolio").insert(buyer_stock).execute()
     else:
         buyer_stock = buyer_stock.pop()
 
     buyer_quantity = buyer_stock["quantity"]
     buyer_balance = buyer_profile["balance"]
 
-    supabase.table("Portfolio").update({"quantity": buyer_quantity + 1}).match({"userId": user_id, "stockId": stock_id}).execute()
+    supabase.table("portfolio").update({"quantity": buyer_quantity + 1}).match({"userId": user_id, "stockId": stock_id}).execute()
     supabase.table("profiles").update({"balance": buyer_balance - order_price}).eq("userId", user_id).execute()
 
 
@@ -185,8 +158,8 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
     Handles difference in desired prices between the buyer and seller
 
     Args:
-        user_id: The user who's balance will be handled
-        price_diff: The amount to be refunded/ rewarded back to the user
+        user_id(str): The user who's balance will be handled
+        price_diff(int): The amount to be refunded/ rewarded back to the user
 
     Returns: None
     """
@@ -203,18 +176,50 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
     supabase.table("profiles").update({"balance": user_balance + price_diff}).eq("userId", user_id).execute()
 
 
-def reset_values(buyer, seller, price, stock):
-    buy_profile = supabase.table("profiles").select("balance").eq("userId", buyer).execute().data.pop()
-    buy_port = supabase.table("Portfolio").select("quantity").match({"userId": buyer, "stockId": stock}).execute().data.pop()
-    sell_profile = supabase.table("profiles").select("balance").eq("userId", seller).execute().data.pop()
-    sell_port = supabase.table("Portfolio").select("quantity").match({"userId": seller, "stockId": stock}).execute().data.pop()
+def delete_processed_order(order_index) -> None:
+    """
+    Deletes the sell/buy order fufilled in a transaction from the active_buy_sell table
 
-    buy_balance = buy_profile["balance"]
-    buy_quantity = buy_port["quantity"]
-    sell_balance = sell_profile["balance"]
-    sell_quantity = sell_port["quantity"]
+    Args:
+        order_index(dict): The unique row identifier for an entry in the active_buy_sell table
 
-    supabase.table("profiles").update({"balance": buy_balance+price}).eq("userId", buyer).execute()
-    supabase.table("profiles").update({"balance": sell_balance-price}).eq("userId", seller).execute()
-    supabase.table("Portfolio").update({"quantity": buy_quantity-1}).match({"userId": buyer, "stockId": stock}).execute()
-    supabase.table("Portfolio").update({"quantity": sell_quantity+1}).match({"userId": seller, "stockId": stock}).execute()
+    Returns: None
+    """
+    supabase.table("active_buy_sell").delete().eq("Id", order_index).execute()
+
+
+# unreviewed
+def log_transaction(buy_info: dict, sell_info: dict) -> None:
+    """
+    Logs buy and sell tansaction info in the inactive_buy_sell (Should be called @ the end of order flow)
+    Removes the Id column from the buyer & seller info as a preprocessing step before logging the transaction
+
+    Args:
+        buy_info (dict): Data related to the buy side of the transaction
+        sell_info (dict): Data relatedto the sell side of the transaction
+
+    Returns: None
+    """
+    if buy_info.get("Id"):
+        del buy_info["Id"]
+    if sell_info.get("Id"):
+        del sell_info["Id"]
+
+    supabase.table("inactive_buy_sell").insert(buy_info).execute()
+    supabase.table("inactive_buy_sell").insert(sell_info).execute()
+
+
+# unreviewed
+def log_unfulfilled_order(order_info: dict) -> None:
+    """
+    Logs info of a order if it cannot be fulfilled (Should be called @ the end of order flow)
+    Removes the Id column from the order info as a preprocessing step before logging the order
+
+    Args:
+        order_info (dict): Data related to the buy side of a transaction
+
+    Returns: None
+    """
+    if order_info.get("Id"):
+        del order_info["Id"]
+    supabase.table("active_buy_sell").insert(order_info).execute()
