@@ -145,9 +145,3 @@ Stores data over 1 day blocks.
 | opening_price   | int8      |               |
 | closing_price   |           |               |
 | volume_of_sales | int8      |               |
-
-## Table Setup SQL
-<details>
-    <summary>Click me</summary>
-    <!-- TODO -->
-</details>
