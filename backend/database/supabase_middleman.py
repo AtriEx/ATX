@@ -27,7 +27,7 @@ def insert_entry(table_name: str, entry: dict) -> None:
     Inserts an entry into a table
 
     Args:
-        tableName (str): The name of the table
+        table_name (str): The name of the table
         entry (dict): The entry to be inserted
 
     Returns: None
@@ -57,7 +57,7 @@ def fetch_profile(user_id: str) -> dict:
     Fetches user data from profiles table using userId
 
     Args:
-        userID (str): The ID of the user
+        user_id (str): The ID of the user
 
     Returns: profile dictionary
     """
