@@ -9,7 +9,7 @@ def test_entry_1() -> dict:
     Creates a test buy order table entry and returns it
     """
     test_entry = {
-        "userId": "572a902e-de7a-4739-adfe-f4af32a3f18b",
+        "userId": "d8a7ae82-1704-41bf-96a3-9347a5c022c8",
         "buy_or_sell": True,
         "stockId": 2,
         "price": 33,
