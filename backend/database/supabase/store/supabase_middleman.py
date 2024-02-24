@@ -25,8 +25,8 @@ def is_market_open() -> bool:
 
     Returns: True if the market is open, False otherwise
     """
-    isOpen = supabase.table("market_State").select("state").order("id", desc=True).limit(1).execute().data
-    return isOpen
+    is_open = supabase.table("market_State").select("state").order("id", desc=True).limit(1).execute().data
+    return is_open
 
 
 def fetch_profile(userID: str) -> dict:
