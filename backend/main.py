@@ -1,4 +1,3 @@
-# from routers import items, users
 from datetime import datetime, timedelta
 from fastapi import FastAPI
 # pylint: disable=no-name-in-module # it's looking in the supabase folder in project root
