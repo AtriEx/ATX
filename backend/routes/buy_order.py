@@ -4,7 +4,7 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
 from util.ext import test_data
-from database.supabase.store import supabase_middleman
+from database import supabase_middleman
 
 
 app=FastAPI()
