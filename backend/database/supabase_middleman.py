@@ -48,80 +48,12 @@ def is_market_open() -> bool:
         .limit(1)
         .execute()
         .data
+        .pop()
     )
-    return is_open
-
-
-def fetch_profile(user_id: str) -> dict:
-    """
-    Fetches user data from profiles table using userId
-
-    Args:
-        user_id (str): The ID of the user
-
-    Returns: profile dictionary
-    """
-
-    return (
-        supabase.table("profiles").select("*").eq("userId", user_id).execute().data[0]
-    )
+    return is_open["state"]
 
 
 # unreviewed
-def fetch_portfolio(user_id: str, stock_id: int) -> dict:
-    """
-    Fetches stock data from portfolio table using userID and stockID
-
-    Args:
-        user_id (str): The ID of the user
-        stock_id (int): The ID of the stock
-
-    Returns: Dictionary describing a user's holding of a stock
-    """
-    portfolios = (
-        supabase.table("portfolio")
-        .select("*")
-        .match({"userId": user_id, "stockId": stock_id})
-        .execute()
-        .data
-    )
-    if portfolios:
-        return portfolios[0]
-
-    stock = (
-        supabase.table("stock_price")
-        .select("stock_price")
-        .eq("stockId", stock_id)
-        .execute()
-        .data
-    )
-    portfolio = (
-        supabase.table("portfolio")
-        .select("portfolio_ID")
-        .eq("userId", user_id)
-        .order("portfolio_ID", desc=True)
-        .limit(1)
-        .execute()
-        .data
-    )
-    if not stock:
-        stock = [{"stock_price": 0}]
-    if not portfolio:
-        portfolio = [{"portfolio_ID": 0}]
-
-    stock = stock[0]
-    portfolio = portfolio[0]
-    return {
-        "stockId": stock_id,
-        "quantity": 0,
-        "userId": user_id,
-        "Price": stock["stock_price"],
-        "portfolio_ID": portfolio["portfolio_ID"] + 1,
-    }
-
-# unreviewed
-
-
 def log_transaction(buy_info: dict, sell_info: dict) -> None:
     """
     Logs buy and sell tansaction info in the inactive_buy_sell
@@ -137,7 +69,7 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
 
 
 # unreviewed
-def log_unfulfilled_buy(order_info: dict) -> None:
+def log_unfulfilled_order(order_info: dict) -> None:
     """
     Logs info of a order if it cannot be fulfilled
 
@@ -188,7 +120,7 @@ def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
     Returns: None
     """
 
-    seller_stock = (supabase.table("portfolio")
+    seller_stock = (supabase.table("Portfolio")
                     .select("quantity")
                     .match({"userId": user_id, "stockId": stock_id})
                     .execute()
@@ -206,14 +138,14 @@ def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
     seller_quantity = seller_stock["quantity"]
     seller_balance = seller_profile["balance"]
 
-    supabase.table("portfolio").update({"quantity": seller_quantity - 1}).match({"userId": user_id, "stockId": stock_id})
-    supabase.table("profiles").update({"balance": seller_balance + order_price}).eq("userId", user_id)
+    supabase.table("Portfolio").update({"quantity": seller_quantity - 1}).match({"userId": user_id, "stockId": stock_id}).execute()
+    supabase.table("profiles").update({"balance": seller_balance + order_price}).eq("userId", user_id).execute()
 
 
 def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
     """
     Buys a stock for the user_id stock at the order_price
-    (Assumes the user has a portfolio of that stock)
+    (Assumes the user has a Portfolio of that stock)
 
     Args:
         user_id (str): The user on the buy side of a stock transaction
@@ -222,15 +154,6 @@ def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
 
     Returns: None
     """
-
-    buyer_stock = (supabase.table("portfolio")
-                   .select("quantity")
-                   .match({"userId": user_id, "stockId": stock_id})
-                   .execute()
-                   .data
-                   .pop()
-                   )
-
     buyer_profile = (supabase.table("profiles")
                      .select("balance")
                      .eq("userId", user_id)
@@ -238,12 +161,23 @@ def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
                      .data
                      .pop()
                      )
+    buyer_stock = (supabase.table("Portfolio")
+                   .select("quantity")
+                   .match({"userId": user_id, "stockId": stock_id})
+                   .execute()
+                   .data
+                   )
+    # Handles the case where the user doesn't have an entry for that stock yet in the Portfolio table
+    if not buyer_stock:
+        buyer_stock = {"userId": user_id, "stockId": stock_id, "quantity": 0, "price_avg": float(0)}
+    else:
+        buyer_stock = buyer_stock.pop()
 
     buyer_quantity = buyer_stock["quantity"]
     buyer_balance = buyer_profile["balance"]
 
-    supabase.table("portfolio").update({"quantity": buyer_quantity + 1}).match({"userId": user_id, "stockId": stock_id})
-    supabase.table("profiles").update({"balance": buyer_balance - order_price}).eq("userId", user_id)
+    supabase.table("Portfolio").update({"quantity": buyer_quantity + 1}).match({"userId": user_id, "stockId": stock_id}).execute()
+    supabase.table("profiles").update({"balance": buyer_balance - order_price}).eq("userId", user_id).execute()
 
 
 def resolve_price_diff(user_id: str, price_diff: int) -> None:
@@ -266,4 +200,21 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
                     )
 
     user_balance = user_profile["balance"]
-    supabase.table("profiles").update({"balance": user_balance + price_diff}).eq("userId", user_id)
+    supabase.table("profiles").update({"balance": user_balance + price_diff}).eq("userId", user_id).execute()
+
+
+def reset_values(buyer, seller, price, stock):
+    buy_profile = supabase.table("profiles").select("balance").eq("userId", buyer).execute().data.pop()
+    buy_port = supabase.table("Portfolio").select("quantity").match({"userId": buyer, "stockId": stock}).execute().data.pop()
+    sell_profile = supabase.table("profiles").select("balance").eq("userId", seller).execute().data.pop()
+    sell_port = supabase.table("Portfolio").select("quantity").match({"userId": seller, "stockId": stock}).execute().data.pop()
+
+    buy_balance = buy_profile["balance"]
+    buy_quantity = buy_port["quantity"]
+    sell_balance = sell_profile["balance"]
+    sell_quantity = sell_port["quantity"]
+
+    supabase.table("profiles").update({"balance": buy_balance+price}).eq("userId", buyer).execute()
+    supabase.table("profiles").update({"balance": sell_balance-price}).eq("userId", seller).execute()
+    supabase.table("Portfolio").update({"quantity": buy_quantity-1}).match({"userId": buyer, "stockId": stock}).execute()
+    supabase.table("Portfolio").update({"quantity": sell_quantity+1}).match({"userId": seller, "stockId": stock}).execute()
