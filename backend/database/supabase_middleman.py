@@ -58,6 +58,8 @@ def update_entry():
     Updates an entry in a table
     """
 
+# unreviewed
+
 
 def fetch_stock_price(stock_id: int) -> int:
     """
@@ -79,6 +81,7 @@ def fetch_stock_price(stock_id: int) -> int:
     return stock_price["stock_price"]
 
 
+# unreviewed
 def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
     """
     Sells a user's stock at the order_price
@@ -114,6 +117,7 @@ def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
     supabase.table("profiles").update({"balance": seller_balance + order_price}).eq("userId", user_id).execute()
 
 
+# unreviewed
 def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
     """
     Buys a stock for the user_id stock at the order_price
@@ -153,6 +157,7 @@ def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
     supabase.table("profiles").update({"balance": buyer_balance - order_price}).eq("userId", user_id).execute()
 
 
+# unreviewed
 def resolve_price_diff(user_id: str, price_diff: int) -> None:
     """
     Handles difference in desired prices between the buyer and seller
@@ -176,6 +181,7 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
     supabase.table("profiles").update({"balance": user_balance + price_diff}).eq("userId", user_id).execute()
 
 
+# unreviewed
 def delete_processed_order(order_index) -> None:
     """
     Deletes the sell/buy order fufilled in a transaction from the active_buy_sell table
