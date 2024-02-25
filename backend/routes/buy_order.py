@@ -17,15 +17,16 @@ supabase: Client = create_client(url, key)
 def buy_order():
     """Create a buy order for one share of a stock
     and fullfill it if possible."""
+    # These are test values
+    # We will have a function that returns this data using API call parameters
+    buy_info = test_data.test_entry_1()
     # Return state by looking for the one with the biggest ID
     is_open = supabase_middleman.is_market_open()
     if not is_open:
         # If the market is closed
         supabase_middleman.log_unfulfilled_order(buy_info)
         return "The market is closed"
-    # These are test values
-    # We will have a function that returns this data using API call parameters
-    buy_info = test_data.test_entry_1()
+
     # If the market is open, get all active sells for the stock <= buy_price
     # Active sells are ordered by price and time_posted (descending)
     valid_sells = (
