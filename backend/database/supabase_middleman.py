@@ -2,10 +2,7 @@
 interactions in high-level generic functions."""
 
 import os
-from datetime import datetime
-
 from dotenv import load_dotenv
-
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 from supabase import Client, create_client
 
@@ -113,8 +110,17 @@ def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
     seller_quantity = seller_stock["quantity"]
     seller_balance = seller_profile["balance"]
 
-    supabase.table("portfolio").update({"quantity": seller_quantity - 1}).match({"userId": user_id, "stockId": stock_id}).execute()
-    supabase.table("profiles").update({"balance": seller_balance + order_price}).eq("userId", user_id).execute()
+    (supabase.table("portfolio")
+     .update({"quantity": seller_quantity - 1})
+     .match({"userId": user_id, "stockId": stock_id})
+     .execute()
+     )
+
+    (supabase.table("profiles")
+     .update({"balance": seller_balance + order_price})
+     .eq("userId", user_id)
+     .execute()
+     )
 
 
 # unreviewed
@@ -130,31 +136,40 @@ def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
 
     Returns: None
     """
-    buyer_profile = (supabase.table("profiles")
-                     .select("balance")
-                     .eq("userId", user_id)
-                     .execute()
-                     .data
-                     .pop()
-                     )
-    buyer_stock = (supabase.table("portfolio")
-                   .select("quantity")
-                   .match({"userId": user_id, "stockId": stock_id})
-                   .execute()
-                   .data
-                   )
+    user_profile = (supabase.table("profiles")
+                    .select("balance")
+                    .eq("userId", user_id)
+                    .execute()
+                    .data
+                    .pop()
+                    )
+    user_stock = (supabase.table("portfolio")
+                  .select("quantity")
+                  .match({"userId": user_id, "stockId": stock_id})
+                  .execute()
+                  .data
+                  )
     # Handles the case where the user doesn't have an entry for that stock yet in the portfolio table
-    if not buyer_stock:
-        buyer_stock = {"userId": user_id, "stockId": stock_id, "quantity": 0, "price_avg": float(0)}
-        supabase.table("portfolio").insert(buyer_stock).execute()
+    if not user_stock:
+        user_stock = {"userId": user_id, "stockId": stock_id, "quantity": 0, "price_avg": float(0)}
+        supabase.table("portfolio").insert(user_stock).execute()
     else:
-        buyer_stock = buyer_stock.pop()
+        user_stock = user_stock.pop()
 
-    buyer_quantity = buyer_stock["quantity"]
-    buyer_balance = buyer_profile["balance"]
+    user_quantity = user_stock["quantity"]
+    user_balance = user_profile["balance"]
 
-    supabase.table("portfolio").update({"quantity": buyer_quantity + 1}).match({"userId": user_id, "stockId": stock_id}).execute()
-    supabase.table("profiles").update({"balance": buyer_balance - order_price}).eq("userId", user_id).execute()
+    (supabase.table("portfolio")
+     .update({"quantity": user_quantity + 1})
+     .match({"userId": user_id, "stockId": stock_id})
+     .execute()
+     )
+
+    (supabase.table("profiles")
+     .update({"balance": user_balance - order_price})
+     .eq("userId", user_id)
+     .execute()
+     )
 
 
 # unreviewed
@@ -178,7 +193,11 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
                     )
 
     user_balance = user_profile["balance"]
-    supabase.table("profiles").update({"balance": user_balance + price_diff}).eq("userId", user_id).execute()
+    (supabase.table("profiles")
+     .update({"balance": user_balance + price_diff})
+     .eq("userId", user_id)
+     .execute()
+     )
 
 
 # unreviewed
@@ -197,8 +216,8 @@ def delete_processed_order(order_index) -> None:
 # unreviewed
 def log_transaction(buy_info: dict, sell_info: dict) -> None:
     """
-    Logs buy and sell tansaction info in the inactive_buy_sell (Should be called @ the end of order flow)
-    Removes the Id column from the buyer & seller info as a preprocessing step before logging the transaction
+    Logs tansaction info in the inactive_buy_sell table (Should be called @ the end of order flow)
+    Removes the Id column from the buyer & seller info before logging the transaction
 
     Args:
         buy_info (dict): Data related to the buy side of the transaction
