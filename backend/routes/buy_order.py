@@ -21,6 +21,7 @@ def buy_order():
     is_open = supabase_middleman.is_market_open()
     if not is_open:
         # If the market is closed
+        supabase_middleman.log_unfulfilled_order(buy_info)
         return "The market is closed"
     # These are test values
     # We will have a function that returns this data using API call parameters
