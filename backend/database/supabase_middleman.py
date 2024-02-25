@@ -149,7 +149,7 @@ def buy_stock(user_id: str, stock_id: int, order_price: int) -> None:
                   .execute()
                   .data
                   )
-    # Handles the case where the user doesn't have an entry for that stock yet in the portfolio table
+    # Handles if the user doesn't have an entry for that stock yet in the portfolio table
     if not user_stock:
         user_stock = {"userId": user_id, "stockId": stock_id, "quantity": 0, "price_avg": float(0)}
         supabase.table("portfolio").insert(user_stock).execute()
