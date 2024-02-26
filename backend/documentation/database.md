@@ -15,14 +15,14 @@ General information about stocks. For price, check `stock_price`.
 
 ### `profiles`
 Information about user profiles. Does not contain auth information.
-| Column Name | Type       | Description             |
-| ----------- | ---------- | ----------------------- |
-| userId      | int8       | Primary key             |
-| joined_at   | timestampz |                         |
-| username    | text       |                         |
-| balance     | int8       |                         |
-| networth    | int8       |                         |
-| comments    | text[]     | Comments about the user |
+| Column Name | Type      | Description             |
+| ----------- | --------- | ----------------------- |
+| userId      | int8      | Primary key             |
+| joined_at   | timestamp |                         |
+| username    | text      |                         |
+| balance     | int8      |                         |
+| networth    | int8      |                         |
+| comments    | text[]    | Comments about the user |
 
 
 ### `stock_price`
@@ -54,11 +54,11 @@ User flags such as achievements or badges.
 
 ### `market_State`
 Historical information on whether or not the market is open.
-| Column Name  | Type       | Description   |
-| ------------ | ---------- | ------------- |
-| id           | int8       | Primary key   |
-| changed_last | timestampz |               |
-| state        | bool       | true = active |
+| Column Name  | Type      | Description   |
+| ------------ | --------- | ------------- |
+| id           | int8      | Primary key   |
+| changed_last | timestamp |               |
+| state        | bool      | true = active |
 
 
 ### `portfolio`
@@ -110,12 +110,12 @@ Where expired and fulfilled orders go.
 
 ### `stock_price_history_daily`
 Historical stock prices, new row on change to stock price.
-| Column Name | Type       | Description   |
-| ----------- | ---------- | ------------- |
-| id          | int8       | Primary key   |
-| changed_at  | timestampz |               |
-| price       | int8       |               |
-| stockId     | int8       | stock_info.id |
+| Column Name | Type      | Description   |
+| ----------- | --------- | ------------- |
+| id          | int8      | Primary key   |
+| changed_at  | timestamp |               |
+| price       | int8      |               |
+| stockId     | int8      | stock_info.id |
 
 
 ### `stock_price_history_weekly`
