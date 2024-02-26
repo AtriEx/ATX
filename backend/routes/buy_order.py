@@ -52,11 +52,13 @@ def buy_order():
     sell_diff = abs(curr_stock_price - sell_info["price"])
     buy_diff = abs(buy_info["price"] - curr_stock_price)
     order_diff = buy_info["price"] - sell_info["price"]
-    if order_diff == 0 and buy_info["price"] != curr_stock_price:
+    # Checks edge case where buy price = sell price != current market price
+    if (order_diff == 0) and (buy_info["price"] != curr_stock_price):
         # Order cannot be fulfilled @ current price
         supabase_middleman.log_unfulfilled_order(buy_info)
         return "Current stock price didn't match equal buy & sell prices"
-    elif sell_diff < buy_diff:
+
+    if sell_diff < buy_diff:
         # Order price = sell price; refund the difference between buy and sell price to the buyer
         supabase_middleman.sell_stock(sell_info["userId"], sell_info["stockId"], sell_info["price"])
         supabase_middleman.buy_stock(buy_info["userId"], buy_info["stockId"], sell_info["price"])
