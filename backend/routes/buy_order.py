@@ -33,7 +33,7 @@ def buy_order():
         .data
     )
     is_open = supabase_middleman.is_market_open()
-    supabase_middleman.escrow_buy(buyer["userId"], buyer["price"] * buyer["quantity"])
+    supabase_middleman.escrow_buy(buyer["userId"], (buyer["price"] * buyer["quantity"]))
     # Return state by looking for the one with the biggest ID
     for _ in range(buyer["quantity"]):
         if not is_open:

@@ -67,7 +67,7 @@ def escrow_buy(user_id: str, buy_price: int) -> None:
     Returns: None
     """
 
-    supabase.rpc("subtract_balance", {"user_id": user_id, "buy_price": buy_price}).execute()
+    supabase.rpc("update_balance", {"user_id": user_id, "price_delta": (-1*buy_price)}).execute()
 
 
 # unreviewed
@@ -136,7 +136,7 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
 
     Returns: None
     """
-    supabase.rpc("resolve_price_diff", {"user_id": user_id, "price_diff": price_diff}).execute()
+    supabase.rpc("update_balance", {"user_id": user_id, "price_delta": price_diff}).execute()
 
 
 # unreviewed
