@@ -55,9 +55,8 @@ def update_entry():
     Updates an entry in a table
     """
 
+
 # unreviewed
-
-
 def escrow_buy(user_id: str, buy_price: int) -> None:
     """
     Subtracts given buy order price from user's balance
@@ -68,24 +67,10 @@ def escrow_buy(user_id: str, buy_price: int) -> None:
     Returns: None
     """
 
-    current_balance = (supabase.table("profiles")
-                       .select("balance")
-                       .eq("userId", user_id)
-                       .execute()
-                       .data
-                       .pop()
-                       )
+    supabase.rpc("subtract_balance", {"user_id": user_id, "buy_price": buy_price}).execute()
 
-    current_balance = current_balance["balance"]
 
-    (supabase.table("profiles")
-     .update({"balance": current_balance - buy_price})
-     .eq("userId", user_id)
-     .execute()
-     )
 # unreviewed
-
-
 def fetch_stock_price(stock_id: int) -> int:
     """
     Gets the current stock price of the given stock_id
@@ -119,36 +104,7 @@ def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
 
     Returns: None
     """
-
-    seller_stock = (supabase.table("portfolio")
-                    .select("quantity")
-                    .match({"userId": user_id, "stockId": stock_id})
-                    .execute()
-                    .data
-                    .pop()
-                    )
-    seller_profile = (supabase.table("profiles")
-                      .select("balance")
-                      .eq("userId", user_id)
-                      .execute()
-                      .data
-                      .pop()
-                      )
-
-    seller_quantity = seller_stock["quantity"]
-    seller_balance = seller_profile["balance"]
-
-    (supabase.table("portfolio")
-     .update({"quantity": seller_quantity - 1})
-     .match({"userId": user_id, "stockId": stock_id})
-     .execute()
-     )
-
-    (supabase.table("profiles")
-     .update({"balance": seller_balance + order_price})
-     .eq("userId", user_id)
-     .execute()
-     )
+    supabase.rpc("sell_stock", {"user_id": user_id, "stock_id": stock_id, "order_price": order_price}).execute()
 
 
 # unreviewed
@@ -164,26 +120,7 @@ def buy_stock(user_id: str, stock_id: int) -> None:
 
     Returns: None
     """
-    user_stock = (supabase.table("portfolio")
-                  .select("quantity")
-                  .match({"userId": user_id, "stockId": stock_id})
-                  .execute()
-                  .data
-                  )
-    # Handles if the user doesn't have an entry for that stock yet in the portfolio table
-    if not user_stock:
-        user_stock = {"userId": user_id, "stockId": stock_id, "quantity": 0, "price_avg": float(0)}
-        supabase.table("portfolio").insert(user_stock).execute()
-    else:
-        user_stock = user_stock.pop()
-
-    user_quantity = user_stock["quantity"]
-
-    (supabase.table("portfolio")
-     .update({"quantity": user_quantity + 1})
-     .match({"userId": user_id, "stockId": stock_id})
-     .execute()
-     )
+    supabase.rpc("buy_stock", {"user_id": user_id, "stock_id": stock_id}).execute()
 
 
 # unreviewed
@@ -197,21 +134,7 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
 
     Returns: None
     """
-
-    user_profile = (supabase.table("profiles")
-                    .select("balance")
-                    .eq("userId", user_id)
-                    .execute()
-                    .data
-                    .pop()
-                    )
-
-    user_balance = user_profile["balance"]
-    (supabase.table("profiles")
-     .update({"balance": user_balance + price_diff})
-     .eq("userId", user_id)
-     .execute()
-     )
+    supabase.rpc("resolve_price_diff", {"user_id": user_id, "price_diff": price_diff}).execute()
 
 
 # unreviewed
