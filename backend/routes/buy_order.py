@@ -20,28 +20,29 @@ def buy_order():
     # These are test values
     # We will have a function that returns this data using API call parameters
     buyer = test_data.test_entry_1()
+    # Slects all active sells order by price then by time-posted (desc)
+    valid_sells = (
+        supabase.table("active_buy_sell")
+        .select("*")
+        .match({"buy_or_sell": False, "stockId": buyer["stockId"]})
+        .lte("price", buyer["price"])
+        .order("price")
+        .order("time_posted", desc=True)
+        .limit(buyer["quantity"])
+        .execute()
+        .data
+    )
+    is_open = supabase_middleman.is_market_open()
+    supabase_middleman.escrow_buy(buyer["userId"], buyer["price"] * buyer["quantity"])
     # Return state by looking for the one with the biggest ID
     for _ in range(buyer["quantity"]):
-        supabase_middleman.escrow_buy(buyer["userId"], buyer["price"])
-        is_open = supabase_middleman.is_market_open()
         if not is_open:
             # If the market is closed
             supabase_middleman.log_unfulfilled_order(buyer)
             print("Market not open")
             continue
 
-        # If the market is open, get all active sells for the stock <= buy_price
-        # Active sells are ordered by price and time_posted (descending)
-        valid_sells = (
-            supabase.table("active_buy_sell")
-            .select("*")
-            .match({"buy_or_sell": False, "stockId": buyer["stockId"]})
-            .lte("price", buyer["price"])
-            .order("price")
-            .order("time_posted", desc=True)
-            .execute()
-            .data
-        )
+        # Market is open and a valid sell is availible
         if not valid_sells:
             # Insert the buy order into active_buy_sell if it can't be fufilled
             supabase_middleman.log_unfulfilled_order(buyer)

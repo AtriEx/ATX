@@ -17,7 +17,7 @@ def test_entry_1() -> dict:
         "price": 26,
         "quantity": 11,
         "time_posted": datetime.now().isoformat(),
-        "orderId": generate_order_id().hex,
+        "orderId": str(generate_order_id()),
         "expirey": (
             datetime.now() + timedelta(hours=1)
         ).isoformat(),  # This is a test value; users will input an expiry date
@@ -36,7 +36,7 @@ def test_entry_2() -> dict:
         "stockId": 2,
         "price": 25,
         "quantity": 1,
-        "orderId": generate_order_id().hex,
+        "orderId": str(generate_order_id()),
         "time_posted": datetime.now().isoformat(),
         "expirey": (
             datetime.now() + timedelta(hours=1)
