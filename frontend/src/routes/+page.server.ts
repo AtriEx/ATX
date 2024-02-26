@@ -27,23 +27,25 @@ export const load = (async ({ url }) => {
 
 	if (query) builder = builder.ilike('name', `*${query}*`);
 
-	if (orderBy === 'price') {
-		builder = builder.order('stock_price', {
-			ascending: order === 'asc',
-			referencedTable: 'stock_price'
-		});
-	} else {
+	if (orderBy !== 'price') {
 		builder = builder.order(orderBy, { ascending: order === 'asc' });
 	}
 
-	const { data, error: pgError } = await builder;
-	if (pgError || !data) {
-		console.error(pgError);
+	let { data } = await builder;
+	if (!data) {
+		console.error('No data');
 		error(404, 'Not found');
 	}
 
 	const hottest = await hottestStocks();
 	const losers = await biggestLosers();
+
+	if (orderBy === 'price')
+		data = data.sort((a, b) =>
+			order === 'asc'
+				? a.stock_price!.stock_price - b.stock_price!.stock_price
+				: b.stock_price!.stock_price - a.stock_price!.stock_price
+		);
 
 	return { stockInfo: data, hottest, losers };
 }) satisfies PageServerLoad;
@@ -61,21 +63,24 @@ async function hottestStocks() {
 		console.error(pgError);
 		error(404, 'Not found');
 	}
-	return data;
+
+	const sorted = data.sort((a, b) => b.stock_price!.stock_price - a.stock_price!.stock_price);
+
+	return sorted;
 }
 
 async function biggestLosers() {
 	const { data, error: pgError } = await adminSupabase
 		.from('stock_info')
 		.select('name, image, stock_price(stock_price), total_shares')
-		.order('stock_price', {
-			ascending: false,
-			referencedTable: 'stock_price'
-		})
+
 		.limit(3);
 	if (pgError || !data) {
 		console.error(pgError);
 		error(404, 'Not found');
 	}
-	return data;
+
+	const sorted = data.sort((a, b) => a.stock_price!.stock_price - b.stock_price!.stock_price);
+
+	return sorted;
 }

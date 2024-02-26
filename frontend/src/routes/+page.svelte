@@ -12,7 +12,7 @@
 	</h1>
 	<StockSearch />
 	<div class="overflow-x-auto rounded-lg">
-		<StockTable stockInfo={data.stockInfo} />
+		<StockTable stockInfo={data.stockInfo} mainTable />
 	</div>
 	<div class="md:flex justify-evenly p-2 pt-5">
 		<div class="md:mr-4 md:w-1/2">
