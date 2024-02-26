@@ -104,7 +104,9 @@ def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
 
     Returns: None
     """
-    supabase.rpc("sell_stock", {"user_id": user_id, "stock_id": stock_id, "order_price": order_price}).execute()
+    supabase.rpc("sell_stock",
+                 {"user_id": user_id, "stock_id": stock_id, "order_price": order_price}
+                 ).execute()
 
 
 # unreviewed
