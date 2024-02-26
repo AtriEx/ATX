@@ -23,7 +23,7 @@ def create_sell_order():
     supabase_middleman.insert_entry('active_buy_sell', test_entry)
     return
 
-def create_active_order(user_id: str, buy_or_sell: str, stock_id, price: float, quantity: int, expirey: str):
+def create_active_order(user_id: str, buy_or_sell: bool, stock_id, price: float, quantity: int, expirey: str):
     # Insert new entry into active_buy_sell table
     entry = {"userId": user_id,
             "buy_or_sell": buy_or_sell,
