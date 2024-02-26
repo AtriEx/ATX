@@ -19,14 +19,14 @@ def buy_order():
     and fullfill it if possible."""
     # These are test values
     # We will have a function that returns this data using API call parameters
-    buy_info = test_data.test_entry_1()
+    buyer = test_data.test_entry_1()
     # Return state by looking for the one with the biggest ID
-    for _ in range(buy_info["quantity"]):
-        supabase_middleman.escrow_buy(buy_info["userId"], buy_info["price"])
+    for _ in range(buyer["quantity"]):
+        supabase_middleman.escrow_buy(buyer["userId"], buyer["price"])
         is_open = supabase_middleman.is_market_open()
         if not is_open:
             # If the market is closed
-            supabase_middleman.log_unfulfilled_order(buy_info)
+            supabase_middleman.log_unfulfilled_order(buyer)
             print("Market not open")
             continue
 
@@ -35,8 +35,8 @@ def buy_order():
         valid_sells = (
             supabase.table("active_buy_sell")
             .select("*")
-            .match({"buy_or_sell": False, "stockId": buy_info["stockId"]})
-            .lte("price", buy_info["price"])
+            .match({"buy_or_sell": False, "stockId": buyer["stockId"]})
+            .lte("price", buyer["price"])
             .order("price")
             .order("time_posted", desc=True)
             .execute()
@@ -44,43 +44,43 @@ def buy_order():
         )
         if not valid_sells:
             # Insert the buy order into active_buy_sell if it can't be fufilled
-            supabase_middleman.log_unfulfilled_order(buy_info)
+            supabase_middleman.log_unfulfilled_order(buyer)
             print("No valid sells")
             continue
 
         # Gets sell order closest to the buy price
-        sell_info = valid_sells.pop()
+        seller = valid_sells.pop()
         # Finds the distances between the current price and the buy/sell prices
         # Decides order handling based off which price is closest to current price
-        curr_stock_price = supabase_middleman.fetch_stock_price(sell_info["stockId"])
-        sell_diff = abs(curr_stock_price - sell_info["price"])
-        buy_diff = abs(buy_info["price"] - curr_stock_price)
-        order_diff = buy_info["price"] - sell_info["price"]
+        curr_price = supabase_middleman.fetch_stock_price(seller["stockId"])
+        sell_diff = abs(curr_price - seller["price"])
+        buy_diff = abs(buyer["price"] - curr_price)
+        order_diff = buyer["price"] - seller["price"]
         # Checks edge case where buy price = sell price != current market price
-        if (order_diff == 0) and (buy_info["price"] != curr_stock_price):
+        if (order_diff == 0) and (buyer["price"] != curr_price):
             # Order cannot be fulfilled @ current price
-            supabase_middleman.log_unfulfilled_order(buy_info)
+            supabase_middleman.log_unfulfilled_order(buyer)
             print("Current market price doesn't match equal buy & sell prices")
             continue
 
         if sell_diff < buy_diff:
-            # Order price = sell price; refund the difference between buy and sell price to the buyer
-            supabase_middleman.sell_stock(sell_info["userId"], sell_info["stockId"], sell_info["price"])
-            supabase_middleman.buy_stock(buy_info["userId"], buy_info["stockId"])
-            supabase_middleman.resolve_price_diff(buy_info["userId"], order_diff)
+            # Order price=sell price; refund the difference between buy and sell price to the buyer
+            supabase_middleman.sell_stock(seller["userId"], seller["stockId"], seller["price"])
+            supabase_middleman.buy_stock(buyer["userId"], buyer["stockId"])
+            supabase_middleman.resolve_price_diff(buyer["userId"], order_diff)
         elif buy_diff < sell_diff:
             # Order price = buy price; No refund needed because seller will sell @ higher price
-            supabase_middleman.sell_stock(sell_info["userId"], sell_info["stockId"], buy_info["price"])
-            supabase_middleman.buy_stock(buy_info["userId"], buy_info["stockId"])
+            supabase_middleman.sell_stock(seller["userId"], seller["stockId"], buyer["price"])
+            supabase_middleman.buy_stock(buyer["userId"], buyer["stockId"])
         else:
             # Order price = current stock price
             # Refund buyer and seller their difference from the current price
-            supabase_middleman.sell_stock(sell_info["userId"], sell_info["stockId"], curr_stock_price)
-            supabase_middleman.buy_stock(buy_info["userId"], buy_info["stockId"])
-            supabase_middleman.resolve_price_diff(buy_info["userId"], buy_diff)
+            supabase_middleman.sell_stock(seller["userId"], seller["stockId"], curr_price)
+            supabase_middleman.buy_stock(buyer["userId"], buyer["stockId"])
+            supabase_middleman.resolve_price_diff(buyer["userId"], buy_diff)
 
         # Deletes sell order used in the active_buy_sell table
-        supabase_middleman.delete_processed_order(sell_info["Id"])
+        supabase_middleman.delete_processed_order(seller["Id"])
         # Logs transaction in the inactive_buy_sell table
-        supabase_middleman.log_transaction(buy_info, sell_info)
+        supabase_middleman.log_transaction(buyer, seller)
     return "Conducted and logged transaction"
