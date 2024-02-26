@@ -44,20 +44,23 @@ def buy_order():
         supabase_middleman.log_unfulfilled_order(buy_info)
         return "No valid sale for this transaction"
 
-    # Gets sell order closest to the buy price and current stock price
+    # Gets sell order closest to the buy price
     sell_info = valid_sells.pop()
-    curr_stock_price = supabase_middleman.fetch_stock_price(sell_info["stockId"])
-
     # Finds the distances between the current price and the buy/sell prices
     # Decides order handling based off which price is closest to current price
+    curr_stock_price = supabase_middleman.fetch_stock_price(sell_info["stockId"])
     sell_diff = abs(curr_stock_price - sell_info["price"])
-    buy_diff = abs(curr_stock_price - buy_info["price"])
-    if sell_diff < buy_diff:
+    buy_diff = abs(buy_info["price"] - curr_stock_price)
+    order_diff = buy_info["price"] - sell_info["price"]
+    if order_diff == 0 and buy_info["price"] != curr_stock_price:
+        # Order cannot be fulfilled @ current price
+        supabase_middleman.log_unfulfilled_order(buy_info)
+        return "Current stock price didn't match equal buy & sell prices"
+    elif sell_diff < buy_diff:
         # Order price = sell price; refund the difference between buy and sell price to the buyer
-        buyer_refund = abs(buy_info["price"] - sell_info["price"])
         supabase_middleman.sell_stock(sell_info["userId"], sell_info["stockId"], sell_info["price"])
         supabase_middleman.buy_stock(buy_info["userId"], buy_info["stockId"], sell_info["price"])
-        supabase_middleman.resolve_price_diff(buy_info["userId"], buyer_refund)
+        supabase_middleman.resolve_price_diff(buy_info["userId"], order_diff)
     elif buy_diff < sell_diff:
         # Order price = buy price; No refund needed because seller will sell @ higher price
         supabase_middleman.sell_stock(sell_info["userId"], sell_info["stockId"], buy_info["price"])
