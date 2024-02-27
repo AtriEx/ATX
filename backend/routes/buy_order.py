@@ -2,7 +2,6 @@
 
 import os
 from collections import deque
-from time import sleep
 from util import test_data
 from database import supabase_middleman
 from dotenv import load_dotenv
@@ -60,7 +59,7 @@ def buy_order():
         buy_diff = abs(buyer["price"] - curr_price)
         order_diff = buyer["price"] - seller["price"]
         # Checks edge case where buy price = sell price != current market price
-        if (order_diff == 0):
+        if order_diff == 0:
             # Order cannot be fulfilled @ current price
             supabase_middleman.sell_stock(seller["userId"], seller["stockId"], seller["price"])
             supabase_middleman.buy_stock(buyer["userId"], buyer["stockId"])

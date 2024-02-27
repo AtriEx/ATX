@@ -167,11 +167,11 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
     """
     if buy_info.get("Id"):
         del buy_info["Id"]
-    if buy_info.get("has_been_processed") != None:
+    if buy_info.get("has_been_processed") is not None:
         del buy_info["has_been_processed"]
     if sell_info.get("Id"):
         del sell_info["Id"]
-    if sell_info.get("has_been_processed") != None:
+    if sell_info.get("has_been_processed") is not None:
         del sell_info["has_been_processed"]
 
     supabase.table("inactive_buy_sell").insert(buy_info).execute()
@@ -191,6 +191,6 @@ def log_unfulfilled_order(order_info: dict) -> None:
     """
     if order_info.get("Id"):
         del order_info["Id"]
-    if order_info.get("has_been_processed") != None:
+    if order_info.get("has_been_processed") is not None:
         del order_info["has_been_processed"]
     supabase.table("active_buy_sell").insert(order_info).execute()
