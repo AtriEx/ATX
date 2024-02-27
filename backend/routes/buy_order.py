@@ -45,7 +45,7 @@ def buy_order():
              .update({"has_been_processed": True})
              .eq("Id", buyer["Id"])
              )
-            return
+            return "Market closed"
 
         # Market is open and a valid sell is availible
         if not valid_sells:
