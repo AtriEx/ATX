@@ -24,12 +24,14 @@ def buy_order():
     # Slects all active sells order by price then by time-posted (desc)
     valid_sells = deque((
         supabase.table("active_buy_sell")
-        .select("*")
+        .select("Id", "userId", "time_posted", "buy_or_sell", "price",
+                "quantity", "stockId", "orderId", "has_been_processed"
+                )
         .match({"buy_or_sell": False, "stockId": buyer["stockId"]})
         .lte("price", buyer["price"])
         .order("price", desc=True)
         .order("time_posted")
-        .limit(buyer["quantity"])
+        .limit(1)
         .execute()
         .data
     ))
@@ -39,9 +41,11 @@ def buy_order():
     for _ in range(buyer["quantity"]):
         if not is_open:
             # If the market is closed
-            supabase_middleman.log_unfulfilled_order(buyer)
-            print("Market not open")
-            continue
+            (supabase.table("active_buy_sell")
+             .update({"has_been_processed": True})
+             .eq("Id", buyer["Id"])
+             )
+            return
 
         # Market is open and a valid sell is availible
         if not valid_sells:
