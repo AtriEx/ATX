@@ -140,15 +140,16 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
 
 
 # unreviewed
-def delete_processed_order(order_index) -> None:
+def delete_processed_order(order_index: int) -> None:
     """
     Deletes the sell/buy order fufilled in a transaction from the active_buy_sell table
 
     Args:
-        order_index(dict): The unique row identifier for an entry in the active_buy_sell table
+        order_index(int): The unique row identifier for an entry in the active_buy_sell table
 
     Returns: None
     """
+    print(order_index)
     supabase.table("active_buy_sell").delete().eq("Id", order_index).execute()
 
 
@@ -166,8 +167,12 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
     """
     if buy_info.get("Id"):
         del buy_info["Id"]
+    if buy_info.get("has_been_processed") != None:
+        del buy_info["has_been_processed"]
     if sell_info.get("Id"):
         del sell_info["Id"]
+    if sell_info.get("has_been_processed") != None:
+        del sell_info["has_been_processed"]
 
     supabase.table("inactive_buy_sell").insert(buy_info).execute()
     supabase.table("inactive_buy_sell").insert(sell_info).execute()
@@ -186,4 +191,6 @@ def log_unfulfilled_order(order_info: dict) -> None:
     """
     if order_info.get("Id"):
         del order_info["Id"]
+    if order_info.get("has_been_processed") != None:
+        del order_info["has_been_processed"]
     supabase.table("active_buy_sell").insert(order_info).execute()
