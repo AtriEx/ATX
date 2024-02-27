@@ -1,3 +1,4 @@
+"""Generates tables for database.md based on documentation on supabase."""
 import os
 import re
 
@@ -10,15 +11,15 @@ BASE_URL = os.getenv("PUBLIC_SUPABASE_URL")
 API_KEY = os.getenv("SUPABASE_KEY")
 
 if BASE_URL is None or API_KEY is None:
-    raise Exception("Make sure to set PUBLIC_SUPABASE_URL and SUPABASE_KEY")
+    raise RuntimeError("Make sure to set PUBLIC_SUPABASE_URL and SUPABASE_KEY")
 
-req = requests.get(BASE_URL + "/rest/v1/", headers={"apikey": API_KEY})
+req = requests.get(BASE_URL + "/rest/v1/", headers={"apikey": API_KEY}, timeout=10)
 
 if req.ok:
     schema = req.json()
 
 else:
-    raise Exception(f"Got HTTP code {req.status_code}: {req.reason}")
+    raise RuntimeError(f"Got HTTP code {req.status_code}: {req.reason}")
 
 
 def generate_table(rows: list[list[str]]) -> str:
@@ -52,18 +53,18 @@ def generate_table(rows: list[list[str]]) -> str:
     return "\n".join(table)
 
 
-output_md = ""
+output_md = "" # pylint: disable=C0103
 
 # Generate the table documentation
-for table_name, table in schema["definitions"].items():
+for table_name, db_table in schema["definitions"].items():
     table_md = f"### `{table_name}`\n"
-    table_md += table.get("description", "") + "\n"
+    table_md += db_table.get("description", "") + "\n"
 
     # Generate rows for markdown table
-    rows = []
+    md_rows = []
 
-    for column_name, column in table["properties"].items():
-        description = column.get("description", "").replace("\n", " ")
+    for column_name, db_column in db_table["properties"].items():
+        description = db_column.get("description", "").replace("\n", " ")
 
         # Descriptions contain text saying that it's a key
         x = re.search(r"Note: This is a (Foreign|Primary) Key", description)
@@ -80,20 +81,19 @@ for table_name, table in schema["definitions"].items():
 
             else:
                 description = (description[:start] if start != 0 else "") + " **PK**"
-                pass
 
-        rows.append([column_name, column.get("format", ""), description.strip()])
+        md_rows.append([column_name, db_column.get("format", ""), description.strip()])
 
-    table_md += generate_table(rows) + "\n\n"
+    table_md += generate_table(md_rows) + "\n\n"
     output_md += table_md
 
 # Finally, rewrite the database file
-with open("database.md", "r") as f:
+with open("database.md", "r", encoding="UTF-8") as f:
     database_docs = f.read()
 
 database_docs = database_docs.split("## Tables")[0]
 
 database_docs += f"## Tables\n\n{output_md}"
 
-with open("database.md", "w") as f:
+with open("database.md", "w", encoding="UTF-8") as f:
     f.write(database_docs)
