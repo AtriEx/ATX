@@ -21,3 +21,15 @@ python -m uvicorn main:app --reload
 > [!NOTE]
 > Interactive API documentation can be viewed at the /docs url of the server, for example: <br>
 > http://127.0.0.1:8000/docs
+
+## Docker
+**Build the docker image**
+```bash
+docker build -t atx .
+```
+
+**Run the docker container**
+```bash
+# Remove -d to start attached to the container
+docker run -d -p 8000:8000 atx
+```
