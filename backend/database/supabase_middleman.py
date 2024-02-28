@@ -300,3 +300,39 @@ def validate_user(user_id: str):
     return bool(
         supabase.table("profiles").select("*").eq("userId", user_id).execute().data
     )
+
+
+def migrate_price_changes():
+    all_daily_price_changes = supabase.table("stock_price_history_daily").select("changed_at, price, stockId").order("changed_at").order("stockId").execute().data;
+    
+    if len(all_daily_price_changes) == 0:
+        return
+    
+    current_stock = all_daily_price_changes[0]["stockId"]
+    current_hour = all_daily_price_changes[0]["changed_at"].replace(minute = 0, second = 0, microsecond = 0)
+
+    hourly_start_price = all_daily_price_changes[0]["price"] 
+    hourly_sum = all_daily_price_changes[0]["price"]
+    hourly_count = 1
+    hourly_highest = all_daily_price_changes[0]["price"] 
+    hourly_lowest = all_daily_price_changes[0]["price"] 
+    hourly_last_price= all_daily_price_changes[0]["price"] 
+
+    weekly_rows_to_add = []
+    monthly_rows_to_add = []
+
+    for price_change in all_daily_price_changes:
+        if price_change["stockId"] != current_stock or price_change["changed_at"].hour != current_hour.hour:
+            weekly_rows_to_add += [{
+                "starting_hour": current_hour,
+                "stockId": current_stock,
+                "average_price": hourly_sum / hourly_count,
+                "highest_price": hourly_highest,
+                "lowest_price": hourly_lowest,
+                "opening_price": hourly_start_price,
+                "closing_price": hourly_last_price,
+                "volume_of_sales": hourly_count, #TODO:This isn't really accurate, needs to be looked over
+            }]
+        if price_change["stockId"] != current_stock:
+            current_stock = price_change["stockId"]
+            current_hour = price_change["changed_at"].replace(minute = 0, second = 0, microsecond = 0)
