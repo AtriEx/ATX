@@ -1,7 +1,7 @@
 <script>
 	import { profile, user, loggedIn } from '$lib/stores/userData';
 	import { loginDialog, debugMenu } from '$lib/stores/uiStates';
-	import { getProfile, getUser } from '$lib/supabase';
+	import { getProfile, getUser, supabase } from '$lib/supabase';
 
 	function logProfile() {
 		console.log($profile);
@@ -19,6 +19,17 @@
 	function openLoginDialog() {
 		$loginDialog = true;
 		$debugMenu = false;
+	}
+
+	async function runExampleEdgeFunction() {
+		try {
+			const { data } = await supabase.functions.invoke('example-function', {
+				body: { exampleParameter: 'exampleValue' }
+			});
+			console.log(data);
+		} catch (error) {
+			console.error(error);
+		}
 	}
 </script>
 
@@ -49,6 +60,12 @@
 				on:click={openLoginDialog}
 			>
 				Open login dialog
+			</button>
+			<button
+				class="bg-twitch text-white text-lg px-8 p-2 rounded-md flex flex-row items-center"
+				on:click={runExampleEdgeFunction}
+			>
+				Run Example Edge Function
 			</button>
 		</div>
 
