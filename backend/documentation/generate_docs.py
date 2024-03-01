@@ -1,4 +1,5 @@
 """Generates tables for database.md based on documentation on supabase."""
+
 import os
 import re
 
