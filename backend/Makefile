@@ -1,4 +1,4 @@
-format:
+format fmt:
 	isort --profile black .
 	black .
 
