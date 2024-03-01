@@ -9,7 +9,10 @@ from datetime import datetime, timedelta
 
 >>>>>>> a9dd20a (enforce black formatting style)
 from dotenv import load_dotenv
+<<<<<<< HEAD
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
+=======
+>>>>>>> 914805c (remove unnecessary linter disables)
 from supabase import Client, create_client
 
 <<<<<<< HEAD
