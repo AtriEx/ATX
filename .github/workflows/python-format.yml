@@ -1,4 +1,4 @@
-name: Lint python files
+name: Check python files formatting
 
 on:
   pull_request:
