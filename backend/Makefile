@@ -1,14 +1,16 @@
+TRACKED_FILES=$(shell git ls-files '*.py')
+
 format fmt:
-	isort --profile black .
-	black .
+	isort --profile black ${TRACKED_FILES}
+	black ${TRACKED_FILES}
 
 lint-only:
-	pylint *.py **/*.py
+	pylint ${TRACKED_FILES}
 
 lint: format lint-only
 
 check-format:
-	isort --profile black --check .
-	black --check .
+	isort --profile black --check ${TRACKED_FILES}
+	black --check ${TRACKED_FILES}
 
 ci: check-format lint-only
