@@ -1,7 +1,6 @@
 """API handler for creating and fulfilling buy orders."""
 
 import os
-from collections import deque
 from util import test_data
 from database import supabase_middleman
 from dotenv import load_dotenv
