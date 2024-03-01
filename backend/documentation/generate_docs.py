@@ -1,4 +1,5 @@
 """Generates tables for database.md based on documentation on supabase."""
+
 import os
 import re
 
@@ -53,7 +54,7 @@ def generate_table(rows: list[list[str]]) -> str:
     return "\n".join(table)
 
 
-output_md = "" # pylint: disable=C0103
+output_md = ""  # pylint: disable=C0103
 
 # Generate the table documentation
 for table_name, db_table in schema["definitions"].items():
