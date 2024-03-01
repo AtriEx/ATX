@@ -12,5 +12,3 @@ lint: format lint-only
 check-format:
 	isort --profile black --check ${TRACKED_FILES}
 	black --check ${TRACKED_FILES}
-
-ci: check-format lint-only

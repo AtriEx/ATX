@@ -26,6 +26,6 @@ jobs:
         pip install -r requirements.txt
         pip install -r dev_requirements.txt
 
-    - name: Run linter
+    - name: Run format check
       run: |
-        make lint-only
+        make check-format
