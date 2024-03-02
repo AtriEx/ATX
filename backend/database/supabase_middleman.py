@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> aa61e28 (test commit of black formatting)
@@ -27,6 +28,11 @@ from supabase import Client, create_client
 >>>>>>> c51a102 (more linter fixes)
 =======
 >>>>>>> 1f2d31f (more linter fixes maybe)
+=======
+=======
+# pylint: disable=import-error,no-name-in-module # it"s looking in the supabase folder in project root
+>>>>>>> 8bc8647 (reformatting/refactoring)
+>>>>>>> 9fdc647 (reformatting/refactoring)
 from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
@@ -70,6 +76,7 @@ def is_market_open() -> bool:
 
 def update_user_balance(user_id: str, amount: int) -> int:
     """
+<<<<<<< HEAD
     Updates the user's balance by adding the given amount
 
     Args:
@@ -77,6 +84,21 @@ def update_user_balance(user_id: str, amount: int) -> int:
         amount (int): The amount to add to the user's balance
 
     Returns: int - The new balance
+=======
+    Updates an entry in a table
+    """
+
+
+# unreviewed
+def escrow_buy(user_id: str, buy_price: int) -> None:
+    """
+    Subtracts given buy order price from user"s balance
+
+    Args:
+        buy_price(int): The price submitted by the buyer
+        user_id(str): The buyer"s user ID
+    Returns: None
+>>>>>>> 8bc8647 (reformatting/refactoring)
     """
     old_balance = (
         supabase.table("profiles")
@@ -157,10 +179,38 @@ def fetch_stock_price(stock_id: int) -> int:
 
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 
 <<<<<<< HEAD
+=======
+=======
+# unreviewed
+def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
+    """
+    Sells a user's stock at the order_price
+    (Assumes the user has a portfolio of that stock)
+
+    Args:
+        user_id (str): The user on the sell side of a stock transaction
+        stock_id(int): The ID of the stock being sold
+        order_price(int): Price closest to current stock price presented by the buyer or seller
+
+    Returns: None
+    """
+    supabase.rpc("sell_stock",
+                 {"user_id": user_id, "stock_id": stock_id, "order_price": order_price}
+                 ).execute()
+
+
+# unreviewed
+def buy_stock(user_id: str, stock_id: int) -> None:
+    """
+    Buys a stock for the user_id stock at the order_price
+    (Assumes the user has a portfolio of that stock)
+
+>>>>>>> 9fdc647 (reformatting/refactoring)
     Args:
         user_id (str): The user on the buy side of a stock transaction
         stock_id(int): The ID of the stock being bought
@@ -186,10 +236,14 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
 
 
 # unreviewed
+<<<<<<< HEAD
 =======
 >>>>>>> 4f518fb (fixed changes from code walkthrough)
 =======
 >>>>>>> aa61e28 (test commit of black formatting)
+=======
+>>>>>>> 8bc8647 (reformatting/refactoring)
+>>>>>>> 9fdc647 (reformatting/refactoring)
 def delete_processed_order(order_index: int) -> None:
     """
     Deletes the sell/buy order fufilled in a transaction from the active_buy_sell table
@@ -316,6 +370,7 @@ def expire_order(order_id: int):
     Args:
         order_id (int): The active order id
     """
+<<<<<<< HEAD
 
     # Delete order
     order = (
@@ -358,6 +413,7 @@ def expire_order(order_id: int):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 def update_entry():
@@ -371,44 +427,54 @@ def update_entry():
 =======
 >>>>>>> 1f2d31f (more linter fixes maybe)
 =======
+=======
+=======
+    if order_info.get("Id"):
+        del order_info["Id"]
+    if order_info.get("has_been_processed") is not None:
+        del order_info["has_been_processed"]
+    supabase.table("active_buy_sell").insert(order_info).execute()
+
+>>>>>>> 8bc8647 (reformatting/refactoring)
+>>>>>>> 9fdc647 (reformatting/refactoring)
 def networth_calculator(user_id: str) -> int:
     """
-    Gets the user's networth from profile,portfolio,and active_buy_sell
+    Gets the user's networth from profile, portfolio,and active_buy_sell
 
     Args:
         user_id (int): The id of the user that you want to see the networth of
 
     Returns: The networth in int
     """
-    profile_balance= (supabase.table('profiles')
-    .select('balance')
-    .match({"userId":user_id})
-    .execute()
-    .data
-    .pop()["balance"])
+    profile_balance = (supabase.table("profiles")
+        .select("balance")
+        .match({"userId": user_id})
+        .execute()
+        .data
+        .pop()["balance"])
 
-    user_portfolio=(supabase.table('portfolio')
-    .select('quantity,stockId')
-    .match({"userId":user_id})
-    .execute()
-    .data)
-    portfolio_balance=0
+    user_portfolio = (supabase.table("portfolio")
+        .select("quantity,stockId")
+        .match({"userId": user_id})
+        .execute()
+        .data)
+    portfolio_balance = 0
     for stock in user_portfolio:
-        portfolio_balance+= stock["quantity"]* fetch_stock_price(stock["stockId"])
+        portfolio_balance += stock["quantity"] * fetch_stock_price(stock["stockId"])
 
-    active_buy_sell_entries=(supabase.table('active_buy_sell')
-    .select('price,quantity,stockId,buy_or_sell,userId')
-    .match({"userId":user_id})
-    .execute()
-    .data)
-    buy_balance=0
-    sell_balance=0
+    active_buy_sell_entries = (supabase.table("active_buy_sell")
+        .select("price,quantity,stockId,buy_or_sell,userId")
+        .match({"userId": user_id})
+        .execute()
+        .data)
+    active_order_balance = 0
     for entry in active_buy_sell_entries:
-        if entry["buy_or_sell"]==True:
-            buy_balance+= (entry['price']*entry["quantity"])
+        if entry["buy_or_sell"]:
+            active_order_balance += entry["price"] * entry["quantity"]
         else:
-            sell_balance+=(fetch_stock_price(entry["stockId"])*entry["quantity"])
-    return sell_balance+buy_balance+portfolio_balance+profile_balance
+            active_order_balance += fetch_stock_price(entry["stockId"]) * entry["quantity"]
+
+    return active_order_balance + portfolio_balance + profile_balance
    
 
 >>>>>>> cfd74d4 (what i have done so far)
