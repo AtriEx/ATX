@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> aa61e28 (test commit of black formatting)
@@ -33,6 +34,14 @@ from supabase import Client, create_client
 # pylint: disable=import-error,no-name-in-module # it"s looking in the supabase folder in project root
 >>>>>>> 8bc8647 (reformatting/refactoring)
 >>>>>>> 9fdc647 (reformatting/refactoring)
+=======
+=======
+# pylint: disable=import-error,no-name-in-module # it"s looking in the supabase folder in project root
+>>>>>>> 8bc8647 (reformatting/refactoring)
+=======
+# pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
+>>>>>>> 9f154e1 (changed typos)
+>>>>>>> 796bd58 (changed typos)
 from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
@@ -92,11 +101,11 @@ def update_user_balance(user_id: str, amount: int) -> int:
 # unreviewed
 def escrow_buy(user_id: str, buy_price: int) -> None:
     """
-    Subtracts given buy order price from user"s balance
+    Subtracts given buy order price from user's balance
 
     Args:
         buy_price(int): The price submitted by the buyer
-        user_id(str): The buyer"s user ID
+        user_id(str): The buyer's user ID
     Returns: None
 >>>>>>> 8bc8647 (reformatting/refactoring)
     """
@@ -439,12 +448,12 @@ def update_entry():
 >>>>>>> 9fdc647 (reformatting/refactoring)
 def networth_calculator(user_id: str) -> int:
     """
-    Gets the user's networth from profile, portfolio,and active_buy_sell
+    Gets the user's networth from profile, portfolio, and active_buy_sell
 
     Args:
-        user_id (int): The id of the user that you want to see the networth of
+        user_id (int): The id of the user whose net worth is requested
 
-    Returns: The networth in int
+    Returns: Net worth of user
     """
     profile_balance = (supabase.table("profiles")
         .select("balance")
