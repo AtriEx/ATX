@@ -357,6 +357,7 @@ def expire_order(order_id: int):
     supabase.table("inactive_buy_sell").insert(order).execute()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 def update_entry():
@@ -369,3 +370,24 @@ def update_entry():
 >>>>>>> 81e8d77 (more linter fixes)
 =======
 >>>>>>> 1f2d31f (more linter fixes maybe)
+=======
+def networth_calculator(user_id: str) -> int:
+   
+   profile_balance= (supabase.table('profiles')
+    .select('balance')
+    .match({"userId":user_id})
+    .execute()
+    .data
+    .pop()["balance"])
+   user_portfolio=(supabase.table('portfolio')
+    .select('quantity,stockId')
+    .match({"userId":user_id})
+    .execute()
+    .data)
+   portfolio_balance=0
+   for stock in user_portfolio:
+        portfolio_balance+= stock["quantity"]* fetch_stock_price(stock["stockId"])
+   return profile_balance+portfolio_balance
+   
+
+>>>>>>> cfd74d4 (what i have done so far)
