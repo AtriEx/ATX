@@ -372,24 +372,39 @@ def update_entry():
 >>>>>>> 1f2d31f (more linter fixes maybe)
 =======
 def networth_calculator(user_id: str) -> int:
+    
  #this gets the balance from the profile table  
-   profile_balance= (supabase.table('profiles')
+    profile_balance= (supabase.table('profiles')
     .select('balance')
     .match({"userId":user_id})
     .execute()
     .data
     .pop()["balance"])
-#this gets the stock from portfolio and and multiply it by the price from the stock_price table
-   user_portfolio=(supabase.table('portfolio')
+ #this gets the stock from portfolio and and multiply it by the price from the stock_price table
+    user_portfolio=(supabase.table('portfolio')
     .select('quantity,stockId')
     .match({"userId":user_id})
     .execute()
     .data)
-   portfolio_balance=0
-   for stock in user_portfolio:
+    portfolio_balance=0
+    for stock in user_portfolio:
         portfolio_balance+= stock["quantity"]* fetch_stock_price(stock["stockId"])
-#then I add all the values here and return them
-   return profile_balance+portfolio_balance
+ #idk
+    active_buy_sell_entries=(supabase.table('active_buy_sell')
+    .select('price,quantity,stockId,buy_or_sell,userId')
+    .match({"userId":user_id})
+    .execute()
+    .data)
+    buy_balance=0
+    sell_balance=0
+    for entry in active_buy_sell_entries:
+        if entry["buy_or_sell"]==True:
+            buy_balance+= (entry['price']*entry["quantity"])
+        else:
+            sell_balance+=(fetch_stock_price(entry["stockId"])*entry["quantity"])
+    return sell_balance
+ #then I add all the values here and return them
+    return profile_balance+portfolio_balance
    
 
 >>>>>>> cfd74d4 (what i have done so far)
