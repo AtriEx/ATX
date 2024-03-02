@@ -3,7 +3,7 @@ interactions in high-level generic functions."""
 
 import os
 from dotenv import load_dotenv
-# pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
+# pylint: disable=import-error,no-name-in-module # it"s looking in the supabase folder in project root
 from supabase import Client, create_client
 
 load_dotenv("env/.env")
@@ -59,11 +59,11 @@ def update_entry():
 # unreviewed
 def escrow_buy(user_id: str, buy_price: int) -> None:
     """
-    Subtracts given buy order price from user's balance
+    Subtracts given buy order price from user"s balance
 
     Args:
         buy_price(int): The price submitted by the buyer
-        user_id(str): The buyer's user ID
+        user_id(str): The buyer"s user ID
     Returns: None
     """
 
@@ -131,7 +131,7 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
     Handles difference in desired prices between the buyer and seller
 
     Args:
-        user_id(str): The user who's balance will be handled
+        user_id(str): The user who"s balance will be handled
         price_diff(int): The amount to be refunded/ rewarded back to the user
 
     Returns: None
@@ -195,43 +195,44 @@ def log_unfulfilled_order(order_info: dict) -> None:
     if order_info.get("has_been_processed") is not None:
         del order_info["has_been_processed"]
     supabase.table("active_buy_sell").insert(order_info).execute()
+
 def networth_calculator(user_id: str) -> int:
     """
-    Gets the user's networth from profile,portfolio,and active_buy_sell
+    Gets the user's networth from profile, portfolio,and active_buy_sell
 
     Args:
         user_id (int): The id of the user that you want to see the networth of
 
     Returns: The networth in int
     """
-    profile_balance= (supabase.table('profiles')
-    .select('balance')
-    .match({"userId":user_id})
-    .execute()
-    .data
-    .pop()["balance"])
+    profile_balance = (supabase.table("profiles")
+        .select("balance")
+        .match({"userId": user_id})
+        .execute()
+        .data
+        .pop()["balance"])
 
-    user_portfolio=(supabase.table('portfolio')
-    .select('quantity,stockId')
-    .match({"userId":user_id})
-    .execute()
-    .data)
-    portfolio_balance=0
+    user_portfolio = (supabase.table("portfolio")
+        .select("quantity,stockId")
+        .match({"userId": user_id})
+        .execute()
+        .data)
+    portfolio_balance = 0
     for stock in user_portfolio:
-        portfolio_balance+= stock["quantity"]* fetch_stock_price(stock["stockId"])
+        portfolio_balance += stock["quantity"] * fetch_stock_price(stock["stockId"])
 
-    active_buy_sell_entries=(supabase.table('active_buy_sell')
-    .select('price,quantity,stockId,buy_or_sell,userId')
-    .match({"userId":user_id})
-    .execute()
-    .data)
-    buy_balance=0
-    sell_balance=0
+    active_buy_sell_entries = (supabase.table("active_buy_sell")
+        .select("price,quantity,stockId,buy_or_sell,userId")
+        .match({"userId": user_id})
+        .execute()
+        .data)
+    active_order_balance = 0
     for entry in active_buy_sell_entries:
-        if entry["buy_or_sell"]==True:
-            buy_balance+= (entry['price']*entry["quantity"])
+        if entry["buy_or_sell"]:
+            active_order_balance += entry["price"] * entry["quantity"]
         else:
-            sell_balance+=(fetch_stock_price(entry["stockId"])*entry["quantity"])
-    return sell_balance+buy_balance+portfolio_balance+profile_balance
+            active_order_balance += fetch_stock_price(entry["stockId"]) * entry["quantity"]
+
+    return active_order_balance + portfolio_balance + profile_balance
    
 
