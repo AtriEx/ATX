@@ -155,6 +155,7 @@ def delete_processed_order(order_index: int) -> None:
 
 # unreviewed
 def log_transaction(buy_info: dict, sell_info: dict) -> None:
+
     """
     Logs tansaction info in the inactive_buy_sell table (Should be called @ the end of order flow)
     Removes the Id column from the buyer & seller info before logging the transaction
@@ -195,23 +196,38 @@ def log_unfulfilled_order(order_info: dict) -> None:
         del order_info["has_been_processed"]
     supabase.table("active_buy_sell").insert(order_info).execute()
 def networth_calculator(user_id: str) -> int:
+    
  #this gets the balance from the profile table  
-   profile_balance= (supabase.table('profiles')
+    profile_balance= (supabase.table('profiles')
     .select('balance')
     .match({"userId":user_id})
     .execute()
     .data
     .pop()["balance"])
-#this gets the stock from portfolio and and multiply it by the price from the stock_price table
-   user_portfolio=(supabase.table('portfolio')
+ #this gets the stock from portfolio and and multiply it by the price from the stock_price table
+    user_portfolio=(supabase.table('portfolio')
     .select('quantity,stockId')
     .match({"userId":user_id})
     .execute()
     .data)
-   portfolio_balance=0
-   for stock in user_portfolio:
+    portfolio_balance=0
+    for stock in user_portfolio:
         portfolio_balance+= stock["quantity"]* fetch_stock_price(stock["stockId"])
-#then I add all the values here and return them
-   return profile_balance+portfolio_balance
+ #idk
+    active_buy_sell_entries=(supabase.table('active_buy_sell')
+    .select('price,quantity,stockId,buy_or_sell,userId')
+    .match({"userId":user_id})
+    .execute()
+    .data)
+    buy_balance=0
+    sell_balance=0
+    for entry in active_buy_sell_entries:
+        if entry["buy_or_sell"]==True:
+            buy_balance+= (entry['price']*entry["quantity"])
+        else:
+            sell_balance+=(fetch_stock_price(entry["stockId"])*entry["quantity"])
+    return sell_balance
+ #then I add all the values here and return them
+    return profile_balance+portfolio_balance
    
 
