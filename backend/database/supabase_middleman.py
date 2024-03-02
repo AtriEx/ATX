@@ -194,3 +194,22 @@ def log_unfulfilled_order(order_info: dict) -> None:
     if order_info.get("has_been_processed") is not None:
         del order_info["has_been_processed"]
     supabase.table("active_buy_sell").insert(order_info).execute()
+def networth_calculator(user_id: str) -> int:
+   
+   profile_balance= (supabase.table('profiles')
+    .select('balance')
+    .match({"userId":user_id})
+    .execute()
+    .data
+    .pop()["balance"])
+   user_portfolio=(supabase.table('portfolio')
+    .select('quantity,stockId')
+    .match({"userId":user_id})
+    .execute()
+    .data)
+   portfolio_balance=0
+   for stock in user_portfolio:
+        portfolio_balance+= stock["quantity"]* fetch_stock_price(stock["stockId"])
+   return profile_balance+portfolio_balance
+   
+
