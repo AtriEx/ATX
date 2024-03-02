@@ -372,13 +372,14 @@ def update_entry():
 >>>>>>> 1f2d31f (more linter fixes maybe)
 =======
 def networth_calculator(user_id: str) -> int:
-   
+ #this gets the balance from the profile table  
    profile_balance= (supabase.table('profiles')
     .select('balance')
     .match({"userId":user_id})
     .execute()
     .data
     .pop()["balance"])
+#this gets the stock from portfolio and and multiply it by the price from the stock_price table
    user_portfolio=(supabase.table('portfolio')
     .select('quantity,stockId')
     .match({"userId":user_id})
@@ -387,6 +388,7 @@ def networth_calculator(user_id: str) -> int:
    portfolio_balance=0
    for stock in user_portfolio:
         portfolio_balance+= stock["quantity"]* fetch_stock_price(stock["stockId"])
+#then I add all the values here and return them
    return profile_balance+portfolio_balance
    
 
