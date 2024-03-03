@@ -4,10 +4,12 @@ has expired.
 """
 
 import asyncio
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from database import supabase_middleman
 from datetime import datetime
+
+from fastapi import FastAPI
+
+from database import supabase_middleman
 
 
 @asynccontextmanager
