@@ -240,6 +240,21 @@ def log_unfulfilled_buy(buy_info: dict) -> None:
     ).execute()
 
 
+def get_active() -> list[dict]:
+    """Return active buy orders, sorted by their expiry time (ascending)"""
+
+    print("Making order")
+
+    orders = (
+        supabase.table("active_buy_sell")
+        .select("expirey")
+        .order("expirey", desc=False)
+        .execute()
+    )
+
+    return orders.data
+
+
 def update_entry():
     """
     Updates an entry in a table
