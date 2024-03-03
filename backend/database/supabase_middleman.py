@@ -255,6 +255,25 @@ def get_active() -> list[dict]:
     return orders.data
 
 
+def move_to_inactive(order_id: int):
+    """
+    Move order_id from active to inactive order table
+
+    Args:
+        order_id (int): The active order id
+    """
+
+    order = (
+        supabase.table("active_buy_sell")
+        .select("*")
+        .eq("Id", order_id)
+        .single()
+        .execute()
+    )
+
+    # TODO: Expire
+
+
 def update_entry():
     """
     Updates an entry in a table
