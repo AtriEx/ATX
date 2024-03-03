@@ -258,8 +258,30 @@ def networth_calculator(user_id: str) -> int:
         else:
             active_order_balance += fetch_stock_price(entry["stockId"]) * entry["quantity"]
 
+<<<<<<< HEAD
     return active_order_balance + portfolio_balance + profile_balance
    
 
 =======
 >>>>>>> aa61e28 (test commit of black formatting)
+=======
+def get_active() -> list[dict]:
+    """Return active buy orders, sorted by their expiry time (ascending)"""
+
+    print("Making order")
+
+    orders = (
+        supabase.table("active_buy_sell")
+        .select("expirey")
+        .order("expirey", desc=False)
+        .execute()
+    )
+
+    return orders.data
+
+
+def update_entry():
+    """
+    Updates an entry in a table
+    """
+>>>>>>> 1d67bff (✨ Get active orders sorted by expiry)
