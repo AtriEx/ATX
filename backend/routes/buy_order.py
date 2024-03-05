@@ -2,18 +2,22 @@
 
 import os
 <<<<<<< HEAD
+<<<<<<< HEAD
 from util import test_data
 from database import supabase_middleman
 =======
 from datetime import datetime, timedelta
 
 >>>>>>> a9dd20a (enforce black formatting style)
+=======
+>>>>>>> 15dc317 (linter changes)
 from dotenv import load_dotenv
 <<<<<<< HEAD
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 =======
 >>>>>>> 914805c (remove unnecessary linter disables)
 from supabase import Client, create_client
+from database import supabase_middleman
 
 <<<<<<< HEAD
 load_dotenv("env/.env")
