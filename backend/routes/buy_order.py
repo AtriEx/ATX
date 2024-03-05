@@ -14,12 +14,16 @@ key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 
-def buy_order():
+def test_params():
+    """API route for testing parameters."""
+    return "Test parameters"
+
+def buy_order(data: dict) -> str:
     """Create a buy order for one share of a stock
     and fullfill it if possible."""
     # These are test values
     # We will have a function that returns this data using API call parameters
-    buyer = test_data.test_entry_1()
+    buyer = data
     # Slects all active sells order by price then by time-posted (desc)
     valid_sells = (
         supabase.table("active_buy_sell")
@@ -37,8 +41,8 @@ def buy_order():
     # Market is open and a valid sell is availible
     if not valid_sells:
         # Insert the buy order into active_buy_sell if it can't be fufilled
-        supabase_middleman.log_unfulfilled_order(buyer)
-        print("No valid sells")
+        #supabase_middleman.log_unfulfilled_order(buyer)
+        return "No valid sells"
 
     # Gets sell order closest to the buy price
     seller = valid_sells.pop()
