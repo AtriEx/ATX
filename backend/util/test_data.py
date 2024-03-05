@@ -21,6 +21,7 @@ def test_entry_1() -> dict:
         "expirey": (
             datetime.now() + timedelta(hours=1)
         ).isoformat(),  # This is a test value; users will input an expiry date
+        "has_been_processed": False,
     }
     return test_entry
 
@@ -41,5 +42,6 @@ def test_entry_2() -> dict:
         "expirey": (
             datetime.now() + timedelta(hours=1)
         ).isoformat(),  # This is a test value; users will input an expiry date
+        "has_been_processed": False,
     }
     return test_entry
