@@ -92,6 +92,73 @@ def fetch_stock_price(stock_id: int) -> int:
     return stock_price["stock_price"]
 
 
+def update_user_balance(user_id: str, amount: int) -> int:
+    """
+    Updates the user's balance by adding the given amount
+
+    Args:
+        user_id (str): The user's ID
+        amount (int): The amount to add to the user's balance
+
+    Returns: int - The new balance
+    """
+    old_balance=supabase.table("profiles").select("balance").eq("userId", user_id).execute().data.pop()["balance"]
+    new_balance=old_balance+amount
+    supabase.table("profiles").update({"balance": new_balance}).eq("userId", user_id).execute()
+    #TODO: make sure the query executed correctly and return if it didn't
+    return new_balance
+
+
+def update_user_portfolio(user_id: str, stock_id: int, quantity: int) -> int:
+    """
+    Updates the user's portfolio by adding the given quantity of the stock
+
+    Args:
+        user_id (str): The user's ID
+        stock_id (int): The stock's ID
+        quantity (int): The quantity of the stock to add
+
+    Returns: int - The new quantity of the stock in the user's portfolio
+    """
+    result=supabase.table("portfolio").select("quantity").eq("userId", user_id).eq("stockId", stock_id).execute().data
+    if result:
+        old_quantity=result.pop()["quantity"]
+        new_quantity=old_quantity+quantity
+        supabase.table("portfolio").update({"quantity": new_quantity}).eq("userId", user_id).eq("stockId", stock_id).execute()
+        payload = new_quantity
+    else:
+        supabase.table("portfolio").insert({"userId": user_id, "stockId": stock_id, "quantity": quantity}).execute()
+        payload = quantity
+    return payload
+
+    
+    
+
+
+def fetch_stock_price(stock_id: int) -> int:
+    """
+    Gets the current stock price of the given stock_id
+
+    Args:
+        stock_id (int): The id of the stock you want to get the price of
+
+    Returns: The price of the stock 
+    """
+
+    result = (supabase.table("stock_price")
+              .select("stock_price")
+              .eq("stockId", stock_id)
+              .execute()
+              .data
+              )
+
+    if result:
+        stock_price = result.pop()["stock_price"]
+        return stock_price
+    else:
+        return None
+
+
 # unreviewed
 def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
     """

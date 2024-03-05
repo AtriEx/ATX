@@ -33,3 +33,9 @@ def insert_custom_order(data: dict):
     """API route for inserting a custom order."""
     supabase_middleman.insert_entry("active_buy_sell", data)
     return "Custom order inserted"
+
+@app.get("/changeBalanceTest")  
+def change_balance_test(amount: int):
+    """API route for testing balance changes."""
+    output=supabase_middleman.update_user_balance("36d22a68-ca25-4110-b769-44cf5b4a1c89", amount)
+    return output
