@@ -67,32 +67,42 @@ def buy_order(data: dict) -> str:
     # Finds the distances between the current price and the buy/sell prices
     # Decides order handling based off which price is closest to current price
     curr_price = supabase_middleman.fetch_stock_price(seller["stockId"])
+    #the difference between the current price and the sellers price
     sell_diff = abs(curr_price - seller["price"])
+    #the difference between the current price and the buyers price
     buy_diff = abs(buyer["price"] - curr_price)
+    #the difference between the buyers price and the sellers price
     order_diff = buyer["price"] - seller["price"]
     # Checks edge case where buy price = sell price != current market price
     if order_diff == 0:
-        # Order cannot be fulfilled @ current price
-        supabase_middleman.sell_stock(seller["userId"], seller["stockId"], seller["price"])
-        supabase_middleman.buy_stock(buyer["userId"], buyer["stockId"])
+        # Order can be fulfilled @ price of both buyer and seller, no refund required.
+        supabase_middleman.update_user_balance(seller["userId"], seller["price"])
+        supabase_middleman.update_user_portfolio(buyer["userId"], buyer["stockId"],buyer["quantity"])
+        payload="Order fulfilled at desired price"
     elif sell_diff < buy_diff:
         # Order price=sell price; refund the difference between buy and sell price to the buyer
-        supabase_middleman.sell_stock(seller["userId"], seller["stockId"], seller["price"])
-        supabase_middleman.buy_stock(buyer["userId"], buyer["stockId"])
-        supabase_middleman.resolve_price_diff(buyer["userId"], order_diff)
+        #top row from excalidraw
+        supabase_middleman.update_user_balance(seller["userId"], seller["price"])
+        supabase_middleman.update_user_balance(buyer["userId"], order_diff)
+        supabase_middleman.update_user_portfolio(buyer["userId"], buyer["stockId"],buyer["quantity"])
+        payload="Order fulfilled at sellers price. refund issued to buyer"
     elif buy_diff < sell_diff:
         # Order price = buy price; No refund needed because seller will sell @ higher price
-        supabase_middleman.sell_stock(seller["userId"], seller["stockId"], buyer["price"])
-        supabase_middleman.buy_stock(buyer["userId"], buyer["stockId"])
+        #middle row from excalidraw
+        supabase_middleman.update_user_balance(seller["userId"], buyer["price"])
+        supabase_middleman.update_user_portfolio(buyer["userId"], buyer["stockId"],buyer["quantity"])
+        payload = "Order fulfilled at buyers price. No refund needed."
     else:
         # Order price = current stock price
         # Refund buyer their difference from the current price
-        supabase_middleman.sell_stock(seller["userId"], seller["stockId"], curr_price)
-        supabase_middleman.buy_stock(buyer["userId"], buyer["stockId"])
-        supabase_middleman.resolve_price_diff(buyer["userId"], buy_diff)
+        #bottom row from excalidraw
+        supabase_middleman.update_user_balance(seller["userId"], curr_price)
+        supabase_middleman.update_user_balance(buyer["userId"], buy_diff)
+        supabase_middleman.update_user_portfolio(buyer["userId"], buyer["stockId"],buyer["quantity"])
+        payload = "Order fulfilled at current price. Refund issued to buyer."
 
     # Deletes sell order used in the active_buy_sell table
     supabase_middleman.delete_processed_order(seller["Id"])
     # Logs transaction in the inactive_buy_sell table
     supabase_middleman.log_transaction(buyer, seller)
-    return "Conducted and logged transaction"
+    return payload
