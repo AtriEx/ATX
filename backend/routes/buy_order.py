@@ -9,6 +9,7 @@ from supabase import Client, create_client
 
 load_dotenv("env/.env")
 
+
 url = os.getenv("PUBLIC_SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
