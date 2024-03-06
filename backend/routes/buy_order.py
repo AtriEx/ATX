@@ -32,7 +32,7 @@ def buy_order(data: dict) -> str:
                 )
         .match({"buy_or_sell": False, "stockId": buyer["stockId"]})
         .lte("price", buyer["price"])
-        .order("price", desc=True)
+        .order("price", desc=False)
         .order("time_posted")
         .limit(1)
         .execute()
