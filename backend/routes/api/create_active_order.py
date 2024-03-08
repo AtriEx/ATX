@@ -46,10 +46,15 @@ def create_active_order(
     price: int,
     expirey: datetime,
     quantity: int,
-    stockId: int,
-    userId: str,
+    stock_id: int,
+    user_id: str,
 ):
     generated_order_id = str(uuid4())
+
+    if buy_or_sell:
+        supabase_middleman.escrow_funds(user_id, price, quantity)
+    else:
+        supabase_middleman.escrow_stock(user_id, stock_id, quantity)
 
     # Generate an entry for each quantity and insert those entries into the table
     for i in range(quantity):
@@ -59,8 +64,8 @@ def create_active_order(
             "price": price,
             "expirey": expirey,
             "quantity": 1,
-            "stockId": stockId,
-            "userId": userId,
+            "stockId": stock_id,
+            "userId": user_id,
             "orderId": generated_order_id,
             "has_been_processed": False,
         }

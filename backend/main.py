@@ -7,7 +7,7 @@ from routes.api import create_active_order
 from routes.api import buy_order
 from dotenv import load_dotenv
 import os
-
+from uuid import UUID
 
 app = FastAPI()
 
@@ -25,13 +25,13 @@ def create_buy_order():
 
 
 @app.get("/createActiveOrder")
-def create_active_order(
+def create_active_buy_sell_order(
     buy_or_sell: bool,
     price: int,
     expirey: datetime,
     quantity: int,
-    stockId: int,
-    userId: str,
+    stock_id: int,
+    user_id: str,
 ):
     if price < 1:
         return "Price must be greater than 0"
@@ -39,12 +39,32 @@ def create_active_order(
         return "Quantity must be greater than 0"
     if expirey < datetime.now():
         return "Expirey must be in the future"
-    if stockId < 1:  # TODO determine what is valid stockId
+    if stock_id < 1:  # TODO determine what is valid stockId
         return "Invalid stockId"
-    if userId == "":  # TODO determine what is valid userId
+
+    # validate userId is a valid uuid
+    try:
+        uuid_obj = UUID(hex=user_id)
+    except ValueError:
         return "Invalid userId"
+    # validate if it's a buy order, user has enough balance, and if it's a sell order, user has enough quantity
+    if buy_or_sell:  # Buy order
+        user_profile = supabase_middleman.fetch_profile(user_id)
+        if not user_profile:
+            return "User not found"
+        if user_profile["balance"] < price * quantity:
+            return "Insufficient funds"
+    else:  # Sell order
+        portfolio = supabase_middleman.fetch_portfolio(user_id, stock_id)
+        if not portfolio:
+            return "Portfolio not found"
+        if portfolio["quantity"] < 1:
+            return "User does not own this stock"
+        if portfolio["quantity"] < quantity:
+            return "Insufficient quantity"
+
     time_posted = datetime.now().isoformat()
     create_active_order.create_active_order(
-        time_posted, buy_or_sell, price, expirey, quantity, stockId, userId
+        time_posted, buy_or_sell, price, expirey, quantity, stock_id, user_id
     )
     return "Active order created"
