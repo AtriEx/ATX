@@ -39,15 +39,20 @@ def create_active_buy_sell_order(
         return "Quantity must be greater than 0"
     if expirey < datetime.now():
         return "Expirey must be in the future"
-    if stock_id < 1:  # TODO determine what is valid stockId
-        return "Invalid stockId"
 
-    # validate userId is a valid uuid
+    if not supabase_middleman.fetch_stock_price(stock_id):
+        return "Stock not found"
+
+    # validate user_id is a valid uuid and it exists
     try:
-        uuid_obj = UUID(hex=user_id)
+        UUID(hex=user_id)  # throws value error if not a valid uuid
+        user_profile = supabase_middleman.fetch_profile(user_id)
+        if not user_profile:
+            return "User not found"
     except ValueError:
-        return "Invalid userId"
-    # validate if it's a buy order, user has enough balance, and if it's a sell order, user has enough quantity
+        return "userId not in UUID format"
+
+    # validate that if order is a buy order, user has enough balance, or if order is a sell order, user has enough quantity
     if buy_or_sell:  # Buy order
         user_profile = supabase_middleman.fetch_profile(user_id)
         if not user_profile:

@@ -234,7 +234,7 @@ def escrow_funds(user_id, price, quantity) -> None:
     Escrows funds for a buy order
 
     Args:
-        userId (str): The ID of the user
+        user_id (str): The ID of the user
         price (int): The price of the stock
         quantity (int): The quantity of the stock
 
@@ -251,8 +251,8 @@ def escrow_stock(user_id, stock_id, quantity) -> None:
     Escrows stock for a sell order
 
     Args:
-        userId (str): The ID of the user
-        stockId (int): The ID of the stock
+        user_id (str): The ID of the user
+        stock_id (int): The ID of the stock
         quantity (int): The quantity of the stock
 
     Returns: None
@@ -261,3 +261,21 @@ def escrow_stock(user_id, stock_id, quantity) -> None:
     supabase.table("portfolio").update(
         {"quantity": portfolio["quantity"] - quantity}
     ).eq("portfolio_ID", portfolio["portfolio_ID"])
+
+
+def query_stock_price(stock_id: int) -> dict:
+    """
+    Fetches stock data from stock_price table using stock_id
+
+    Args:
+        stock_id (int): The ID of the stock
+
+    Returns: Dictionary describing a stock
+    """
+    return (
+        supabase.table("stock_price")
+        .select("*")
+        .eq("stockId", stock_id)
+        .execute()
+        .data[0]
+    )
