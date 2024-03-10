@@ -248,11 +248,11 @@ def update_entry():
     """
 
 
-def authenticate(bearer_token: str) -> str:
-    """Authenticates a user by twitch bearer token
+def authenticate(jwt: str) -> str:
+    """Authenticates a user by supabase jwt (Authorization header)
 
     Args:
-        bearer_token (str): Twitch-issued bearer token
+        jwt (str): Supabase jwt
 
     Raises:
         HTTPException: If the token passed is invalid
@@ -264,11 +264,11 @@ def authenticate(bearer_token: str) -> str:
 
     # separate case to prevent any kind of session leakage because of
     # behaivior of get_user when there is no token passed.
-    if not bearer_token:
+    if not jwt:
         raise unauth_error
 
     try:
-        data = supabase.auth.get_user(bearer_token)
+        data = supabase.auth.get_user(jwt)
     except Exception as e:
         logging.warning("Error when authenticating user", exc_info=e)
 
