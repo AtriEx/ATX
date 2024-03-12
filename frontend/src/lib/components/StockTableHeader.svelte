@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { tableState } from '$lib/stores/tableState';
 
-	export let order: 'asc' | 'desc' = 'asc';
 	export let orderBy: Exclude<Query['orderBy'], undefined>;
 	export let mainTable = false;
+
+	$: order = $tableState.order;
 
 	type Query = {
 		query?: string;
@@ -19,14 +20,19 @@
 		const queryParams = new URLSearchParams($page.url.searchParams);
 		queryParams.set('order', newOrder);
 		queryParams.set('orderBy', orderBy);
-		if (browser) goto('?' + queryParams.toString(), { replaceState: true });
+		goto('/?' + queryParams.toString(), { replaceState: false, noScroll: true });
+		if ($tableState.order !== newOrder) tableState.changeOrder();
+		if ($tableState.orderBy !== orderBy) tableState.changeOrderBy(orderBy);
 	}
 </script>
 
 <th
 	scope="col"
-	class="px-6 py-3 text-left text-xs text-gray-500 dark:text-gray-300 uppercase cursor-pointer hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
-	class:underline={orderBy === $page.url.searchParams.get('orderBy') && mainTable}
+	class="px-6 py-3 text-left text-xs uppercase cursor-pointer transition-colors
+		   text-light-secondary dark:text-dark-accent
+		   hover:text-light-primary dark:hover:text-dark-primary
+		   select-none
+		   {orderBy === $tableState.orderBy && mainTable ? 'underline' : ''}"
 	on:click={changeOrder}
 >
 	{#if orderBy === 'total_shares'}
@@ -35,7 +41,13 @@
 		{orderBy}
 	{/if}
 
-	{#if $page.url.searchParams.get('orderBy') === orderBy && mainTable}
-		{order === 'asc' ? '▲' : '▼'}
+	{#if $tableState.orderBy === orderBy && mainTable}
+		<span
+			class={order === 'asc'
+				? 'text-light-accent dark:text-dark-primary'
+				: 'text-light-primary dark:text-dark-accent'}
+		>
+			{order === 'asc' ? '▲' : '▼'}
+		</span>
 	{/if}
 </th>

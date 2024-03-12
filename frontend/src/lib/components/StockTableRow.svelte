@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { Row } from '$lib/supabase';
 	import type { PageData } from '../../routes/$types';
 
 	type Stock = PageData['stockInfo'][number];
