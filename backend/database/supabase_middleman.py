@@ -13,12 +13,6 @@ key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 
-def fetch_entries():
-    """
-    Fetches all entries from a table
-    """
-
-
 # needs a lot more checks and error handling
 def insert_entry(table_name: str, entry: dict) -> None:
     """
@@ -51,45 +45,9 @@ def is_market_open() -> bool:
     return is_open["state"]
 
 
-def update_entry():
-    """
-    Updates an entry in a table
-    """
 
 
-# unreviewed
-def escrow_buy(user_id: str, buy_price: int) -> None:
-    """
-    Subtracts given buy order price from user's balance
 
-    Args:
-        buy_price(int): The price submitted by the buyer
-        user_id(str): The buyer's user ID
-    Returns: None
-    """
-
-    supabase.rpc("update_balance", {"user_id": user_id, "price_delta": (-1*buy_price)}).execute()
-
-
-# unreviewed
-def fetch_stock_price(stock_id: int) -> int:
-    """
-    Gets the current stock price of the given stock_id
-
-    Args:
-        stock_id (int): The id of the stock you want to get the price of
-
-    Returns: The price of the stock 
-    """
-
-    stock_price = (supabase.table("stock_price")
-                   .select("stock_price")
-                   .eq("stockId", stock_id)
-                   .execute()
-                   .data
-                   .pop()
-                   )
-    return stock_price["stock_price"]
 
 
 def update_user_balance(user_id: str, amount: int) -> int:
@@ -103,8 +61,7 @@ def update_user_balance(user_id: str, amount: int) -> int:
     Returns: int - The new balance
     """
     old_balance=supabase.table("profiles").select("balance").eq("userId", user_id).execute().data.pop()["balance"]
-    new_balance=old_balance+amount
-    supabase.table("profiles").update({"balance": new_balance}).eq("userId", user_id).execute()
+    new_balance=supabase.table("profiles").update({"balance": old_balance + amount}).eq("userId", user_id).execute()
     #TODO: make sure the query executed correctly and return if it didn't
     return new_balance
 
@@ -123,8 +80,7 @@ def update_user_portfolio(user_id: str, stock_id: int, quantity: int) -> int:
     result=supabase.table("portfolio").select("quantity").eq("userId", user_id).eq("stockId", stock_id).execute().data
     if result:
         old_quantity=result.pop()["quantity"]
-        new_quantity=old_quantity+quantity
-        supabase.table("portfolio").update({"quantity": new_quantity}).eq("userId", user_id).eq("stockId", stock_id).execute()
+        new_quantity=supabase.table("portfolio").update({"quantity": old_quantity+quantity}).eq("userId", user_id).eq("stockId", stock_id).execute()
         payload = new_quantity
     else:
         supabase.table("portfolio").insert({"userId": user_id, "stockId": stock_id, "quantity": quantity}).execute()
@@ -159,55 +115,9 @@ def fetch_stock_price(stock_id: int) -> int:
         return None
 
 
-# unreviewed
-def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
-    """
-    Sells a user's stock at the order_price
-    (Assumes the user has a portfolio of that stock)
-
-    Args:
-        user_id (str): The user on the sell side of a stock transaction
-        stock_id(int): The ID of the stock being sold
-        order_price(int): Price closest to current stock price presented by the buyer or seller
-
-    Returns: None
-    """
-    supabase.rpc("sell_stock",
-                 {"user_id": user_id, "stock_id": stock_id, "order_price": order_price}
-                 ).execute()
 
 
-# unreviewed
-def buy_stock(user_id: str, stock_id: int) -> None:
-    """
-    Buys a stock for the user_id stock at the order_price
-    (Assumes the user has a portfolio of that stock)
 
-    Args:
-        user_id (str): The user on the buy side of a stock transaction
-        stock_id(int): The ID of the stock being bought
-        order_price(int): Price closest to current stock price presented by the buyer or seller
-
-    Returns: None
-    """
-    supabase.rpc("buy_stock", {"user_id": user_id, "stock_id": stock_id}).execute()
-
-
-# unreviewed
-def resolve_price_diff(user_id: str, price_diff: int) -> None:
-    """
-    Handles difference in desired prices between the buyer and seller
-
-    Args:
-        user_id(str): The user who's balance will be handled
-        price_diff(int): The amount to be refunded/ rewarded back to the user
-
-    Returns: None
-    """
-    supabase.rpc("update_balance", {"user_id": user_id, "price_delta": price_diff}).execute()
-
-
-# unreviewed
 def delete_processed_order(order_index: int) -> None:
     """
     Deletes the sell/buy order fufilled in a transaction from the active_buy_sell table
@@ -221,7 +131,7 @@ def delete_processed_order(order_index: int) -> None:
     supabase.table("active_buy_sell").delete().eq("Id", order_index).execute()
 
 
-# unreviewed
+
 def log_transaction(buy_info: dict, sell_info: dict) -> None:
     """
     Logs tansaction info in the inactive_buy_sell table (Should be called @ the end of order flow)
@@ -233,32 +143,14 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
 
     Returns: None
     """
-    if buy_info.get("Id"):
-        del buy_info["Id"]
-    if buy_info.get("has_been_processed") is not None:
-        del buy_info["has_been_processed"]
-    if sell_info.get("Id"):
-        del sell_info["Id"]
-    if sell_info.get("has_been_processed") is not None:
-        del sell_info["has_been_processed"]
+    
+    del buy_info["Id"]
+    del buy_info["has_been_processed"]
+    del sell_info["Id"]
+    del sell_info["has_been_processed"]
 
     supabase.table("inactive_buy_sell").insert(buy_info).execute()
     supabase.table("inactive_buy_sell").insert(sell_info).execute()
 
 
-# unreviewed
-def log_unfulfilled_order(order_info: dict) -> None:
-    """
-    Logs info of a order if it cannot be fulfilled (Should be called @ the end of order flow)
-    Removes the Id column from the order info as a preprocessing step before logging the order
 
-    Args:
-        order_info (dict): Data related to the buy side of a transaction
-
-    Returns: None
-    """
-    if order_info.get("Id"):
-        del order_info["Id"]
-    if order_info.get("has_been_processed") is not None:
-        del order_info["has_been_processed"]
-    supabase.table("active_buy_sell").insert(order_info).execute()

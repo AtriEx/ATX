@@ -30,7 +30,7 @@ def buy_order(data: dict) -> str:
         .select("Id", "userId", "time_posted", "buy_or_sell", "price",
                 "quantity", "stockId", "orderId", "has_been_processed"
                 )
-        .match({"buy_or_sell": False, "stockId": buyer["stockId"]})
+        .match({"buy_or_sell": False, "stockId": buyer["stockId"], "has_been_processed": True})
         .lte("price", buyer["price"])
         .order("price", desc=False)
         .order("time_posted")
@@ -42,6 +42,7 @@ def buy_order(data: dict) -> str:
     if not valid_sells:
         # Insert the buy order into active_buy_sell if it can't be fufilled
         #supabase_middleman.log_unfulfilled_order(buyer)
+        supabase.table("active_buy_sell").update({"has_been_processed": True}).match({"Id": buyer["Id"]}).execute()
         return "No valid sells"
 
     # Gets sell order closest to the buy price
@@ -70,6 +71,7 @@ def buy_order(data: dict) -> str:
         payload="Order fulfilled at sellers price. refund issued to buyer"
     elif buy_diff < sell_diff:
         # Order price = buy price; No refund needed because seller will sell @ higher price
+        #is the same as the first condition, but kept in for clarity
         #middle row from excalidraw
         supabase_middleman.update_user_balance(seller["userId"], buyer["price"])
         supabase_middleman.update_user_portfolio(buyer["userId"], buyer["stockId"],buyer["quantity"])
@@ -85,6 +87,7 @@ def buy_order(data: dict) -> str:
 
     # Deletes sell order used in the active_buy_sell table
     supabase_middleman.delete_processed_order(seller["Id"])
+    supabase_middleman.delete_processed_order(buyer["Id"])
     # Logs transaction in the inactive_buy_sell table
     supabase_middleman.log_transaction(buyer, seller)
     return payload
