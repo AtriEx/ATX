@@ -42,8 +42,6 @@ class ExpireOrdersThread(threading.Thread):
     def run(self):
         """Infinetly runs a loop to expire orders."""
 
-        time.sleep(1)  # Allow server to start
-
         # Will complete db operations before shutting down
         while not self._stop_event.is_set():
             orders = supabase_middleman.get_expired()
