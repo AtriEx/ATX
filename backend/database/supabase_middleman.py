@@ -259,6 +259,7 @@ def networth_calculator(user_id: str) -> int:
             active_order_balance += fetch_stock_price(entry["stockId"]) * entry["quantity"]
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     return active_order_balance + portfolio_balance + profile_balance
    
 
@@ -266,14 +267,18 @@ def networth_calculator(user_id: str) -> int:
 >>>>>>> aa61e28 (test commit of black formatting)
 =======
 def get_active() -> list[dict]:
+=======
+def get_expired() -> list[dict]:
+>>>>>>> f827511 (:thread: Change from asyncio to threading)
     """
-    Return active buy orders (only their expiry time and id),
-    sorted by their expiry time (ascending)
+    Return a list of active orders that have expired.
+    Only contains the order id.
     """
 
     orders = (
         supabase.table("active_buy_sell")
-        .select("Id,expirey")
+        .select("Id")
+        .lte("expirey", datetime.now().isoformat())
         .order("expirey", desc=False)
         .execute()
     )

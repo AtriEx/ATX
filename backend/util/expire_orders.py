@@ -3,10 +3,10 @@ Handles orders moving from the active to inactive buy orders table once it
 has expired.
 """
 
-import asyncio
 import os
+import threading
+import time
 from contextlib import asynccontextmanager
-from datetime import datetime
 
 from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI
@@ -21,30 +21,33 @@ SLEEP_TIME = int(os.getenv("EXPIRE_LOOP_DELAY", "10"))  # Default to 10s
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """Runs before and after the server starts and closes"""
-    task = asyncio.create_task(run_loop())
+    thread = ExpireOrdersThread()
+
+    thread.start()
     yield  # Anything after here runs when server is shutting down
-    task.cancel()
+    thread.stop()
 
 
-async def run_loop():
-    """Infinetly runs a loop to expire orders."""
+class ExpireOrdersThread(threading.Thread):
+    def __init__(self):
+        super().__init__()
+        self._stop_event = threading.Event()
 
-    await asyncio.sleep(5)  # Allow server to start
+    def stop(self):
+        self._stop_event.set()
 
-    while True:
-        orders = supabase_middleman.get_active()
+    def run(self):
+        """Infinetly runs a loop to expire orders."""
 
-        for order in orders:
-            # expirey column is optional
-            try:
-                expiry_time = datetime.fromisoformat(order["expirey"])
-            except KeyError:
-                continue
+        time.sleep(1)  # Allow server to start
 
-            # Since it's sorted, all orders after are also in the future
-            if expiry_time > datetime.now():
-                break
+        # Will complete db operations before shutting down
+        while not self._stop_event.is_set():
+            orders = supabase_middleman.get_expired()
 
-            await supabase_middleman.expire_order(order["Id"])
+            for order in orders:
+                supabase_middleman.expire_order(order["Id"])
 
-        await asyncio.sleep(SLEEP_TIME)
+            # Server may have stopped during db operations
+            if not self._stop_event.is_set():
+                time.sleep(SLEEP_TIME)
