@@ -256,7 +256,7 @@ def get_active() -> list[dict]:
     return orders.data
 
 
-async def expire_order(order_id: int):
+def expire_order(order_id: int):
     """
     Move order_id from active to inactive order table
     Refunds stocks or money
