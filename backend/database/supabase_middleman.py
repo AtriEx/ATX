@@ -2,8 +2,9 @@
 interactions in high-level generic functions."""
 
 import os
+from datetime import datetime
 from dotenv import load_dotenv
-
+from supabase import Client, create_client  
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 
 from supabase import Client, create_client
