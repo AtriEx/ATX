@@ -3,6 +3,7 @@
 import os
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from util import test_data
 from database import supabase_middleman
 =======
@@ -17,6 +18,9 @@ from dotenv import load_dotenv
 =======
 
 >>>>>>> aa61e28 (test commit of black formatting)
+=======
+from dotenv import load_dotenv
+>>>>>>> 1f2d31f (more linter fixes maybe)
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 <<<<<<< HEAD
 <<<<<<< HEAD

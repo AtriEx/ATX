@@ -3,8 +3,8 @@ interactions in high-level generic functions."""
 
 import os
 from datetime import datetime
-
 from dotenv import load_dotenv
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -24,6 +24,8 @@ from supabase import Client, create_client
 =======
 
 >>>>>>> c51a102 (more linter fixes)
+=======
+>>>>>>> 1f2d31f (more linter fixes maybe)
 from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
@@ -353,6 +355,7 @@ def expire_order(order_id: int):
 
     supabase.table("inactive_buy_sell").insert(order).execute()
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 def update_entry():
@@ -363,3 +366,5 @@ def update_entry():
 =======
     
 >>>>>>> 81e8d77 (more linter fixes)
+=======
+>>>>>>> 1f2d31f (more linter fixes maybe)

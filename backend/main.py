@@ -1,7 +1,6 @@
 """API routes declaration"""
 
 from fastapi import FastAPI
-
 from routes import buy_order, create_active_order
 from util.expire_orders import lifespan
 
