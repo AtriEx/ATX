@@ -8,19 +8,19 @@ We host our database using [supabase](https://supabase.com/). Here is documentat
 
 ### `inactive_buy_sell`
 Where expired and fulfilled orders go
-| Columns       | Type                        | Description                                         |
-| ------------- | --------------------------- | --------------------------------------------------- |
-| delisted_time | timestamp without time zone |                                                     |
-| userId        | uuid                        | **FK(`profiles.userId`)**                           |
-| buy_or_sell   | boolean                     | true = buy, false = sell                            |
-| time_posted   | timestamp without time zone |                                                     |
-| price         | bigint                      |                                                     |
-| expirey       | timestamp without time zone |                                                     |
-| quantity      | bigint                      |                                                     |
-| completed     | boolean                     |                                                     |
-| stockId       | bigint                      | Stock ID description test   **FK(`stock_info.id`)** |
-| Id            | bigint                      | **PK**                                              |
-| orderId       | uuid                        |                                                     |
+| Columns       | Type                        | Description               |
+| ------------- | --------------------------- | ------------------------- |
+| delisted_time | timestamp without time zone |                           |
+| userId        | uuid                        | **FK(`profiles.userId`)** |
+| buy_or_sell   | boolean                     | true = buy, false = sell  |
+| time_posted   | timestamp without time zone |                           |
+| price         | bigint                      |                           |
+| expirey       | timestamp without time zone |                           |
+| quantity      | bigint                      |                           |
+| completed     | boolean                     |                           |
+| stockId       | bigint                      | **FK(`stock_info.id`)**   |
+| Id            | bigint                      | **PK**                    |
+| orderId       | uuid                        |                           |
 
 ### `portfolio`
 A table of all the stocks that all the users own
@@ -127,7 +127,7 @@ All the times the market has open and closed
 
 | Columns     | Type   | Description |
 | ----------- | ------ | ----------- |
-| stockId     | bigint |             |
+| stockId     | bigint | **PK**      |
 | stock_price | bigint |             |
 
 ### `rel_user_flag`
