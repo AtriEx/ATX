@@ -3,6 +3,7 @@ interactions in high-level generic functions."""
 
 import os
 from dotenv import load_dotenv
+
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 
 from supabase import Client, create_client
@@ -39,15 +40,9 @@ def is_market_open() -> bool:
         .order("id", desc=True)
         .limit(1)
         .execute()
-        .data
-        .pop()
+        .data.pop()
     )
     return is_open["state"]
-
-
-
-
-
 
 
 def update_user_balance(user_id: str, amount: int) -> int:
@@ -60,9 +55,20 @@ def update_user_balance(user_id: str, amount: int) -> int:
 
     Returns: int - The new balance
     """
-    old_balance=supabase.table("profiles").select("balance").eq("userId", user_id).execute().data.pop()["balance"]
-    new_balance=supabase.table("profiles").update({"balance": old_balance + amount}).eq("userId", user_id).execute()
-    #TODO: make sure the query executed correctly and return if it didn't
+    old_balance = (
+        supabase.table("profiles")
+        .select("balance")
+        .eq("userId", user_id)
+        .execute()
+        .data.pop()["balance"]
+    )
+    new_balance = (
+        supabase.table("profiles")
+        .update({"balance": old_balance + amount})
+        .eq("userId", user_id)
+        .execute()
+    )
+    # TODO: make sure the query executed correctly and return if it didn't
     return new_balance
 
 
@@ -77,18 +83,30 @@ def update_user_portfolio(user_id: str, stock_id: int, quantity: int) -> int:
 
     Returns: int - The new quantity of the stock in the user's portfolio
     """
-    result=supabase.table("portfolio").select("quantity").eq("userId", user_id).eq("stockId", stock_id).execute().data
+    result = (
+        supabase.table("portfolio")
+        .select("quantity")
+        .eq("userId", user_id)
+        .eq("stockId", stock_id)
+        .execute()
+        .data
+    )
     if result:
-        old_quantity=result.pop()["quantity"]
-        new_quantity=supabase.table("portfolio").update({"quantity": old_quantity+quantity}).eq("userId", user_id).eq("stockId", stock_id).execute()
+        old_quantity = result.pop()["quantity"]
+        new_quantity = (
+            supabase.table("portfolio")
+            .update({"quantity": old_quantity + quantity})
+            .eq("userId", user_id)
+            .eq("stockId", stock_id)
+            .execute()
+        )
         payload = new_quantity
     else:
-        supabase.table("portfolio").insert({"userId": user_id, "stockId": stock_id, "quantity": quantity}).execute()
+        supabase.table("portfolio").insert(
+            {"userId": user_id, "stockId": stock_id, "quantity": quantity}
+        ).execute()
         payload = quantity
     return payload
-
-    
-    
 
 
 def fetch_stock_price(stock_id: int) -> int:
@@ -98,24 +116,22 @@ def fetch_stock_price(stock_id: int) -> int:
     Args:
         stock_id (int): The id of the stock you want to get the price of
 
-    Returns: The price of the stock 
+    Returns: The price of the stock
     """
 
-    result = (supabase.table("stock_price")
-              .select("stock_price")
-              .eq("stockId", stock_id)
-              .execute()
-              .data
-              )
+    result = (
+        supabase.table("stock_price")
+        .select("stock_price")
+        .eq("stockId", stock_id)
+        .execute()
+        .data
+    )
 
     if result:
         stock_price = result.pop()["stock_price"]
         return stock_price
     else:
         return None
-
-
-
 
 
 def delete_processed_order(order_index: int) -> None:
@@ -131,7 +147,6 @@ def delete_processed_order(order_index: int) -> None:
     supabase.table("active_buy_sell").delete().eq("Id", order_index).execute()
 
 
-
 def log_transaction(buy_info: dict, sell_info: dict) -> None:
     """
     Logs tansaction info in the inactive_buy_sell table (Should be called @ the end of order flow)
@@ -143,7 +158,7 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
 
     Returns: None
     """
-    
+
     del buy_info["Id"]
     del buy_info["has_been_processed"]
     del sell_info["Id"]
@@ -151,6 +166,3 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
 
     supabase.table("inactive_buy_sell").insert(buy_info).execute()
     supabase.table("inactive_buy_sell").insert(sell_info).execute()
-
-
-
