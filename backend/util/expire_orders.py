@@ -49,8 +49,4 @@ class ExpireOrdersThread(threading.Thread):
             for order in orders:
                 supabase_middleman.expire_order(order["Id"])
 
-            # Server may have stopped during db operations
-            if not self._stop_event.is_set():
-                time.sleep(SLEEP_TIME)
-
             self._stop_event.wait(SLEEP_TIME)
