@@ -15,7 +15,7 @@ from database import supabase_middleman
 
 load_dotenv(find_dotenv())
 
-SLEEP_TIME = int(os.getenv("EXPIRE_LOOP_DELAY", 10))  # Default to 10s
+SLEEP_TIME = int(os.getenv("EXPIRE_LOOP_DELAY", "10"))  # Default to 10s
 
 
 @asynccontextmanager
