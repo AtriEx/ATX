@@ -5,7 +5,6 @@ has expired.
 
 import os
 import threading
-import time
 from contextlib import asynccontextmanager
 
 from dotenv import find_dotenv, load_dotenv
