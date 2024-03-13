@@ -266,13 +266,14 @@ def networth_calculator(user_id: str) -> int:
 >>>>>>> aa61e28 (test commit of black formatting)
 =======
 def get_active() -> list[dict]:
-    """Return active buy orders, sorted by their expiry time (ascending)"""
-
-    print("Making order")
+    """
+    Return active buy orders (only their expiry time and id),
+    sorted by their expiry time (ascending)
+    """
 
     orders = (
         supabase.table("active_buy_sell")
-        .select("expirey")
+        .select("Id,expirey")
         .order("expirey", desc=False)
         .execute()
     )
@@ -280,23 +281,53 @@ def get_active() -> list[dict]:
     return orders.data
 
 
-def move_to_inactive(order_id: int):
+async def expire_order(order_id: int):
     """
     Move order_id from active to inactive order table
+    Refunds stocks or money
 
     Args:
         order_id (int): The active order id
     """
 
+    # Delete order
     order = (
-        supabase.table("active_buy_sell")
-        .select("*")
-        .eq("Id", order_id)
-        .single()
-        .execute()
-    )
+        supabase.table("active_buy_sell").delete().eq("Id", order_id).execute()
+    ).data[0]
 
-    # TODO: Expire
+    # Refund stocks/money
+    if order["buy_or_sell"]:
+        # Buy order - refund money
+        order_cost = order["quantity"] * order["price"]
+
+        current_balance = (
+            supabase.table("profiles")
+            .select("balance")
+            .eq("userId", order["userId"])
+            .single()
+            .execute()
+        ).data["balance"]
+
+        supabase.table("profiles").update({"balance": current_balance + order_cost}).eq(
+            "userId", order["userId"]
+        ).execute()
+
+    else:
+        # Sell order - refund stock
+        supabase.table("portfolio").insert(
+            {
+                "stockId": order["stockId"],
+                "userId": order["userId"],
+                "quantity": order["quantity"],
+                "price_avg": order["price"],
+            }
+        ).execute()
+
+    # Insert record into inactive_buy_sell
+    del order["has_been_processed"]
+    order["delisted_time"] = datetime.now().isoformat()
+
+    supabase.table("inactive_buy_sell").insert(order).execute()
 
 
 def update_entry():
