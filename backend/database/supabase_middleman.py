@@ -4,10 +4,8 @@ interactions in high-level generic functions."""
 import os
 from datetime import datetime
 from dotenv import load_dotenv
-from supabase import Client, create_client  
-# pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
-
 from supabase import Client, create_client
+# pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 
 load_dotenv("env/.env")
 url = os.getenv("PUBLIC_SUPABASE_URL")
@@ -168,8 +166,8 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
 
     supabase.table("inactive_buy_sell").insert(buy_info).execute()
     supabase.table("inactive_buy_sell").insert(sell_info).execute()
-  
-  
+
+
 def get_expired() -> list[dict]:
     """
     Return a list of active orders that have expired.
@@ -233,3 +231,4 @@ def expire_order(order_id: int):
     order["delisted_time"] = datetime.now().isoformat()
 
     supabase.table("inactive_buy_sell").insert(order).execute()
+    
