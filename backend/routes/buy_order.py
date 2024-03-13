@@ -4,6 +4,7 @@ import os
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from util import test_data
 from database import supabase_middleman
 =======
@@ -21,6 +22,11 @@ from dotenv import load_dotenv
 =======
 from dotenv import load_dotenv
 >>>>>>> 1f2d31f (more linter fixes maybe)
+=======
+
+from dotenv import load_dotenv
+
+>>>>>>> 3717663 (🚨 Linting fix??)
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -33,8 +39,8 @@ from database import supabase_middleman
 =======
 >>>>>>> c51a102 (more linter fixes)
 from supabase import Client, create_client
-from database import supabase_middleman
 
+from database import supabase_middleman
 
 <<<<<<< HEAD
 load_dotenv("env/.env")
