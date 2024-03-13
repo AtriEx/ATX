@@ -52,3 +52,5 @@ class ExpireOrdersThread(threading.Thread):
             # Server may have stopped during db operations
             if not self._stop_event.is_set():
                 time.sleep(SLEEP_TIME)
+
+            self._stop_event.wait(SLEEP_TIME)
