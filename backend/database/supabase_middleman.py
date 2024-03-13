@@ -1,10 +1,12 @@
 """Supabase middleman should contain all of the database 
 interactions in high-level generic functions."""
 
+import logging
 import os
 from datetime import datetime
 
 from dotenv import load_dotenv
+from fastapi import HTTPException
 from supabase import Client, create_client
 
 load_dotenv("env/.env")
@@ -310,3 +312,35 @@ def update_entry():
     """
     Updates an entry in a table
     """
+
+
+def authenticate(jwt: str) -> str:
+    """Authenticates a user by supabase jwt (Authorization header)
+
+    Args:
+        jwt (str): Supabase jwt
+
+    Raises:
+        HTTPException: If the token passed is invalid
+
+    Returns:
+        str: User ID
+    """
+    unauth_error = HTTPException(status_code=401, detail="Invalid token")
+
+    # separate case to prevent any kind of session leakage because of
+    # behaivior of get_user when there is no token passed.
+    if not jwt:
+        raise unauth_error
+
+    try:
+        data = supabase.auth.get_user(jwt)
+    except Exception as e:
+        logging.warning("Error when authenticating user", exc_info=e)
+
+        raise unauth_error from e
+
+    if data is None:
+        raise unauth_error
+
+    return data.user.id
