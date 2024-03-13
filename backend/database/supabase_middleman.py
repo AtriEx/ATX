@@ -3,6 +3,7 @@ interactions in high-level generic functions."""
 
 import os
 from datetime import datetime
+
 from dotenv import load_dotenv
 from supabase import Client, create_client
 

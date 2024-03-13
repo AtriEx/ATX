@@ -1,11 +1,13 @@
 """API handler for creating and fulfilling buy orders."""
 
 import os
+
 from dotenv import load_dotenv
+
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 from supabase import Client, create_client
-from database import supabase_middleman
 
+from database import supabase_middleman
 
 load_dotenv("env/.env")
 
