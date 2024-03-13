@@ -6,30 +6,93 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
+      active_buy_sell: {
+        Row: {
+          buy_or_sell: boolean
+          expirey: string | null
+          has_been_processed: boolean | null
+          Id: number
+          orderId: string | null
+          price: number
+          quantity: number
+          stockId: number
+          time_posted: string
+          userId: string
+        }
+        Insert: {
+          buy_or_sell?: boolean
+          expirey?: string | null
+          has_been_processed?: boolean | null
+          Id?: number
+          orderId?: string | null
+          price?: number
+          quantity?: number
+          stockId: number
+          time_posted: string
+          userId: string
+        }
+        Update: {
+          buy_or_sell?: boolean
+          expirey?: string | null
+          has_been_processed?: boolean | null
+          Id?: number
+          orderId?: string | null
+          price?: number
+          quantity?: number
+          stockId?: number
+          time_posted?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "active_buy_sell_stockId_fkey"
+            columns: ["stockId"]
+            isOneToOne: false
+            referencedRelation: "stock_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "active_buy_sell_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["userId"]
+          }
+        ]
+      }
       contributors: {
         Row: {
-          description: string | null
+          description: string
+          discordUserID: string | null
+          githubUsername: string | null
           id: number
           image: string | null
           name: string
           role: string | null
+          twitterUsername: string | null
         }
         Insert: {
-          description?: string | null
+          description?: string
+          discordUserID?: string | null
+          githubUsername?: string | null
           id?: number
           image?: string | null
           name: string
           role?: string | null
+          twitterUsername?: string | null
         }
         Update: {
-          description?: string | null
+          description?: string
+          discordUserID?: string | null
+          githubUsername?: string | null
           id?: number
           image?: string | null
           name?: string
           role?: string | null
+          twitterUsername?: string | null
         }
         Relationships: []
       }
@@ -57,18 +120,96 @@ export interface Database {
         }
         Relationships: []
       }
+      inactive_buy_sell: {
+        Row: {
+          buy_or_sell: boolean
+          completed: boolean
+          delisted_time: string
+          expirey: string | null
+          Id: number
+          orderId: string | null
+          price: number
+          quantity: number
+          stockId: number
+          time_posted: string
+          userId: string
+        }
+        Insert: {
+          buy_or_sell?: boolean
+          completed?: boolean
+          delisted_time?: string
+          expirey?: string | null
+          Id?: number
+          orderId?: string | null
+          price?: number
+          quantity?: number
+          stockId: number
+          time_posted?: string
+          userId: string
+        }
+        Update: {
+          buy_or_sell?: boolean
+          completed?: boolean
+          delisted_time?: string
+          expirey?: string | null
+          Id?: number
+          orderId?: string | null
+          price?: number
+          quantity?: number
+          stockId?: number
+          time_posted?: string
+          userId?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inactive_buy_sell_stockId_fkey"
+            columns: ["stockId"]
+            isOneToOne: false
+            referencedRelation: "stock_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inactive_buy_sell_userId_fkey"
+            columns: ["userId"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["userId"]
+          }
+        ]
+      }
+      market_State: {
+        Row: {
+          changed_last: string
+          id: number
+          state: boolean
+        }
+        Insert: {
+          changed_last: string
+          id?: number
+          state?: boolean
+        }
+        Update: {
+          changed_last?: string
+          id?: number
+          state?: boolean
+        }
+        Relationships: []
+      }
       portfolio: {
         Row: {
+          price_avg: number
           quantity: number
           stockId: number
           userId: string
         }
         Insert: {
+          price_avg?: number
           quantity?: number
           stockId?: number
           userId: string
         }
         Update: {
+          price_avg?: number
           quantity?: number
           stockId?: number
           userId?: string
@@ -78,7 +219,7 @@ export interface Database {
             foreignKeyName: "portfolio_stockId_fkey"
             columns: ["stockId"]
             isOneToOne: false
-            referencedRelation: "stockInfo"
+            referencedRelation: "stock_info"
             referencedColumns: ["id"]
           },
           {
@@ -104,7 +245,7 @@ export interface Database {
           balance?: number
           comments?: string[] | null
           image?: string | null
-          joined_at?: string
+          joined_at: string
           networth?: number
           userId: string
           username: string
@@ -158,49 +299,166 @@ export interface Database {
           }
         ]
       }
-      stockInfo: {
+      stock_info: {
         Row: {
           description: string | null
           id: number
           image: string | null
           name: string
-          totalShares: number
+          total_shares: number
         }
         Insert: {
           description?: string | null
           id?: number
           image?: string | null
           name: string
-          totalShares?: number
+          total_shares?: number
         }
         Update: {
           description?: string | null
           id?: number
           image?: string | null
           name?: string
-          totalShares?: number
+          total_shares?: number
         }
         Relationships: []
       }
-      stockPrices: {
+      stock_price: {
         Row: {
+          stock_price: number
           stockId: number
-          stockPrice: number
         }
         Insert: {
+          stock_price?: number
           stockId?: number
-          stockPrice?: number
         }
         Update: {
+          stock_price?: number
           stockId?: number
-          stockPrice?: number
         }
         Relationships: [
           {
-            foreignKeyName: "stockPrices_stockId_fkey"
+            foreignKeyName: "stock_price_stockId_fkey"
             columns: ["stockId"]
             isOneToOne: true
-            referencedRelation: "stockInfo"
+            referencedRelation: "stock_info"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      stock_price_history_daily: {
+        Row: {
+          changed_at: string
+          id: number
+          price: number
+          stockId: number
+        }
+        Insert: {
+          changed_at: string
+          id?: number
+          price: number
+          stockId: number
+        }
+        Update: {
+          changed_at?: string
+          id?: number
+          price?: number
+          stockId?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_stock_price_history_daily_stockId_fkey"
+            columns: ["stockId"]
+            isOneToOne: false
+            referencedRelation: "stock_info"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      stock_price_history_monthly: {
+        Row: {
+          average_price: number
+          closing_price: number
+          highest_price: number
+          id: number
+          lowest_price: number
+          opening_price: number
+          starting_hour: string
+          stockId: number
+          volume_of_sales: number
+        }
+        Insert: {
+          average_price: number
+          closing_price: number
+          highest_price: number
+          id?: number
+          lowest_price: number
+          opening_price: number
+          starting_hour: string
+          stockId: number
+          volume_of_sales: number
+        }
+        Update: {
+          average_price?: number
+          closing_price?: number
+          highest_price?: number
+          id?: number
+          lowest_price?: number
+          opening_price?: number
+          starting_hour?: string
+          stockId?: number
+          volume_of_sales?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_stock_price_history_monthly_stockId_fkey"
+            columns: ["stockId"]
+            isOneToOne: false
+            referencedRelation: "stock_info"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      stock_price_history_weekly: {
+        Row: {
+          average_price: number
+          closing_price: number
+          highest_price: number
+          id: number
+          lowest_price: number
+          opening_price: number
+          starting_hour: string
+          stockId: number
+          volume_of_sales: number
+        }
+        Insert: {
+          average_price: number
+          closing_price: number
+          highest_price: number
+          id?: number
+          lowest_price: number
+          opening_price: number
+          starting_hour: string
+          stockId: number
+          volume_of_sales: number
+        }
+        Update: {
+          average_price?: number
+          closing_price?: number
+          highest_price?: number
+          id?: number
+          lowest_price?: number
+          opening_price?: number
+          starting_hour?: string
+          stockId?: number
+          volume_of_sales?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_stock_price_history_weekly_stockId_fkey"
+            columns: ["stockId"]
+            isOneToOne: false
+            referencedRelation: "stock_info"
             referencedColumns: ["id"]
           }
         ]
@@ -210,7 +468,35 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      buy_stock: {
+        Args: {
+          user_id: string
+          stock_id: number
+        }
+        Returns: undefined
+      }
+      resolve_price_diff: {
+        Args: {
+          user_id: string
+          price_diff: number
+        }
+        Returns: undefined
+      }
+      "sell_stock(depricated)": {
+        Args: {
+          user_id: string
+          stock_id: number
+          order_price: number
+        }
+        Returns: undefined
+      }
+      update_balance: {
+        Args: {
+          user_id: string
+          price_delta: number
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

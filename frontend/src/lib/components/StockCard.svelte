@@ -8,37 +8,33 @@
 	}
 
 	export let stock: StockCardProps;
-
-	console.log(stock);
 </script>
 
 <div
-	class="bg-light-background dark:bg-dark-secondary rounded-lg shadow-md p-2 sm:p-5 my-4 flex flex-col md:flex-row items-center md:space-y-0"
+	class="bg-light-background dark:bg-dark-secondary rounded-xl shadow-xl p-5 my-5 flex flex-col md:flex-row items-center justify-between transition duration-300 ease-in-out hover:shadow-2xl"
 >
-	<div class="flex flex-col w-full gap-3">
-		<div class="flex flex-row items-center gap-3">
+	<div class="flex flex-col md:flex-row md:items-center gap-4 w-full">
+		<img
+			src={stock.image}
+			alt="{stock.name} Icon"
+			class="md:w-20 md:h-20 w-24 h-24 rounded-full object-cover bg-gray-200 dark:bg-gray-800 border-light-accent dark:border-dark-accent border-4 shadow-lg transition-transform duration-300 ease-in-out hover:scale-105"
+		/>
+
+		<div class="flex-1">
 			<a
 				href="/{stock.name}"
-				class="text-2xl font-bold text-light-primary dark:text-dark-primary hover:underline transition ease-in-out duration-200 active:scale-95"
+				class="text-2xl md:text-3xl font-bold text-light-primary dark:text-dark-primary hover:underline transition ease-in-out duration-200 active:scale-95"
 			>
 				{stock.name}
 			</a>
-			<div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4">
-				<p class="text-md font-medium text-light-text dark:text-dark-text">
-					<span class="text-light-text/80 dark:text-dark-text/80">
-						{stock.quantity} stock(s) at {stock.price} coins each
-					</span>
-				</p>
-			</div>
-		</div>
-		<div class="">
-			<p class="text-light-text dark:text-dark-text">{stock.description}</p>
+			<p class="text-sm md:text-md text-light-text dark:text-dark-text mt-2">
+				<span class="font-medium text-light-accent dark:text-dark-accent">
+					{stock.quantity} stock(s) at {stock.price} coins each
+				</span>
+			</p>
+			<p class="mt-2 text-light-text dark:text-dark-text">
+				{stock.description}
+			</p>
 		</div>
 	</div>
-
-	<img
-		src={stock.image}
-		alt="{stock.name} Icon"
-		class="w-24 h-24 rounded-3xl m-4 bg-gray-200 border-light-accent dark:border-dark-accent border-2 p-2"
-	/>
 </div>
