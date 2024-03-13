@@ -29,11 +29,14 @@ async def lifespan(_: FastAPI):
 
 
 class ExpireOrdersThread(threading.Thread):
+    """Infinetly running thread to expire orders."""
+
     def __init__(self):
         super().__init__()
         self._stop_event = threading.Event()
 
     def stop(self):
+        """Stop the thread after completing db operations."""
         self._stop_event.set()
 
     def run(self):
