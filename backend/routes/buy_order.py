@@ -1,83 +1,121 @@
 """API handler for creating and fulfilling buy orders."""
 
 import os
-from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
+
+# pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 from supabase import Client, create_client
 
 from database import supabase_middleman
 
-load_dotenv()
+load_dotenv("env/.env")
+
 
 url = os.getenv("PUBLIC_SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
 
-def buy_order():
+def test_params():
+    """API route for testing parameters."""
+    return "Test parameters"
+
+
+def buy_order(data: dict) -> str:
     """Create a buy order for one share of a stock
     and fullfill it if possible."""
-    # Return state by looking for the one with the biggest ID
-    is_open = supabase_middleman.is_market_open()
-    if not is_open:
-        # If the market is closed
-        return "The market is closed"
-
-    buy_info = {
-        "userId": "572a902e-de7a-4739-adfe-f4af32a3f18b",
-        "buy_or_sell": True,
-        "stockId": 2,
-        "price": 15,
-        "quantity": 1,
-        "time_posted": datetime.now().isoformat(),
-        "expirey": (
-            datetime.now() + timedelta(hours=1)
-        ).isoformat(),  # This is a test value; users will input an expiry date
-    }
-
-    # If the market is open, get all active sells for the stock <= buy_price, ordered by price
+    # These are test values
+    # We will have a function that returns this data using API call parameters
+    buyer = data
+    # Slects all active sells order by price then by time-posted (desc)
     valid_sells = (
         supabase.table("active_buy_sell")
-        .select("*")
-        .match({"buy_or_sell": False, "stockId": buy_info["stockId"]})
-        .lte("price", buy_info["price"])
-        .order("price")
+        .select(
+            "Id",
+            "userId",
+            "time_posted",
+            "buy_or_sell",
+            "price",
+            "quantity",
+            "stockId",
+            "orderId",
+            "has_been_processed",
+        )
+        .match(
+            {
+                "buy_or_sell": False,
+                "stockId": buyer["stockId"],
+                "has_been_processed": True,
+            }
+        )
+        .lte("price", buyer["price"])
+        .order("price", desc=False)
+        .order("time_posted")
+        .limit(1)
         .execute()
         .data
     )
+    # Market is open and a valid sell is availible
     if not valid_sells:
         # Insert the buy order into active_buy_sell if it can't be fufilled
-        # supabaseMiddleman.log_unfulfilled_buy(buy_info)
-        return "No valid sale for this transaction"
+        # supabase_middleman.log_unfulfilled_order(buyer)
+        supabase.table("active_buy_sell").update({"has_been_processed": True}).match(
+            {"Id": buyer["Id"]}
+        ).execute()
+        return "No valid sells"
 
-    # cheapest_sale = valid_sells[0]
-    # saleId = cheapest_sale["Id"]
-    # sell_info = {"userId": cheapest_sale["userId"],
-    #             "buy_or_sell": False,
-    #             "stockId": cheapest_sale["stockId"],
-    #             "price": cheapest_sale["price"],
-    #             "quantity": 1,
-    #             "time_posted": cheapest_sale["time_posted"],
-    #             "expirey": cheapest_sale["expirey"]
-    #             }
-    # # Get Buyer and Seller user info and their holdings of the stock being traded
-    # buyer_profile = supabase_middleman.fetch_profile(buy_info["userId"])
-    # buyer_portfolio = supabase_middleman.fetch_portfolio(buy_info["userId"], buy_info["stockId"])
-    # seller_profile = supabase_middleman.fetch_profile(sell_info["userId"])
-    # seller_portfolio = supabase_middleman.fetch_portfolio(
-    #     sell_info["userId"], sell_info["stockId"]
-    # )
-    return "Transaction profiles and portfolios fetched"
+    # Gets sell order closest to the buy price
+    seller = valid_sells.pop()
+    # Finds the distances between the current price and the buy/sell prices
+    # Decides order handling based off which price is closest to current price
+    curr_price = supabase_middleman.fetch_stock_price(seller["stockId"])
+    # the difference between the current price and the sellers price
+    sell_diff = abs(curr_price - seller["price"])
+    # the difference between the current price and the buyers price
+    buy_diff = abs(buyer["price"] - curr_price)
+    # the difference between the buyers price and the sellers price
+    order_diff = buyer["price"] - seller["price"]
+    # Checks edge case where buy price = sell price != current market price
+    if order_diff == 0:
+        # Order can be fulfilled @ price of both buyer and seller, no refund required.
+        supabase_middleman.update_user_balance(seller["userId"], seller["price"])
+        supabase_middleman.update_user_portfolio(
+            buyer["userId"], buyer["stockId"], buyer["quantity"]
+        )
+        payload = "Order fulfilled at desired price"
+    elif sell_diff < buy_diff:
+        # Order price=sell price; refund the difference between buy and sell price to the buyer
+        # top row from excalidraw
+        supabase_middleman.update_user_balance(seller["userId"], seller["price"])
+        supabase_middleman.update_user_balance(buyer["userId"], order_diff)
+        supabase_middleman.update_user_portfolio(
+            buyer["userId"], buyer["stockId"], buyer["quantity"]
+        )
+        payload = "Order fulfilled at sellers price. refund issued to buyer"
+    elif buy_diff < sell_diff:
+        # Order price = buy price; No refund needed because seller will sell @ higher price
+        # is the same as the first condition, but kept in for clarity
+        # middle row from excalidraw
+        supabase_middleman.update_user_balance(seller["userId"], buyer["price"])
+        supabase_middleman.update_user_portfolio(
+            buyer["userId"], buyer["stockId"], buyer["quantity"]
+        )
+        payload = "Order fulfilled at buyers price. No refund needed."
+    else:
+        # Order price = current stock price
+        # Refund buyer their difference from the current price
+        # bottom row from excalidraw
+        supabase_middleman.update_user_balance(seller["userId"], curr_price)
+        supabase_middleman.update_user_balance(buyer["userId"], buy_diff)
+        supabase_middleman.update_user_portfolio(
+            buyer["userId"], buyer["stockId"], buyer["quantity"]
+        )
+        payload = "Order fulfilled at current price. Refund issued to buyer."
 
-    # Exchange the stock by altering balances and stock holdings of buyer & seller
-    # (disabled for testing)
-    # supabase_middleman.exchange_stock(
-    #     buyer_profile, buyer_portfolio, seller_profile, seller_portfolio, sell_price
-    # )
-
-    # Log the transactions by inserting them into the inactive_buy_sell table
-    # supabaseMiddleman.log_transaction(buy_info, sell_info)
-
-    # Delete active sell order that was just fufilled (disabled for testing)
-    # supabase.table("active_buy_sell").delete().eq("id",saleId)
+    # Deletes sell order used in the active_buy_sell table
+    supabase_middleman.delete_processed_order(seller["Id"])
+    supabase_middleman.delete_processed_order(buyer["Id"])
+    # Logs transaction in the inactive_buy_sell table
+    supabase_middleman.log_transaction(buyer, seller)
+    return payload
