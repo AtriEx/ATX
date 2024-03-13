@@ -240,15 +240,16 @@ def log_unfulfilled_buy(buy_info: dict) -> None:
     ).execute()
 
 
-def get_active() -> list[dict]:
+def get_expired() -> list[dict]:
     """
-    Return active buy orders (only their expiry time and id),
-    sorted by their expiry time (ascending)
+    Return a list of active orders that have expired.
+    Only contains the order id.
     """
 
     orders = (
         supabase.table("active_buy_sell")
-        .select("Id,expirey")
+        .select("Id")
+        .lte("expirey", datetime.now().isoformat())
         .order("expirey", desc=False)
         .execute()
     )
