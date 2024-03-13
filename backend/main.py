@@ -3,10 +3,11 @@
 from fastapi import FastAPI
 
 from routes import buy_order, create_active_order
-
+from util.expire_orders import lifespan
 from database import supabase_middleman
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
+
 
 
 @app.get("/buyOrder")

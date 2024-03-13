@@ -164,5 +164,71 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
     del sell_info["Id"]
     del sell_info["has_been_processed"]
 
+
     supabase.table("inactive_buy_sell").insert(buy_info).execute()
     supabase.table("inactive_buy_sell").insert(sell_info).execute()
+  
+  
+def get_expired() -> list[dict]:
+    """
+    Return a list of active orders that have expired.
+    Only contains the order id.
+    """
+
+    orders = (
+        supabase.table("active_buy_sell")
+        .select("Id")
+        .lte("expirey", datetime.now().isoformat())
+        .order("expirey", desc=False)
+        .execute()
+    )
+
+    return orders.data
+
+
+def expire_order(order_id: int):
+    """
+    Move order_id from active to inactive order table
+    Refunds stocks or money
+    Args:
+        order_id (int): The active order id
+    """
+
+    # Delete order
+    order = (
+        supabase.table("active_buy_sell").delete().eq("Id", order_id).execute()
+    ).data[0]
+
+    # Refund stocks/money
+    if order["buy_or_sell"]:
+        # Buy order - refund money
+        order_cost = order["quantity"] * order["price"]
+
+        current_balance = (
+            supabase.table("profiles")
+            .select("balance")
+            .eq("userId", order["userId"])
+            .single()
+            .execute()
+        ).data["balance"]
+
+        supabase.table("profiles").update({"balance": current_balance + order_cost}).eq(
+            "userId", order["userId"]
+        ).execute()
+
+    else:
+        # Sell order - refund stock
+        supabase.table("portfolio").insert(
+            {
+                "stockId": order["stockId"],
+                "userId": order["userId"],
+                "quantity": order["quantity"],
+                "price_avg": order["price"],
+            }
+        ).execute()
+
+    # Insert record into inactive_buy_sell
+    del order["has_been_processed"]
+    order["delisted_time"] = datetime.now().isoformat()
+
+    supabase.table("inactive_buy_sell").insert(order).execute()
