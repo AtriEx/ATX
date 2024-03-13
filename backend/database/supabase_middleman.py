@@ -3,7 +3,9 @@ interactions in high-level generic functions."""
 
 import os
 from datetime import datetime
+
 from dotenv import load_dotenv
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -19,7 +21,11 @@ from supabase import Client, create_client
 >>>>>>> a9dd20a (enforce black formatting style)
 =======
 >>>>>>> 81e8d77 (more linter fixes)
+=======
+
+>>>>>>> c51a102 (more linter fixes)
 from supabase import Client, create_client
+
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 
 load_dotenv("env/.env")
@@ -82,7 +88,7 @@ def update_user_balance(user_id: str, amount: int) -> int:
         .eq("userId", user_id)
         .execute()
     )
-    # TODO: make sure the query executed correctly and return if it didn't
+    # make sure in the future that the query executed correctly and return if it didn't
     return new_balance
 
 
@@ -144,8 +150,7 @@ def fetch_stock_price(stock_id: int) -> int:
     if result:
         stock_price = result.pop()["stock_price"]
         return stock_price
-    else:
-        return None
+    return None
 
 
 <<<<<<< HEAD

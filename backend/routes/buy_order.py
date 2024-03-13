@@ -19,13 +19,17 @@ from dotenv import load_dotenv
 >>>>>>> aa61e28 (test commit of black formatting)
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 914805c (remove unnecessary linter disables)
 from supabase import Client, create_client
 =======
 >>>>>>> 03b6667 (fixed some of the errors i introduced in the merge)
 from database import supabase_middleman
+=======
+>>>>>>> c51a102 (more linter fixes)
 from supabase import Client, create_client
+from database import supabase_middleman
 
 
 <<<<<<< HEAD
