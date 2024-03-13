@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> aa61e28 (test commit of black formatting)
@@ -16,7 +17,10 @@ from supabase import Client, create_client
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 =======
 >>>>>>> a9dd20a (enforce black formatting style)
+=======
+>>>>>>> 81e8d77 (more linter fixes)
 from supabase import Client, create_client
+# pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 
 load_dotenv("env/.env")
 url = os.getenv("PUBLIC_SUPABASE_URL")
@@ -212,6 +216,7 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
     supabase.table("inactive_buy_sell").insert(buy_info).execute()
     supabase.table("inactive_buy_sell").insert(sell_info).execute()
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 
@@ -273,6 +278,10 @@ def networth_calculator(user_id: str) -> int:
 =======
 def get_active() -> list[dict]:
 =======
+=======
+
+
+>>>>>>> 81e8d77 (more linter fixes)
 def get_expired() -> list[dict]:
 >>>>>>> f827511 (:thread: Change from asyncio to threading)
     """
@@ -338,6 +347,7 @@ def expire_order(order_id: int):
     order["delisted_time"] = datetime.now().isoformat()
 
     supabase.table("inactive_buy_sell").insert(order).execute()
+<<<<<<< HEAD
 
 
 def update_entry():
@@ -345,3 +355,6 @@ def update_entry():
     Updates an entry in a table
     """
 >>>>>>> 1d67bff (✨ Get active orders sorted by expiry)
+=======
+    
+>>>>>>> 81e8d77 (more linter fixes)
