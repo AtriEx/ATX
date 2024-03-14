@@ -15,6 +15,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: Install Task
+      uses: arduino/setup-task@v2
+
     - name: Set up Python 3.12
       uses: actions/setup-python@v3
       with:
@@ -28,4 +31,4 @@ jobs:
 
     - name: Run linter
       run: |
-        make lint-only
+        task lint-only

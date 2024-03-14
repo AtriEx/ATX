@@ -1,0 +1,30 @@
+version: '3'
+
+vars:
+  TRACKED_FILES_NL:
+    sh: git ls-files "*.py"
+  TRACKED_FILES: "{{.TRACKED_FILES_NL | catLines}}"
+
+tasks:
+  fmt:
+    cmds:
+    - isort --profile black {{.TRACKED_FILES}}
+    - black {{.TRACKED_FILES}}
+
+  format: 
+    cmds:
+    - task: fmt
+
+  lint-only:
+    cmds:
+    - pylint {{.TRACKED_FILES}}
+
+  lint:
+    cmds:
+    - task: fmt
+    - task: lint-only
+
+  check-format:
+    cmds:
+    - isort --profile black --check {{.TRACKED_FILES}}
+    - black --check {{.TRACKED_FILES}}
