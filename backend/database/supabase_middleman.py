@@ -5,46 +5,6 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> aa61e28 (test commit of black formatting)
-=======
-from supabase import Client, create_client  
->>>>>>> 03b6667 (fixed some of the errors i introduced in the merge)
-# pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
-=======
->>>>>>> a9dd20a (enforce black formatting style)
-=======
->>>>>>> 81e8d77 (more linter fixes)
-=======
-
->>>>>>> c51a102 (more linter fixes)
-=======
->>>>>>> 1f2d31f (more linter fixes maybe)
-=======
-=======
-# pylint: disable=import-error,no-name-in-module # it"s looking in the supabase folder in project root
->>>>>>> 8bc8647 (reformatting/refactoring)
->>>>>>> 9fdc647 (reformatting/refactoring)
-=======
-=======
-# pylint: disable=import-error,no-name-in-module # it"s looking in the supabase folder in project root
->>>>>>> 8bc8647 (reformatting/refactoring)
-=======
-# pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
->>>>>>> 9f154e1 (changed typos)
->>>>>>> 796bd58 (changed typos)
-=======
->>>>>>> 95f401c (rebase test)
 from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
@@ -174,75 +134,6 @@ def fetch_stock_price(stock_id: int) -> int:
     return None
 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-
-
-<<<<<<< HEAD
-=======
-=======
-# unreviewed
-def sell_stock(user_id: str, stock_id: int, order_price: int) -> None:
-    """
-    Sells a user's stock at the order_price
-    (Assumes the user has a portfolio of that stock)
-
-    Args:
-        user_id (str): The user on the sell side of a stock transaction
-        stock_id(int): The ID of the stock being sold
-        order_price(int): Price closest to current stock price presented by the buyer or seller
-
-    Returns: None
-    """
-    supabase.rpc("sell_stock",
-                 {"user_id": user_id, "stock_id": stock_id, "order_price": order_price}
-                 ).execute()
-
-
-# unreviewed
-def buy_stock(user_id: str, stock_id: int) -> None:
-    """
-    Buys a stock for the user_id stock at the order_price
-    (Assumes the user has a portfolio of that stock)
-
->>>>>>> 9fdc647 (reformatting/refactoring)
-    Args:
-        user_id (str): The user on the buy side of a stock transaction
-        stock_id(int): The ID of the stock being bought
-        order_price(int): Price closest to current stock price presented by the buyer or seller
-
-    Returns: None
-    """
-    supabase.rpc("buy_stock", {"user_id": user_id, "stock_id": stock_id}).execute()
-
-
-# unreviewed
-def resolve_price_diff(user_id: str, price_diff: int) -> None:
-    """
-    Handles difference in desired prices between the buyer and seller
-
-    Args:
-        user_id(str): The user who"s balance will be handled
-        price_diff(int): The amount to be refunded/ rewarded back to the user
-
-    Returns: None
-    """
-    supabase.rpc("update_balance", {"user_id": user_id, "price_delta": price_diff}).execute()
-
-
-# unreviewed
-<<<<<<< HEAD
-=======
->>>>>>> 4f518fb (fixed changes from code walkthrough)
-=======
->>>>>>> aa61e28 (test commit of black formatting)
-=======
->>>>>>> 8bc8647 (reformatting/refactoring)
->>>>>>> 9fdc647 (reformatting/refactoring)
-=======
->>>>>>> 95f401c (rebase test)
 def delete_processed_order(order_index: int) -> None:
     """
     Deletes the sell/buy order fufilled in a transaction from the active_buy_sell table
@@ -275,75 +166,9 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
 
     supabase.table("inactive_buy_sell").insert(buy_info).execute()
     supabase.table("inactive_buy_sell").insert(sell_info).execute()
-<<<<<<< HEAD
-<<<<<<< HEAD
 
 
-
-    Args:
-        order_info (dict): Data related to the buy side of a transaction
-
-    Returns: None
-    """
-    if order_info.get("Id"):
-        del order_info["Id"]
-    if order_info.get("has_been_processed") is not None:
-        del order_info["has_been_processed"]
-    supabase.table("active_buy_sell").insert(order_info).execute()
-
-def networth_calculator(user_id: str) -> int:
-    """
-    Gets the user's networth from profile, portfolio, and active_buy_sell test
-
-    Args:
-        user_id (int): The id of the user whose net worth is requested
-
-    Returns: Net worth of user
-    """
-    profile_balance = (supabase.table("profiles")
-        .select("balance")
-        .match({"userId": user_id})
-        .execute()
-        .data
-        .pop()["balance"])
-
-    user_portfolio = (supabase.table("portfolio")
-        .select("quantity,stockId")
-        .match({"userId": user_id})
-        .execute()
-        .data)
-    portfolio_balance = 0
-    for stock in user_portfolio:
-        portfolio_balance += stock["quantity"] * fetch_stock_price(stock["stockId"])
-
-    active_buy_sell_entries = (supabase.table("active_buy_sell")
-        .select("price,quantity,stockId,buy_or_sell,userId")
-        .match({"userId": user_id})
-        .execute()
-        .data)
-    active_order_balance = 0
-    for entry in active_buy_sell_entries:
-        if entry["buy_or_sell"]:
-            active_order_balance += entry["price"] * entry["quantity"]
-        else:
-            active_order_balance += fetch_stock_price(entry["stockId"]) * entry["quantity"]
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-    return active_order_balance + portfolio_balance + profile_balance
-   
-
-=======
->>>>>>> aa61e28 (test commit of black formatting)
-=======
-def get_active() -> list[dict]:
-=======
-=======
-
-
->>>>>>> 81e8d77 (more linter fixes)
 def get_expired() -> list[dict]:
->>>>>>> f827511 (:thread: Change from asyncio to threading)
     """
     Return a list of active orders that have expired.
     Only contains the order id.
@@ -364,7 +189,6 @@ def expire_order(order_id: int):
     """
     Move order_id from active to inactive order table
     Refunds stocks or money
-
     Args:
         order_id (int): The active order id
     """
@@ -407,36 +231,8 @@ def expire_order(order_id: int):
     order["delisted_time"] = datetime.now().isoformat()
 
     supabase.table("inactive_buy_sell").insert(order).execute()
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 
-
-def update_entry():
-    """
-    Updates an entry in a table
-    """
->>>>>>> 1d67bff (✨ Get active orders sorted by expiry)
-=======
     
->>>>>>> 81e8d77 (more linter fixes)
-=======
->>>>>>> 1f2d31f (more linter fixes maybe)
-=======
-=======
-=======
-    if order_info.get("Id"):
-        del order_info["Id"]
-    if order_info.get("has_been_processed") is not None:
-        del order_info["has_been_processed"]
-    supabase.table("active_buy_sell").insert(order_info).execute()
-
->>>>>>> 8bc8647 (reformatting/refactoring)
->>>>>>> 9fdc647 (reformatting/refactoring)
-=======
->>>>>>> 95f401c (rebase test)
 def networth_calculator(user_id: str) -> int:
     """
     Gets the user's networth from profile, portfolio, and active_buy_sell
@@ -476,5 +272,3 @@ def networth_calculator(user_id: str) -> int:
 
     return active_order_balance + portfolio_balance + profile_balance
    
-
->>>>>>> cfd74d4 (what i have done so far)
