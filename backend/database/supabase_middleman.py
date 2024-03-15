@@ -13,6 +13,7 @@ from dotenv import load_dotenv
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 >>>>>>> aa61e28 (test commit of black formatting)
@@ -42,6 +43,8 @@ from supabase import Client, create_client
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 >>>>>>> 9f154e1 (changed typos)
 >>>>>>> 796bd58 (changed typos)
+=======
+>>>>>>> 95f401c (rebase test)
 from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
@@ -85,7 +88,6 @@ def is_market_open() -> bool:
 
 def update_user_balance(user_id: str, amount: int) -> int:
     """
-<<<<<<< HEAD
     Updates the user's balance by adding the given amount
 
     Args:
@@ -93,21 +95,6 @@ def update_user_balance(user_id: str, amount: int) -> int:
         amount (int): The amount to add to the user's balance
 
     Returns: int - The new balance
-=======
-    Updates an entry in a table
-    """
-
-
-# unreviewed
-def escrow_buy(user_id: str, buy_price: int) -> None:
-    """
-    Subtracts given buy order price from user's balance
-
-    Args:
-        buy_price(int): The price submitted by the buyer
-        user_id(str): The buyer's user ID
-    Returns: None
->>>>>>> 8bc8647 (reformatting/refactoring)
     """
     old_balance = (
         supabase.table("profiles")
@@ -189,6 +176,7 @@ def fetch_stock_price(stock_id: int) -> int:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 
@@ -253,6 +241,8 @@ def resolve_price_diff(user_id: str, price_diff: int) -> None:
 =======
 >>>>>>> 8bc8647 (reformatting/refactoring)
 >>>>>>> 9fdc647 (reformatting/refactoring)
+=======
+>>>>>>> 95f401c (rebase test)
 def delete_processed_order(order_index: int) -> None:
     """
     Deletes the sell/buy order fufilled in a transaction from the active_buy_sell table
@@ -267,7 +257,6 @@ def delete_processed_order(order_index: int) -> None:
 
 
 def log_transaction(buy_info: dict, sell_info: dict) -> None:
-
     """
     Logs tansaction info in the inactive_buy_sell table (Should be called @ the end of order flow)
     Removes the Id column from the buyer & seller info before logging the transaction
@@ -379,7 +368,6 @@ def expire_order(order_id: int):
     Args:
         order_id (int): The active order id
     """
-<<<<<<< HEAD
 
     # Delete order
     order = (
@@ -423,6 +411,7 @@ def expire_order(order_id: int):
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 
 def update_entry():
@@ -446,9 +435,11 @@ def update_entry():
 
 >>>>>>> 8bc8647 (reformatting/refactoring)
 >>>>>>> 9fdc647 (reformatting/refactoring)
+=======
+>>>>>>> 95f401c (rebase test)
 def networth_calculator(user_id: str) -> int:
     """
-    Gets the user's networth from profile, portfolio, and active_buy_sell test
+    Gets the user's networth from profile, portfolio, and active_buy_sell
 
     Args:
         user_id (int): The id of the user whose net worth is requested
