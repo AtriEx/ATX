@@ -1,0 +1,93 @@
+
+    current_hour_time = datetime.now().replace(minute=0, second=0, microsecond=0)
+    last_hour_time = current_hour_time - timedelta(hours=1)
+    last_day_time = current_hour_time - timedelta(days=1)
+
+    all_hourly_price_changes = (
+        supabase.table("stock_price_history_daily") 
+        .select("changed_at, price, stockId") 
+        .order("changed_at")
+        .order("stockId")
+        .gte("changed_at", last_hour_time.strftime("%Y-%m-%d %H:%M:%S"))
+        .lt("changed_at", current_hour_time.strftime("%Y-%m-%d %H:%M:%S"))
+        .execute().data
+    )
+    all_hourly_fulfilled = (supabase
+        .table("inactive_buy_sell")
+        .select("quantity, stockId")
+        .gte("delisted_time", last_hour_time.strftime("%Y-%m-%d %H:%M:%S"))
+        .lt("delisted_time", current_hour_time.strftime("%Y-%m-%d %H:%M:%S"))
+        .order("stockId")
+        .execute().data
+    )
+    
+    if len(all_hourly_price_changes) == 0:
+        return
+
+    hourly_volume_table = {}
+    for fulfilled_order in all_hourly_fulfilled:
+        if fulfilled_order["stockId"] not in hourly_volume_table:
+            hourly_volume_table[fulfilled_order["stockId"]] = 0
+        hourly_volume_table[fulfilled_order["stockId"]] += fulfilled_order["quantity"]
+
+    current_stock = all_hourly_price_changes[0]["stockId"]
+    current_hour = datetime.strptime(all_hourly_price_changes[0]["changed_at"], "%Y-%m-%dT%H:%M:%S") \
+            .replace(minute = 0, second = 0, microsecond = 0)
+
+    hourly_start_price = all_hourly_price_changes[0]["price"] 
+    hourly_sum = all_hourly_price_changes[0]["price"]
+    hourly_count = 1
+    hourly_highest = all_hourly_price_changes[0]["price"] 
+    hourly_lowest = all_hourly_price_changes[0]["price"] 
+    hourly_last_price= all_hourly_price_changes[0]["price"] 
+
+    weekly_rows_to_add = []
+
+    for price_change in all_hourly_price_changes:
+        if price_change["stockId"] != current_stock or datetime.strptime(price_change["changed_at"], "%Y-%m-%dT%H:%M:%S").hour != current_hour.hour:
+            weekly_rows_to_add += [{
+                "starting_hour": current_hour.strftime("%Y-%m-%d %H:%M:%S"),
+                "stockId": current_stock,
+                "average_price": hourly_sum / hourly_count,
+                "highest_price": hourly_highest,
+                "lowest_price": hourly_lowest,
+                "opening_price": hourly_start_price,
+                "closing_price": hourly_last_price,
+                "volume_of_sales": hourly_volume_table[current_stock], 
+            }]
+        if price_change["stockId"] != current_stock:
+            current_stock = price_change["stockId"]
+            current_hour = datetime.strptime(price_change["changed_at"], "%Y-%m-%dT%H:%M:%S").replace(minute = 0, second = 0, microsecond = 0)
+
+    print(hourly_volume_table)
+    weekly_rows_to_add += [{
+        "starting_hour": current_hour.strftime("%Y-%m-%d %H:%M:%S"),
+        "stockId": current_stock,
+        "average_price": hourly_sum / hourly_count,
+        "highest_price": hourly_highest,
+        "lowest_price": hourly_lowest,
+        "opening_price": hourly_start_price,
+        "closing_price": hourly_last_price,
+        "volume_of_sales": hourly_volume_table[current_stock], 
+        }]
+
+    supabase.table("stock_price_history_weekly").insert(weekly_rows_to_add).execute();
+
+    # If hour == 0 we're at the end of the day
+    if current_hour_time.hour == 0:
+        monthly_rows_to_add = []
+        all_daily_fulfilled = (
+            supabase.table("inactive_buy_sell")
+            .select("quantity")
+            .gte("delisted_time", last_day_time.strftime("%Y-%m-%d %H:%M:%S"))
+            .lt("delisted_time", current_hour_time.strftime("%Y-%m-%d %H:%M:%S"))
+            .execute()
+            .data
+        )
+
+
+
+
+
+
+

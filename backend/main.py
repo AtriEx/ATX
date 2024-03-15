@@ -3,7 +3,6 @@
 from fastapi import FastAPI
 
 from routes import buy_order, create_active_order
-from util import test_history_migration
 
 app = FastAPI()
 
@@ -20,7 +19,3 @@ def create_buy_order():
     """API route for creating a buy order for one share of a stock."""
     buy_order.buy_order()
     return "Quick buy executed"
-
-@app.get("/migrateHistory")
-def test_history_route():
-    test_history_migration.test_migrate_history_middle_day()
