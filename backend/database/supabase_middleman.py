@@ -448,7 +448,7 @@ def update_entry():
 >>>>>>> 9fdc647 (reformatting/refactoring)
 def networth_calculator(user_id: str) -> int:
     """
-    Gets the user's networth from profile, portfolio, and active_buy_sell
+    Gets the user's networth from profile, portfolio, and active_buy_sell test
 
     Args:
         user_id (int): The id of the user whose net worth is requested
