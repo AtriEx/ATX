@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from database import supabase_middleman
 from routes import buy_order, create_active_order, net_worth_calculator
 from util.expire_orders import lifespan
+from util import test_history_migration
 
 app = FastAPI(lifespan=lifespan)
 
@@ -71,3 +72,10 @@ def create_order(data: dict):
     """API route for creating an active order."""
     result = create_active_order.create_active_buy_sell_order(data)
     return result
+    buy_order.buy_order()
+    return "Quick buy executed"
+
+# testing
+@app.get("/migrateHistory")
+def test_history_route():
+    test_history_migration.test_migrate_history_middle_day()
