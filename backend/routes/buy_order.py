@@ -1,54 +1,16 @@
 """API handler for creating and fulfilling buy orders."""
 
 import os
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-from util import test_data
-from database import supabase_middleman
-=======
-from datetime import datetime, timedelta
-
->>>>>>> a9dd20a (enforce black formatting style)
-=======
->>>>>>> 15dc317 (linter changes)
-from dotenv import load_dotenv
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> aa61e28 (test commit of black formatting)
-=======
-from dotenv import load_dotenv
->>>>>>> 1f2d31f (more linter fixes maybe)
-=======
 
 from dotenv import load_dotenv
 
->>>>>>> 3717663 (🚨 Linting fix??)
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> 914805c (remove unnecessary linter disables)
-from supabase import Client, create_client
-=======
->>>>>>> 03b6667 (fixed some of the errors i introduced in the merge)
-from database import supabase_middleman
-=======
->>>>>>> c51a102 (more linter fixes)
 from supabase import Client, create_client
 
 from database import supabase_middleman
 
-<<<<<<< HEAD
 load_dotenv("env/.env")
-=======
-from database import supabase_middleman
 
-load_dotenv()
->>>>>>> a9dd20a (enforce black formatting style)
 
 url = os.getenv("PUBLIC_SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")

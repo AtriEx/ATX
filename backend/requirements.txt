@@ -1,12 +1,5 @@
 fastapi
 uvicorn[standard]
-<<<<<<< HEAD
-supabase
-=======
 python-dotenv
-<<<<<<< HEAD
->>>>>>> dea0c10 (🚨 Fix linter warnings)
-=======
 supabase
 requests
->>>>>>> 0db5c06 (➕ Add requests to requirements.txt)
