@@ -2,7 +2,7 @@ from database import supabase_middleman
 
 
     
-def networth_calculator(user_id: str) -> int:
+def net_worth_calculator(user_id: str) -> int:
     """
     Gets the user's networth from profile, portfolio, and active_buy_sell
 
