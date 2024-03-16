@@ -414,11 +414,52 @@ def migrate_price_changes(hour: datetime):
     # If hour == 0 we're at the end of the day
     if current_hour_time.hour == 0:
     
-        monthly_change_table = {}
+        monthly_entries = []
         todays_weekly_entries = (
             supabase.table("stock_price_history_weekly")
             .select("opening_price", "closing_price", "stockId", "average_price", "volume_of_sales", "lowest_price", "highest_price")
             .gte("starting_hour", to_supabase_date(last_day_time))
             .lt("starting_hour", to_supabase_date(current_hour_time))
+            .order("starting_hour")
+            .order("stockId")
             .execute().data
         )
+
+        # We do a little grouping
+        weekly_group_table = {
+        }
+
+        for weekly_entry in todays_weekly_entries:
+            if weekly_entry["stockId"] not in weekly_group_table:
+                weekly_group_table[weekly_entry["stockId"]] = [weekly_entry]
+            else:
+                weekly_group_table[weekly_entry["stockId"]] += [weekly_entry]
+
+        for stock_group in list(weekly_group_table.values()):
+            current_stock_id = stock_group[0]["stockId"]
+            open_price = stock_group[0]["opening_price"]
+            highest_price = stock_group[0]["highest_price"]
+            lowest_price = stock_group[0]["lowest_price"]
+            closing_price = stock_group[len(stock_group)]["closing_price"]
+            total_volume = 0
+            total_price_sum = 0
+
+            for weekly_entry in stock_group:
+                total_volume += weekly_entry["volume_of_sales"]
+                total_price_sum += weekly_entry["average_price"] * weekly_entry["volume_of_sales"]
+
+                highest_price = max(highest_price, weekly_entry["highest_price"])
+                lowets_price = min(lowest_price, weekly_entry["lowest_price"])
+            
+            monthly_entries += [{
+                "starting_hour": current_hour_time,
+                "stockId": current_stock_id, 
+                "opening_price": open_price,
+                "closing_price": closing_price,
+                "highest_price": highest_price,
+                "lowest_price": lowest_price,
+                "volume_of_sales": total_volume,
+                "average_price": total_price_sum / total_volume
+            }]
+
+        supabase.table("stock_price_history_monthly").insert(monthly_entries).execute
