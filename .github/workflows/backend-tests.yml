@@ -1,0 +1,47 @@
+name: Backend Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r dev_requirements.txt
+
+      - name: Setup Environment Variables
+        uses: mravselj/envfile@v1
+        with:
+          secrets: ${{ toJSON(secrets) }}
+      - run: |
+          echo "PUBLIC_SUPABASE_URL: $PUBLIC_SUPABASE_URL"
+          echo "SUPABASE_KEY: $SUPABASE_KEY"
+
+      - name: Test with pytest
+        run: |
+          pytest test.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+
+      - name: Monitor coverage
+        uses: slavcodev/coverage-monitor-action@1.9.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          coverage_path: "junit/test-results.xml"
+          threshold_alert: 10
+          threshold_warning: 50
+          threshold_metric: "lines"
