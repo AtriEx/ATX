@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="2" failures="0" skipped="0" tests="2" time="0.672" timestamp="2024-03-17T16:38:01.302857" hostname="MSI"><testcase classname="" name="backend.test_qb" time="0.000"><error message="collection failure">backend\test_qb.py:3: in &lt;module&gt;
+    from main import app
+backend\main.py:5: in &lt;module&gt;
+    from database import supabase_middleman
+backend\database\supabase_middleman.py:15: in &lt;module&gt;
+    supabase: Client = create_client(url, key)
+.venv\Lib\site-packages\supabase\_sync\client.py:313: in create_client
+    return SyncClient.create(
+.venv\Lib\site-packages\supabase\_sync\client.py:102: in create
+    client = cls(supabase_url, supabase_key, options)
+.venv\Lib\site-packages\supabase\_sync\client.py:51: in __init__
+    raise SupabaseException("supabase_url is required")
+E   supabase._sync.client.SupabaseException: supabase_url is required</error><error message="collection failure">backend\test_qb.py:3: in &lt;module&gt;
+    from main import app
+backend\main.py:5: in &lt;module&gt;
+    from database import supabase_middleman
+backend\database\supabase_middleman.py:15: in &lt;module&gt;
+    supabase: Client = create_client(url, key)
+.venv\Lib\site-packages\supabase\_sync\client.py:313: in create_client
+    return SyncClient.create(
+.venv\Lib\site-packages\supabase\_sync\client.py:102: in create
+    client = cls(supabase_url, supabase_key, options)
+.venv\Lib\site-packages\supabase\_sync\client.py:51: in __init__
+    raise SupabaseException("supabase_url is required")
+E   supabase._sync.client.SupabaseException: supabase_url is required</error></testcase></testsuite></testsuites>
