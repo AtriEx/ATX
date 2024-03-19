@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { transformAmount } from '$lib';
 	import Podium from '$lib/components/PodiumComponent.svelte';
 	import type { PageData } from './$types';
 
@@ -41,11 +42,13 @@
 								alt={player.username}
 								class="w-8 h-8 rounded-full inline-block mr-2 bg-slate-500"
 							/>
-							<a href="/user/{player.userId}">
+							<a href="/user/{player.username}">
 								{player.username}
 							</a>
 						</td>
-						<td class="px-6 py-4 text-light-text dark:text-dark-text">{player.networth} coins</td>
+						<td class="px-6 py-4 text-light-text dark:text-dark-text"
+							>{transformAmount(player.networth)} coins</td
+						>
 					</tr>
 				{/each}
 			</tbody>
