@@ -9,9 +9,9 @@
 	export let users: User[];
 </script>
 
-<div class="flex w-full h-96 items-end justify-center gap-8">
+<div class="flex w-full h-96 items-end justify-center gap-8 p-3">
 	<div
-		class="podium w-1/5 bg-light-accent dark:bg-dark-accent/60 rounded-t-3xl shadow-2xl flex flex-col items-center justify-center p-6 h-[70%] transform transition duration-500 hover:-translate-y-2"
+		class="w-1/5 bg-light-accent dark:bg-dark-accent/60 rounded-t-3xl shadow-2xl flex flex-col items-center justify-center p-6 h-[75%] transform transition duration-500 hover:-translate-y-2"
 	>
 		<img
 			src={users[1].image}
@@ -51,7 +51,7 @@
 		</div>
 	</div>
 	<div
-		class="w-1/5 bg-light-accent dark:bg-dark-accent/50 rounded-t-3xl shadow-lg flex flex-col items-center justify-center p-6 h-[80%] transform transition duration-500 hover:-translate-y-2"
+		class="w-1/5 bg-light-accent dark:bg-dark-accent/50 rounded-t-3xl shadow-lg flex flex-col items-center justify-center p-6 h-[60%] transform transition duration-500 hover:-translate-y-2"
 	>
 		<img
 			src={users[2].image}
