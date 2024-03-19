@@ -3,19 +3,7 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		interface Locals {
-			supabase: SupabaseClient;
-			/**
-			 * A convenience helper so we can just call await getSession() instead
-			 * ```
-			 * const { data: { session } } = await supabase.auth.getSession()
-			 * ```
-			 */
-			getSession(): Promise<Session | null>;
-		}
-		interface PageData {
-			session: Session | null;
-		}
+		// interface Locals {}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
