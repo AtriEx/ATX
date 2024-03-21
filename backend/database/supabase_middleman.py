@@ -232,6 +232,7 @@ def expire_order(order_id: int):
 
     supabase.table("inactive_buy_sell").insert(order).execute()
 
+
 def get_user_profile(user_id: str) -> dict:
     """
     Get the user's profile from the profiles table
@@ -259,22 +260,16 @@ def get_user_portfolio(user_id: str) -> list[dict]:
 
     Returns: list[dict] - The user's portfolio
     """
-    return (
-        supabase.table("portfolio")
-        .select("*")
-        .eq("userId", user_id)
-        .execute()
-        .data
-    )
+    return supabase.table("portfolio").select("*").eq("userId", user_id).execute().data
 
 
 def get_user_active_orders(user_id: str) -> list[dict]:
     """
     Get the user's active orders from the active_buy_sell table
-    
+
     Args:
         user_id (str): The user's ID
-        
+
     Returns: list[dict] - The user's active orders"""
     return (
         supabase.table("active_buy_sell")

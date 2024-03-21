@@ -32,9 +32,10 @@ def net_worth_calculator(user_id: str) -> int:
     active_order_balance = 0
     for entry in active_buy_sell_entries:
         if entry["buy_or_sell"]:
-            active_order_balance += entry["price"] * entry["quantity"] # buy order
+            active_order_balance += entry["price"] * entry["quantity"]  # buy order
         else:
             active_order_balance += (
-                supabase_middleman.fetch_stock_price(entry["stockId"])*entry["quantity"]
-                ) # sell order                      
+                supabase_middleman.fetch_stock_price(entry["stockId"])
+                * entry["quantity"]
+            )  # sell order
     return active_order_balance + portfolio_balance + profile_balance
