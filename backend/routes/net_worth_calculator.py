@@ -22,18 +22,19 @@ def net_worth_calculator(user_id: str) -> int:
 
     # Calculate the value of the user's portfolio
     for stock in user_portfolio:
-        portfolio_balance += stock["quantity"] * supabase_middleman.fetch_stock_price(stock["stockId"])
+        quantity = stock["quantity"]
+        stock_price = supabase_middleman.fetch_stock_price(stock["stockId"])
+        portfolio_balance += quantity * stock_price
 
     # Get the user's active buy/sell orders
     active_buy_sell_entries = supabase_middleman.get_user_active_orders(user_id)
-    
     # Calculate the value of the user's active buy/sell orders
     active_order_balance = 0
     for entry in active_buy_sell_entries:
         if entry["buy_or_sell"]:
             active_order_balance += entry["price"] * entry["quantity"] # buy order
         else:
-            active_order_balance += supabase_middleman.fetch_stock_price(entry["stockId"]) * entry["quantity"] # sell order
+            enty_stock_price = supabase_middleman.fetch_stock_price(entry["stockId"])
+            active_order_balance += entry_stock_price * entry["quantity"]  # sell order
 
     return active_order_balance + portfolio_balance + profile_balance
-   

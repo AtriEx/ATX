@@ -3,6 +3,7 @@
 from fastapi import FastAPI
 
 from database import supabase_middleman
+
 from routes import buy_order, create_active_order, net_worth_calculator
 
 from util.expire_orders import lifespan
