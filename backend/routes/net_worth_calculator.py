@@ -1,19 +1,6 @@
 """API handler for calculating the net worth of a user"""
 
-import os
-
-from dotenv import load_dotenv
-
-from supabase import Client, create_client
-
 from database import supabase_middleman
-
-load_dotenv("env/.env")
-
-
-url = os.getenv("PUBLIC_SUPABASE_URL")
-key = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
 
 
 def net_worth_calculator(user_id: str) -> int:
@@ -27,19 +14,10 @@ def net_worth_calculator(user_id: str) -> int:
     """
 
     # Get the user's balance
-    profile_balance = (supabase.table("profiles")
-        .select("balance")
-        .match({"userId": user_id})
-        .execute()
-        .data
-        .pop()["balance"])
+    profile_balance = supabase_middleman.get_user_profile(user_id)["balance"]
 
     # Get the user's portfolio
-    user_portfolio = (supabase.table("portfolio")
-        .select("quantity,stockId")
-        .match({"userId": user_id})
-        .execute()
-        .data)
+    user_portfolio = supabase_middleman.get_user_portfolio(user_id)
     portfolio_balance = 0
 
     # Calculate the value of the user's portfolio
@@ -47,11 +25,7 @@ def net_worth_calculator(user_id: str) -> int:
         portfolio_balance += stock["quantity"] * supabase_middleman.fetch_stock_price(stock["stockId"])
 
     # Get the user's active buy/sell orders
-    active_buy_sell_entries = (supabase.table("active_buy_sell")
-        .select("price,quantity,stockId,buy_or_sell,userId")
-        .match({"userId": user_id})
-        .execute()
-        .data)
+    active_buy_sell_entries = supabase_middleman.get_user_active_orders(user_id)
     
     # Calculate the value of the user's active buy/sell orders
     active_order_balance = 0
