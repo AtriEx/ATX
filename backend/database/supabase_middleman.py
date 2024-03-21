@@ -230,8 +230,7 @@ def expire_order(order_id: int):
     del order["has_been_processed"]
     order["delisted_time"] = datetime.now().isoformat()
 
-    supabase.table("inactive_buy_sell").insert(order).execute()
-    
+    supabase.table("inactive_buy_sell").insert(order).execute()   
 
 def get_user_profile(user_id: str) -> dict:
     """
