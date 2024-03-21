@@ -119,3 +119,5 @@ def buy_order(data: dict) -> str:
     # Logs transaction in the inactive_buy_sell table
     supabase_middleman.log_transaction(buyer, seller)
     return payload
+
+

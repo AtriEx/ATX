@@ -231,4 +231,4 @@ def expire_order(order_id: int):
     order["delisted_time"] = datetime.now().isoformat()
 
     supabase.table("inactive_buy_sell").insert(order).execute()
-
+    
