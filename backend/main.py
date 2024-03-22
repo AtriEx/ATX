@@ -47,7 +47,7 @@ def change_balance_test(amount: int):
 
 
 @app.get("/netWorth")
-def fetch_net_worth(Id: str):
+def fetch_net_worth(user_id: str):
     """API route for calculating the net worth of a user."""
-    net_worth = net_worth_calculator.net_worth_calculator(Id)
+    net_worth = net_worth_calculator.net_worth_calculator(user_id)
     return net_worth
