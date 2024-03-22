@@ -46,10 +46,8 @@ def change_balance_test(amount: int):
     return output
 
 
-@app.get("/networthTest")
-def net_worth_test():
-    """API route for testing net worth calculator."""
-    net_worth = net_worth_calculator.net_worth_calculator(
-        "36d22a68-ca25-4110-b769-44cf5b4a1c89"
-    )
+@app.get("/netWorth")
+def net_worth(Id: str):
+    """API route for calculating the net worth of a user."""
+    net_worth = net_worth_calculator.net_worth_calculator(Id)
     return net_worth
