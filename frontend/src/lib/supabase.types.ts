@@ -7,6 +7,7 @@ export type Database = {
 				Row: {
 					buy_or_sell: boolean;
 					expirey: string | null;
+					has_been_processed: boolean | null;
 					Id: number;
 					orderId: string | null;
 					price: number;
@@ -18,6 +19,7 @@ export type Database = {
 				Insert: {
 					buy_or_sell?: boolean;
 					expirey?: string | null;
+					has_been_processed?: boolean | null;
 					Id?: number;
 					orderId?: string | null;
 					price?: number;
@@ -29,6 +31,7 @@ export type Database = {
 				Update: {
 					buy_or_sell?: boolean;
 					expirey?: string | null;
+					has_been_processed?: boolean | null;
 					Id?: number;
 					orderId?: string | null;
 					price?: number;
@@ -175,7 +178,7 @@ export type Database = {
 					state: boolean;
 				};
 				Insert: {
-					changed_last?: string;
+					changed_last: string;
 					id?: number;
 					state?: boolean;
 				};
@@ -186,7 +189,7 @@ export type Database = {
 				};
 				Relationships: [];
 			};
-			Portfolio: {
+			portfolio: {
 				Row: {
 					price_avg: number;
 					quantity: number;
@@ -236,7 +239,7 @@ export type Database = {
 					balance?: number;
 					comments?: string[] | null;
 					image?: string | null;
-					joined_at?: string;
+					joined_at: string;
 					networth?: number;
 					userId: string;
 					username: string;
@@ -284,6 +287,51 @@ export type Database = {
 					{
 						foreignKeyName: 'rel_user_flag_userId_fkey';
 						columns: ['userId'];
+						isOneToOne: false;
+						referencedRelation: 'profiles';
+						referencedColumns: ['userId'];
+					}
+				];
+			};
+			rewards_logging: {
+				Row: {
+					created_at: string;
+					dollar_amount: number | null;
+					id: number;
+					quantity: number | null;
+					reason: string | null;
+					stock_id: number | null;
+					user_id: string;
+				};
+				Insert: {
+					created_at: string;
+					dollar_amount?: number | null;
+					id?: number;
+					quantity?: number | null;
+					reason?: string | null;
+					stock_id?: number | null;
+					user_id: string;
+				};
+				Update: {
+					created_at?: string;
+					dollar_amount?: number | null;
+					id?: number;
+					quantity?: number | null;
+					reason?: string | null;
+					stock_id?: number | null;
+					user_id?: string;
+				};
+				Relationships: [
+					{
+						foreignKeyName: 'public_rewards_logging_stock_id_fkey';
+						columns: ['stock_id'];
+						isOneToOne: false;
+						referencedRelation: 'stock_info';
+						referencedColumns: ['id'];
+					},
+					{
+						foreignKeyName: 'public_rewards_logging_user_id_fkey';
+						columns: ['user_id'];
 						isOneToOne: false;
 						referencedRelation: 'profiles';
 						referencedColumns: ['userId'];
@@ -345,7 +393,7 @@ export type Database = {
 					stockId: number;
 				};
 				Insert: {
-					changed_at?: string;
+					changed_at: string;
 					id?: number;
 					price: number;
 					stockId: number;
@@ -358,7 +406,7 @@ export type Database = {
 				};
 				Relationships: [
 					{
-						foreignKeyName: 'public_daily_stock_price_history_stockId_fkey';
+						foreignKeyName: 'public_stock_price_history_daily_stockId_fkey';
 						columns: ['stockId'];
 						isOneToOne: false;
 						referencedRelation: 'stock_info';
@@ -459,7 +507,35 @@ export type Database = {
 			[_ in never]: never;
 		};
 		Functions: {
-			[_ in never]: never;
+			buy_stock: {
+				Args: {
+					user_id: string;
+					stock_id: number;
+				};
+				Returns: undefined;
+			};
+			resolve_price_diff: {
+				Args: {
+					user_id: string;
+					price_diff: number;
+				};
+				Returns: undefined;
+			};
+			'sell_stock(depricated)': {
+				Args: {
+					user_id: string;
+					stock_id: number;
+					order_price: number;
+				};
+				Returns: undefined;
+			};
+			update_balance: {
+				Args: {
+					user_id: string;
+					price_delta: number;
+				};
+				Returns: undefined;
+			};
 		};
 		Enums: {
 			[_ in never]: never;
@@ -470,9 +546,11 @@ export type Database = {
 	};
 };
 
+type PublicSchema = Database[Extract<keyof Database, 'public'>];
+
 export type Tables<
 	PublicTableNameOrOptions extends
-		| keyof (Database['public']['Tables'] & Database['public']['Views'])
+		| keyof (PublicSchema['Tables'] & PublicSchema['Views'])
 		| { schema: keyof Database },
 	TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
 		? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
@@ -485,10 +563,8 @@ export type Tables<
 		}
 		? R
 		: never
-	: PublicTableNameOrOptions extends keyof (Database['public']['Tables'] &
-				Database['public']['Views'])
-		? (Database['public']['Tables'] &
-				Database['public']['Views'])[PublicTableNameOrOptions] extends {
+	: PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views'])
+		? (PublicSchema['Tables'] & PublicSchema['Views'])[PublicTableNameOrOptions] extends {
 				Row: infer R;
 			}
 			? R
@@ -496,7 +572,7 @@ export type Tables<
 		: never;
 
 export type TablesInsert<
-	PublicTableNameOrOptions extends keyof Database['public']['Tables'] | { schema: keyof Database },
+	PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
 	TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
 		? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
 		: never = never
@@ -506,8 +582,8 @@ export type TablesInsert<
 		}
 		? I
 		: never
-	: PublicTableNameOrOptions extends keyof Database['public']['Tables']
-		? Database['public']['Tables'][PublicTableNameOrOptions] extends {
+	: PublicTableNameOrOptions extends keyof PublicSchema['Tables']
+		? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
 				Insert: infer I;
 			}
 			? I
@@ -515,7 +591,7 @@ export type TablesInsert<
 		: never;
 
 export type TablesUpdate<
-	PublicTableNameOrOptions extends keyof Database['public']['Tables'] | { schema: keyof Database },
+	PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
 	TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
 		? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
 		: never = never
@@ -525,8 +601,8 @@ export type TablesUpdate<
 		}
 		? U
 		: never
-	: PublicTableNameOrOptions extends keyof Database['public']['Tables']
-		? Database['public']['Tables'][PublicTableNameOrOptions] extends {
+	: PublicTableNameOrOptions extends keyof PublicSchema['Tables']
+		? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
 				Update: infer U;
 			}
 			? U
@@ -534,12 +610,12 @@ export type TablesUpdate<
 		: never;
 
 export type Enums<
-	PublicEnumNameOrOptions extends keyof Database['public']['Enums'] | { schema: keyof Database },
+	PublicEnumNameOrOptions extends keyof PublicSchema['Enums'] | { schema: keyof Database },
 	EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
 		? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
 		: never = never
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
 	? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
-	: PublicEnumNameOrOptions extends keyof Database['public']['Enums']
-		? Database['public']['Enums'][PublicEnumNameOrOptions]
+	: PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
+		? PublicSchema['Enums'][PublicEnumNameOrOptions]
 		: never;
