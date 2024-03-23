@@ -12,7 +12,7 @@ const adminSupabase = createClient<Database>(
 
 export const load: PageServerLoad = async ({ params }) => {
 	// Check if the username is empty
-	if (!params.username || params.username === '') error(404, 'Profile not found');
+	if (!params.username || params.username === '') error(404, { message: 'Profile not found' });
 
 	// Perform a combined query to fetch profile, portfolio, and flags
 	const { data, error: fetchError } = await adminSupabase
@@ -29,11 +29,10 @@ export const load: PageServerLoad = async ({ params }) => {
     `
 		)
 		.eq('username', params.username)
-		.single()
-		.throwOnError();
+		.single();
 
-	if (fetchError) error(404, 'Profile not found');
-	if (!data) error(404, 'Profile not found');
+	if (fetchError) error(404, { message: 'Profile not found' });
+	if (!data) error(404, { message: 'Profile not found' });
 
 	const profile = {
 		...data,
