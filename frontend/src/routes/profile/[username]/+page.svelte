@@ -19,53 +19,57 @@
 </svelte:head>
 
 <div class="dark:bg-dark-background bg-light-background flex flex-col flex-1">
-	<div class="mx-5 my-3 p-6 bg-dark-primary/5 dark:bg-dark-primary/10 rounded-lg shadow-lg flex">
-		<div class="flex items-center space-x-4 w-full">
-			<img
-				src={profile.image}
-				alt="{profile.username} Image"
-				class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gray-200 dark:bg-gray-700 border-light-accent dark:border-dark-accent border-4 shadow-lg"
-			/>
-			<div class="flex flex-col grow">
-				<div class="flex-grow flex md:flex-row flex-col md:items-center md:space-x-4">
-					<h1 class="text-3xl lg:text-4xl font-bold text-light-primary dark:text-dark-primary">
-						{profile.username}
-					</h1>
-					<div class="flex space-x-2 mt-2 md:mt-0">
-						{#each profile.badges as badge}
-							<ProfileBadge {...badge} />
-						{/each}
-					</div>
+	<div
+		class="mx-4 sm:mx-5 my-4 sm:my-3 p-4 sm:p-6 bg-dark-primary/5 dark:bg-dark-primary/10 rounded-lg shadow-lg flex flex-col md:flex-row"
+	>
+		<img
+			src={profile.image}
+			alt="{profile.username} Image"
+			class="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-gray-200 dark:bg-gray-700 border-light-accent dark:border-dark-accent border-4 shadow-lg self-center md:self-start"
+		/>
+		<div class="flex flex-col grow mt-4 md:mt-0 md:ml-4">
+			<div class="flex-grow flex flex-col md:flex-row items-center md:space-x-4">
+				<h1
+					class="text-2xl sm:text-3xl md:text-4xl font-bold text-light-primary dark:text-dark-primary text-center md:text-left"
+				>
+					{profile.username}
+				</h1>
+				<div class="flex space-x-2 mt-2 md:mt-0 justify-center md:justify-start">
+					{#each profile.badges as badge}
+						<ProfileBadge {...badge} />
+					{/each}
 				</div>
-				<div class="flex flex-row items-center w-full justify-between mt-4">
-					<div
-						class="flex flex-col lg:flex-row gap-4 uppercase font-bold text-gray-600 dark:text-gray-300"
-					>
-						<p class="text-base lg:text-lg">
-							Joined: <span class="text-light-primary dark:text-dark-accent"
-								>{formatDate(profile.joined_at)}</span
-							>
-						</p>
-						<p class="text-base lg:text-lg">
-							NETWORTH: <span class="text-light-primary dark:text-dark-accent"
-								>{formatNumber(profile.networth)} Coins</span
-							>
-						</p>
-						<p class="text-base lg:text-lg">
-							Balance: <span class="text-light-primary dark:text-dark-accent font-bold"
-								>{formatNumber(profile.balance)} Coins</span
-							>
-						</p>
-					</div>
-					<ShareProfile userName={profile.username} />
+			</div>
+			<div
+				class="flex flex-col md:flex-row items-center justify-between text-center md:text-left mt-4"
+			>
+				<div
+					class="flex flex-col md:flex-row gap-4 uppercase font-bold text-gray-600 dark:text-gray-300"
+				>
+					<p class="text-base sm:text-lg">
+						Joined: <span class="text-light-primary dark:text-dark-accent"
+							>{formatDate(profile.joined_at)}</span
+						>
+					</p>
+					<p class="text-base sm:text-lg">
+						NETWORTH: <span class="text-light-primary dark:text-dark-accent"
+							>{formatNumber(profile.networth)} Coins</span
+						>
+					</p>
+					<p class="text-base sm:text-lg">
+						Balance: <span class="text-light-primary dark:text-dark-accent font-bold"
+							>{formatNumber(profile.balance)} Coins</span
+						>
+					</p>
 				</div>
+				<ShareProfile userName={profile.username} />
 			</div>
 		</div>
 	</div>
 
-	<div class="md:flex flex-wrap m-5 gap-5">
+	<div class="md:flex flex-wrap mx-5">
 		<div
-			class="flex-1 min-w-[40%] bg-dark-primary/5 dark:bg-dark-primary/10 rounded-xl p-6 shadow-lg"
+			class="flex-1 min-w-[40%] bg-dark-primary/5 dark:bg-dark-primary/10 rounded-xl p-6 shadow-lg my-3 md:m-3 md:my-0"
 		>
 			<h2 class="text-2xl font-bold text-light-text dark:text-dark-text">Stocks Owned</h2>
 			<div
