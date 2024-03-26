@@ -12,7 +12,7 @@ from fastapi import FastAPI
 
 from database import supabase_middleman
 
-load_dotenv(find_dotenv())
+load_dotenv(os.getenv("ENV_FILE", find_dotenv()))
 
 SLEEP_TIME = int(os.getenv("EXPIRE_LOOP_DELAY", "10"))  # Default to 10s
 

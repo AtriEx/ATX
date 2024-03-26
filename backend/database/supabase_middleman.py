@@ -9,7 +9,7 @@ from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 
-load_dotenv("env/.env")
+load_dotenv(os.getenv("ENV_FILE", "env/.env"))
 url = os.getenv("PUBLIC_SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)

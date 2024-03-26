@@ -6,7 +6,7 @@ import re
 import requests
 from dotenv import find_dotenv, load_dotenv
 
-load_dotenv(find_dotenv())
+load_dotenv(os.getenv("ENV_FILE", find_dotenv()))
 
 BASE_URL = os.getenv("PUBLIC_SUPABASE_URL")
 API_KEY = os.getenv("SUPABASE_KEY")
