@@ -8,8 +8,8 @@ vars:
 tasks:
   fmt:
     cmds:
-    - isort --profile black {{.TRACKED_FILES}}
-    - black {{.TRACKED_FILES}}
+    - python -m isort --profile black {{.TRACKED_FILES}}
+    - python -m black {{.TRACKED_FILES}}
 
   format: 
     cmds:
@@ -17,7 +17,7 @@ tasks:
 
   lint-only:
     cmds:
-    - pylint {{.TRACKED_FILES}}
+    - python -m pylint {{.TRACKED_FILES}}
 
   lint:
     cmds:
@@ -26,5 +26,5 @@ tasks:
 
   check-format:
     cmds:
-    - isort --profile black --check {{.TRACKED_FILES}}
-    - black --check {{.TRACKED_FILES}}
+    - python -m isort --profile black --check {{.TRACKED_FILES}}
+    - python -m black --check {{.TRACKED_FILES}}
