@@ -1,0 +1,27 @@
+version: '3'
+
+includes:
+  backend:
+    taskfile: './backend/tasks.yml'
+    dir: './backend'
+
+tasks:
+  default:
+    cmds:
+    - echo "For more information run \"task --summary <task>\""
+    - echo "Arguments should be passed using \"task <task> -- <arguments>\""
+    - echo ""
+    - task --list   # by default if someone runs "task" in project directory it will list all available tasks with descriptions
+    silent: true
+
+  fmt:
+    cmds:
+    - task: backend:fmt
+
+  format:
+    cmds:
+    - task: fmt
+
+  lint:
+    cmds:
+    - task: backend:lint
