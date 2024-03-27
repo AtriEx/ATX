@@ -10,7 +10,7 @@ def create_buy_order():
 
     Returns: None
     """
-    test_entry = test_data.test_entry_1()
+    test_entry = test_data.buy_entry()
     supabase_middleman.insert_entry("active_buy_sell", test_entry)
 
 
@@ -20,5 +20,5 @@ def create_sell_order():
 
     Returns: None
     """
-    test_entry = test_data.test_entry_2()
+    test_entry = test_data.sell_entry()
     supabase_middleman.insert_entry("active_buy_sell", test_entry)
