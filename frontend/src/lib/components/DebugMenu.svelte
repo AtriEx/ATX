@@ -1,6 +1,6 @@
 <script>
 	import { profile, user, loggedIn } from '$lib/stores/userData';
-	import { loginDialog, debugMenu } from '$lib/stores/uiStates';
+	import { loginDialog, debugMenu, rewardsDialog } from '$lib/stores/uiStates';
 	import { getProfile, getUser, supabase } from '$lib/supabase';
 
 	function logProfile() {
@@ -18,6 +18,11 @@
 
 	function openLoginDialog() {
 		$loginDialog = true;
+		$debugMenu = false;
+	}
+
+	function openDailyRewards() {
+		$rewardsDialog = true;
 		$debugMenu = false;
 	}
 
@@ -60,6 +65,12 @@
 				on:click={openLoginDialog}
 			>
 				Open login dialog
+			</button>
+			<button
+				class="bg-twitch text-white text-lg px-8 p-2 rounded-md flex flex-row items-center"
+				on:click={openDailyRewards}
+			>
+				Open rewards dialog
 			</button>
 			<button
 				class="bg-twitch text-white text-lg px-8 p-2 rounded-md flex flex-row items-center"
