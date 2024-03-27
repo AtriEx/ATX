@@ -12,7 +12,7 @@
 
 <div class="absolute top-0 left-0 w-screen h-screen z-1 flex justify-center items-center">
 	<div
-		class=" bg-light-background dark:bg-dark-primary/5 h-3/8 md:h-1/5  lg:w-1/3 md:w-2/4 w-4/5 rounded-xl relative flex border border-dark-accent"
+		class="bg-light-background dark:bg-dark-primary/5 h-3/8 md:h-1/5  lg:w-1/3 md:w-2/4 w-4/5 rounded-xl relative flex border border-dark-accent"
 	>
 		<div class="absolute scale-50 right-0 mr-1 text-light-text dark:text-dark-text">
 			<button on:click={() => ($loginDialog = false)}>

@@ -11,20 +11,20 @@
 	
 </script>
 
-<div class="absolute top-0 left-0 w-screen h-screen z-1 flex justify-center items-center">
+<div class="absolute top-0 left-0 w-screen h-screen z-1 flex justify-center items-center overflow-hidden">
 
 	<div
-		class=" bg-light-background dark:bg-dark-primary/5 h-3/8 md:h-1/5  lg:w-1/3 md:w-2/4 w-4/5 rounded-xl relative flex border border-dark-accent"
+		class="bg-light-background dark:bg-dark-primary/5 w-4/5 h-3/8 md:h-1/5 md:w-2/4 lg:w-1/3 min-h-64 rounded-xl relative flex border border-dark-accent"
 	>
 
 		<div class="flex flex-col justify-between items-center w-full grow pt-5 pb-2 px-6">
 			<span class=" flex flex-col items-center w-full px-4 border-b-2 border-dark-secondary text-light-text dark:text-dark-text ">
 
-				<h1 class="text-3xl pt-2 font-extrabold pb-2">
+				<h1 class="text-l md:text-xl lg:text-3xl pt-2 font-extrabold pb-2">
 					Daily Login Reward
 				</h1>
 			</span>
-			<p class="text-light-text dark:text-dark-text">*this is a dark pattern to keep you trading*</p>
+			<p class="text-light-text dark:text-dark-text">*we're manipulating you*</p>
 			<!-- STOCK OR MONEY VALUES GOES IN THIS DIV -->
 			<div class="text-green-500">
 				&lt;Money or Stock PlaceHolder&gt;
