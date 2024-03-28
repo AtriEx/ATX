@@ -14,12 +14,14 @@ def health():
     return ""
 
 
-
+#testing
 @app.get("/buyOrder")
 def test_entry_1():
     """API route for creating a test buy order."""
     #create_active_order.create_sell_order()
+    #create_active_order.create_sell_order()
     return "Test entry inserted"
+
 
 #prod
 @app.get("/qb")
@@ -28,6 +30,7 @@ def create_buy_order(data: dict):
     ret_val = buy_order.buy_order(data)
     return ret_val
 
+
 #testing
 @app.get("/testParams")
 def test_params(data: dict):
@@ -35,12 +38,14 @@ def test_params(data: dict):
     buy_order.test_params()
     return data
 
+
 #testing
 @app.get("/insertCustomOrder")
 def insert_custom_order(data: dict):
     """API route for inserting a custom order."""
     supabase_middleman.insert_entry("active_buy_sell", data)
     return "Custom order inserted"
+
 
 #testing
 @app.get("/changeBalanceTest")
