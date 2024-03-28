@@ -1,5 +1,4 @@
 """Creates buy and sell orders"""
-"""Creates buy and sell orders"""
 
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
