@@ -15,7 +15,7 @@
 			else queryParams.set('query', value);
 			if (!browser) return;
 			tableState.changeQuery(value || undefined);
-			goto('/?' + queryParams.toString(), { replaceState: false, noScroll: true });
+			goto('/stocks?' + queryParams.toString(), { replaceState: false, noScroll: true });
 		}, 500);
 	}
 </script>

@@ -20,7 +20,7 @@
 		const queryParams = new URLSearchParams($page.url.searchParams);
 		queryParams.set('order', newOrder);
 		queryParams.set('orderBy', orderBy);
-		goto('/?' + queryParams.toString(), { replaceState: false, noScroll: true });
+		goto('/stocks?' + queryParams.toString(), { replaceState: false, noScroll: true });
 		if ($tableState.order !== newOrder) tableState.changeOrder();
 		if ($tableState.orderBy !== orderBy) tableState.changeOrderBy(orderBy);
 	}

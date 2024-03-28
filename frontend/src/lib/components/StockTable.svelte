@@ -1,8 +1,7 @@
 <script lang="ts">
 	import StockTableHeader from './StockTableHeader.svelte';
 	import StockTableRow from './StockTableRow.svelte';
-	import { page } from '$app/stores';
-	import type { PageData } from '../../routes/$types';
+	import type { PageData } from '../../routes/stocks/$types';
 
 	export let stockInfo: PageData['stockInfo'];
 	export let mainTable = false;
