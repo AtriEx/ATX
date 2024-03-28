@@ -1,7 +1,7 @@
 """Creates buy and sell orders"""
 
 from fastapi import FastAPI, HTTPException
-from datetime import datetime
+from datetime import datetime, timezone
 from pydantic import BaseModel
 from database import supabase_middleman
 from uuid import UUID, uuid4
@@ -23,6 +23,8 @@ def create_active_buy_sell_order(data: dict) -> str:
     stock_id = data["stockId"]
     user_id = data["userId"]
 
+    expirey = expirey.replace("Z", "+00:00")  # Replace Z with +00:00 to make it ISO 8601 compliant
+    expirey = datetime.fromisoformat(expirey)   # Convert expirey to datetime object
 
     if price < 1:
         raise_http_exception(
@@ -36,7 +38,7 @@ def create_active_buy_sell_order(data: dict) -> str:
             error_code=400,
             error_message="Quantity must be greater than 0",
         )
-    if expirey < datetime.now():
+    if expirey < datetime.now(timezone.utc):
         raise_http_exception(
             status_code=HTTP_400_BAD_REQUEST,
             error_code=400,
@@ -53,7 +55,8 @@ def create_active_buy_sell_order(data: dict) -> str:
     # validate user_id is a valid uuid and it exists
     try:
         UUID(hex=user_id)  # throws value error if not a valid uuid
-        user_profile = supabase_middleman.fetch_profile(user_id)
+        #user_profile = supabase_middleman.fetch_profile(user_id)
+        user_profile = supabase_middleman.get_user_profile(user_id)
         if not user_profile:
             raise_http_exception(
                 status_code=HTTP_400_BAD_REQUEST,
@@ -83,7 +86,8 @@ def create_active_buy_sell_order(data: dict) -> str:
                 error_message="Insufficient balance",
             )
     else:  # Sell order
-        portfolio = supabase_middleman.fetch_portfolio(user_id, stock_id)
+        #portfolio = supabase_middleman.fetch_portfolio(user_id, stock_id)
+        portfolio = supabase_middleman.get_user_portfolio(user_id)[stock_id]
         if not portfolio:
             raise_http_exception(
                 status_code=HTTP_400_BAD_REQUEST,
@@ -117,6 +121,7 @@ def create_active_buy_sell_order(data: dict) -> str:
         supabase_middleman.update_user_portfolio(user_id, stock_id, quantity * -1)
         #supabase_middleman.escrow_stock(user_id, stock_id, quantity)
 
+    expirey=str(expirey)
     # Generate an entry for each quantity and insert those entries into the table
     for i in range(quantity):
         entry = {
