@@ -2,7 +2,7 @@ FROM python:3.12
 
 EXPOSE 8000
 
-HEALTHCHECK --interval=15s --timeout=15s --start-period=5s --retries=2 CMD ["curl", "--fail", "http://localhost:8000/health"]
+HEALTHCHECK --interval=15s --timeout=15s --start-period=5s --retries=2 CMD ["curl", "-sfo", "/dev/null", "http://localhost:8000/health"]
 
 WORKDIR /app
 
