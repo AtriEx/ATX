@@ -9,7 +9,7 @@ from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
 
-load_dotenv("env/.env")
+load_dotenv(os.getenv("ENV_FILE", "env/.env"))
 url = os.getenv("PUBLIC_SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
@@ -231,3 +231,50 @@ def expire_order(order_id: int):
     order["delisted_time"] = datetime.now().isoformat()
 
     supabase.table("inactive_buy_sell").insert(order).execute()
+
+
+def get_user_profile(user_id: str) -> dict:
+    """
+    Get the user's profile from the profiles table
+
+    Args:
+        user_id (str): The user's ID
+
+    Returns: dict - The user's profile
+    """
+    return (
+        supabase.table("profiles")
+        .select("*")
+        .eq("userId", user_id)
+        .execute()
+        .data.pop()
+    )
+
+
+def get_user_portfolio(user_id: str) -> list[dict]:
+    """
+    Get the user's portfolio from the portfolio table
+
+    Args:
+        user_id (str): The user's ID
+
+    Returns: list[dict] - The user's portfolio
+    """
+    return supabase.table("portfolio").select("*").eq("userId", user_id).execute().data
+
+
+def get_user_active_orders(user_id: str) -> list[dict]:
+    """
+    Get the user's active orders from the active_buy_sell table
+
+    Args:
+        user_id (str): The user's ID
+
+    Returns: list[dict] - The user's active orders"""
+    return (
+        supabase.table("active_buy_sell")
+        .select("*")
+        .eq("userId", user_id)
+        .execute()
+        .data
+    )

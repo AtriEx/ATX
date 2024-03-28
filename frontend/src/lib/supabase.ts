@@ -81,12 +81,15 @@ export async function getProfile() {
 // Function to handle actions post-login
 export async function onLogin() {
 	loginDialog.set(false);
+
 	if (get(loggedIn)) return;
+	loggedIn.set(true);
 
 	const currentUser = await getUser();
 	if (currentUser) {
-		getProfile();
-		loggedIn.set(true);
+		const currentProfile = await getProfile();
+
+		if (!currentProfile) loggedIn.set(false);
 	}
 }
 
