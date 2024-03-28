@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import { page } from '$app/stores';
 </script>
 
@@ -34,7 +35,7 @@
 			<div class="w-full flex justify-center">
 				<button
 					class="bg-light-primary dark:bg-dark-primary p-2 rounded-lg text-light-text dark:text-dark-text"
-					on:click={() => history.back()}>Go back</button
+					on:click={() => goto('/')}>Home</button
 				>
 			</div>
 		</div>

@@ -24,7 +24,7 @@ export const load: PageServerLoad = async ({ params }) => {
         username,
         image,
         joined_at,
-        portfolio(stockId, quantity, stock_info(name, image, description, stock_price(stock_price))),
+        portfolio(quantity, stock_info(name, image, description, stock_price(stock_price))),
         flags(id, name, image, description, type)
     `
 		)
