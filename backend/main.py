@@ -9,6 +9,12 @@ from util.expire_orders import lifespan
 app = FastAPI(lifespan=lifespan)
 
 
+@app.get("/health")
+def health():
+    """API route for health checks."""
+    return ""
+
+
 @app.get("/buyOrder")
 def test_entry_1():
     """API route for creating a test buy order."""
