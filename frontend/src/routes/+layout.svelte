@@ -9,33 +9,26 @@
 	import { PUBLIC_ENVIRONMENT } from '$env/static/public';
 	import DebugMenu from '$lib/components/DebugMenu.svelte';
 
-	onMount(async () => {
-		try {
-			const {data, error} = await supabase.auth.getSession();
-			if (error) throw error;
-
-			if(data.session !== null){
-				onLogin();
-				console.log("Successully restored session.");
-			}
-		} catch (error) {
-			console.error("Error while attempting to restore session", error);
-		}
-
+	onMount(() => {
 		supabase.auth.onAuthStateChange((event, session) => {
-			if (event === 'SIGNED_IN') {
-				try {
-					onLogin();
-				} catch (error) {
-					console.error('Error in onAuthStateChange', error);
-				}
-			}
-			if (event === 'SIGNED_OUT') {
-				try {
-					onLogout();
-				} catch (error) {
-					console.error();
-				}
+			switch (event) {
+				case 'INITIAL_SESSION':
+					if(session === null)break;
+				case 'SIGNED_IN':
+					try {
+						onLogin();
+					} catch (error) {
+						console.error('Error in onAuthStateChange', error);
+					}
+					break;
+
+				case 'SIGNED_OUT':
+					try {
+						onLogout();
+					} catch (error) {
+						console.error();
+					}
+					break;
 			}
 		});
 	});
