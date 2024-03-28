@@ -26,6 +26,7 @@ def insert_entry(table_name: str, entry: dict) -> None:
 
     Returns: None
     """
+    print(entry)
     supabase.table(table_name).insert(entry).execute()
 
 
