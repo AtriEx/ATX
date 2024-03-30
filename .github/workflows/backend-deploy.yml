@@ -9,7 +9,7 @@ on:
     - '**.py'
 
 jobs:
-  update:
+  deploy:
     runs-on:
     - self-hosted
     - deploy
