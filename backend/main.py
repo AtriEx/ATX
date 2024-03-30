@@ -3,7 +3,7 @@
 from fastapi import FastAPI
 
 from database import supabase_middleman
-from routes import buy_order, create_active_order, net_worth_calculator
+from routes import buy_order, create_active_order, net_worth_calculator, daily_bonus
 from util.expire_orders import lifespan
 
 app = FastAPI(lifespan=lifespan)
@@ -57,3 +57,8 @@ def fetch_net_worth(user_id: str):
     """API route for calculating the net worth of a user."""
     net_worth = net_worth_calculator.net_worth_calculator(user_id)
     return net_worth
+
+
+@app.post("/dailyBonus")
+def create_daily_bonus(user_id: str):
+    return daily_bonus.give_daily_bonus(user_id)
