@@ -14,17 +14,17 @@ url = os.getenv("PUBLIC_SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
 
-def test_migrate_history_middle_day():
+def test_migrate_history_middle_day(clean):
 
     default_opening_price = 300
 
     # Create test data
-    current_hour_time = datetime.now().replace(minute=0, second=0, microsecond=0)
-    last_hour_time = current_hour_time - timedelta(hours=1)
-    two_hours_ago = current_hour_time - timedelta(hours=2)
+    test_hour_time = datetime.now().replace(minute=0, second=0, microsecond=0)
+    last_hour_time = test_hour_time - timedelta(hours=1)
+    two_hours_before = test_hour_time - timedelta(hours=2)
     for delta_t in range(1,20):
         supabase_middleman.insert_entry("stock_price_history_daily", {
-            "changed_at": to_supabase_date(current_hour_time - timedelta(minutes=delta_t)),
+            "changed_at": to_supabase_date(test_hour_time - timedelta(minutes=delta_t)),
             "price": random.randint(1,100),
             "stockId": 1,
         })
@@ -34,7 +34,7 @@ def test_migrate_history_middle_day():
     for stock_id in all_stock_ids:
         supabase_middleman.insert_entry("stock_price_history_weekly", {
                 "stockId": stock_id["id"],
-                "starting_hour": to_supabase_date(two_hours_ago),
+                "starting_hour": to_supabase_date(two_hours_before),
                 "average_price": 200,
                 "highest_price": 400,
                 "lowest_price":50,
@@ -45,7 +45,7 @@ def test_migrate_history_middle_day():
 
     # Run test
     try:
-        supabase_middleman.migrate_price_changes(current_hour_time)
+        supabase_middleman.migrate_price_changes(test_hour_time)
 
     except:
         print("\n\nmigrate_price_changes failed\n")
@@ -65,26 +65,27 @@ def test_migrate_history_middle_day():
 
     print(f"OPENING VALUE TEST: {"PASS" if opening_pass_value else "FAIL"}")
 
-    # Clean up test data
-    (
-        supabase.table("stock_price_history_daily")
-        .delete()
-        .gt("changed_at", to_supabase_date(last_hour_time))
-        .lt("changed_at", to_supabase_date(current_hour_time))
-        .execute()
-    )
-    (
-        supabase.table("stock_price_history_weekly")
-        .delete()
-        .eq("starting_hour", to_supabase_date(two_hours_ago))
-        .execute()
-    )
-    (
-        supabase.table("stock_price_history_weekly")
-        .delete()
-        .eq("starting_hour", to_supabase_date(last_hour_time))
-        .execute()
-    )
+    if clean:
+        # Clean up test data
+        (
+            supabase.table("stock_price_history_daily")
+            .delete()
+            .gt("changed_at", to_supabase_date(last_hour_time))
+            .lt("changed_at", to_supabase_date(test_hour_time))
+            .execute()
+        )
+        (
+            supabase.table("stock_price_history_weekly")
+            .delete()
+            .eq("starting_hour", to_supabase_date(two_hours_before))
+            .execute()
+        )
+        (
+            supabase.table("stock_price_history_weekly")
+            .delete()
+            .eq("starting_hour", to_supabase_date(last_hour_time))
+            .execute()
+        )
 
 def test_migrate_history_end_of_day():
     current_hour_time = datetime.now().replace(minute=0, second=0, microsecond=0)

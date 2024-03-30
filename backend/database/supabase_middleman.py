@@ -337,13 +337,15 @@ def migrate_price_changes(hour: datetime):
         .eq("starting_hour", to_supabase_date(two_hours_ago))
         .execute().data
     )
-    
-    hourly_volume_table = {}
-    hourly_change_table = {}
+
+    hour_volume_table = {}
+    hour_change_table = {}
+    hour_check_table = {}
 
     for stock_id in all_stock_ids:
-        hourly_volume_table[stock_id["id"]] = (0, 0)
-        hourly_change_table[stock_id["id"]] = {
+        hour_volume_table[stock_id["id"]] = (0, 0)
+        hour_check_table[stock_id["id"]] = False
+        hour_change_table[stock_id["id"]] = {
             "starting_hour": to_supabase_date(last_hour_time),
             "stockId": stock_id["id"],
             "average_price": 0,
@@ -354,62 +356,84 @@ def migrate_price_changes(hour: datetime):
             "volume_of_sales": 0,
         }
 
+    # Use last the last hours close as the default for this hours open, close, highest, lowest, and average price.
     for weekly_entry in last_weekly_history:
-        hourly_change_table[weekly_entry["stockId"]]["opening_price"] = weekly_entry["closing_price"]
-        hourly_change_table[weekly_entry["stockId"]]["closing_price"] = weekly_entry["closing_price"]
-        hourly_change_table[weekly_entry["stockId"]]["highest_price"] = weekly_entry["closing_price"]
-        hourly_change_table[weekly_entry["stockId"]]["lowest_price"] = weekly_entry["closing_price"]
-        hourly_change_table[weekly_entry["stockId"]]["average_price"] = weekly_entry["closing_price"]
+        hour_check_table[weekly_entry["stockId"]] = True
+        hour_change_table[weekly_entry["stockId"]]["opening_price"] = weekly_entry["closing_price"]
+        hour_change_table[weekly_entry["stockId"]]["closing_price"] = weekly_entry["closing_price"]
+        hour_change_table[weekly_entry["stockId"]]["highest_price"] = weekly_entry["closing_price"]
+        hour_change_table[weekly_entry["stockId"]]["lowest_price"] = weekly_entry["closing_price"]
+        hour_change_table[weekly_entry["stockId"]]["average_price"] = weekly_entry["closing_price"]
 
-    for fulfilled_order in all_hourly_fulfilled:
-        hourly_volume_table[fulfilled_order["stockId"]] += (fulfilled_order["quantity"], fulfilled_order["quantity"] * fulfilled_order["price"])
-
-    print(hourly_volume_table)
-
-    current_stock = all_hourly_price_changes[0]["stockId"]
-    hourly_highest = all_hourly_price_changes[0]["price"] 
-    hourly_lowest = all_hourly_price_changes[0]["price"] 
-    hourly_last_price = all_hourly_price_changes[0]["price"] 
-
-    for price_change in all_hourly_price_changes:
-        if price_change["stockId"] != current_stock:
-            hourly_change_table[current_stock]["average_price"] = (
-                hourly_last_price if hourly_volume_table[current_stock][0] == 0
-                else hourly_volume_table[current_stock][1] / hourly_volume_table[current_stock][0]
+    # If there was no weekly entry for the stock, then the stock must be new. In this case, check for the earliest daily entry. Stocks are created with a entry via a trigger.
+    for hour_check in hour_check_table.items():
+        if hour_check[1]:
+            stock_weekly_default = ( 
+                supabase.table("stock_price_history_daily")
+                .select("price")
+                .single()
+                .eq("stockId", hour_check[0]),
+                .order("changed_at", desc = False)
+                .limit(1)
+                .execute()
+                .data
             )
-            hourly_change_table[current_stock]["highest_price"] = hourly_highest
-            hourly_change_table[current_stock]["lowest_price"] = hourly_lowest
-            hourly_change_table[current_stock]["closing_price"] = hourly_last_price
-            hourly_change_table[current_stock]["volume_of_sales"] = hourly_volume_table[current_stock][0]
+
+            hourly_change_table[hour_check[0]]["opening_price"] = stock_weekly_default["price"]
+            hourly_change_table[hour_check[0]]["closing_price"] = stock_weekly_default["price"]
+            hourly_change_table[hour_check[0]]["highest_price"] = stock_weekly_default["price"]
+            hourly_change_table[hour_check[0]]["lowest_price"] = stock_weekly_default["price"]
+            hourly_change_table[hour_check[0]]["average_price"] = stock_weekly_default["price"]
+
+    for fulfilled_order in all_hour_fulfilled:
+        hour_volume_table[fulfilled_order["stockId"]] += (fulfilled_order["quantity"], fulfilled_order["quantity"] * fulfilled_order["price"])
+
+    print(hour_volume_table)
+
+    current_stock = all_hour_price_changes[0]["stockId"]
+    hour_highest = all_hourly_price_changes[0]["price"] 
+    hour_lowest = all_hourly_price_changes[0]["price"] 
+    hour_last_price = all_hourly_price_changes[0]["price"] 
+
+    for price_change in all_hour_price_changes:
+        if price_change["stockId"] != current_stock:
+            hour_change_table[current_stock]["average_price"] = (
+                hour_last_price if hourly_volume_table[current_stock][0] == 0
+                else hour_volume_table[current_stock][1] / hourly_volume_table[current_stock][0]
+            )
+            hour_change_table[current_stock]["highest_price"] = hourly_highest
+            hour_change_table[current_stock]["lowest_price"] = hourly_lowest
+            hour_change_table[current_stock]["closing_price"] = hourly_last_price
+            hour_change_table[current_stock]["volume_of_sales"] = hourly_volume_table[current_stock][0]
 
             current_stock = price_change["stockId"]
-            hourly_highest = price_change["price"]
-            hourly_lowest = price_change["price"]
-            hourly_last_price = price_change["price"]
+            hour_highest = price_change["price"]
+            hour_lowest = price_change["price"]
+            hour_last_price = price_change["price"]
         else:
-            hourly_highest = max(hourly_highest, price_change["price"])
-            hourly_lowest = min(hourly_lowest, price_change["price"])
-            hourly_last_price = price_change["price"]
+            hour_highest = max(hourly_highest, price_change["price"])
+            hour_lowest = min(hourly_lowest, price_change["price"])
+            hour_last_price = price_change["price"]
     
 
-    hourly_change_table[current_stock]["average_price"] = (
-        hourly_last_price if hourly_volume_table[current_stock][0] == 0
-        else hourly_volume_table[current_stock][1] / hourly_volume_table[current_stock][0]
+    hour_change_table[current_stock]["average_price"] = (
+        hour_last_price if hourly_volume_table[current_stock][0] == 0
+        else hour_volume_table[current_stock][1] / hourly_volume_table[current_stock][0]
     )
-    hourly_change_table[current_stock]["highest_price"] = hourly_highest
-    hourly_change_table[current_stock]["lowest_price"] = hourly_lowest
-    hourly_change_table[current_stock]["closing_price"] = hourly_last_price
-    hourly_change_table[current_stock]["volume_of_sales"] = hourly_volume_table[current_stock][0]
+    hour_change_table[current_stock]["highest_price"] = hourly_highest
+    hour_change_table[current_stock]["lowest_price"] = hourly_lowest
+    hour_change_table[current_stock]["closing_price"] = hourly_last_price
+    hour_change_table[current_stock]["volume_of_sales"] = hourly_volume_table[current_stock][0]
 
     print("\nHourly Volume Table \n\n")
-    print(hourly_volume_table)
+    print(hour_volume_table)
     print("\nHourly Change Table \n\n")
-    pprint(hourly_change_table[1])
+    pprint(hour_change_table[1])
     print("\n\n")
-    pprint(all_hourly_price_changes)
+    pprint(all_hour_price_changes)
 
 
-    supabase.table("stock_price_history_weekly").insert(list(hourly_change_table.values())).execute();
+    supabase.table("stock_price_history_weekly").insert(list(hour_change_table.values())).execute();
 
     # If hour == 0 we're at the end of the day
     if current_hour_time.hour == 0:
@@ -463,3 +487,12 @@ def migrate_price_changes(hour: datetime):
             }]
 
         supabase.table("stock_price_history_monthly").insert(monthly_entries).execute
+
+        # Delete old weekly entries
+        seven_days_before = current_hour_time - timedelta(days=7)
+        (
+            supabase.table("stock_price_history_weekly")
+            .delete()
+            .lt("starting_hour", to_supabase_date(seven_days_before))
+            .execute()
+        )
