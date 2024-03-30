@@ -1,0 +1,41 @@
+# ! This is a very sensitive workflow as it runs on a self-hosted runner. All changes to this have to be meticulously reviewed.
+name: Deploy Backend
+
+on:
+  push:
+    branches:
+    - master
+    paths:
+    - '**.py'
+
+jobs:
+  update:
+    runs-on:
+    - self-hosted
+    - deploy
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Save image name
+      run: echo "image=atx:$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+
+    - name: Build image
+      run: docker build -t '${{ env.image }}' .
+      env:
+        # work around https://github.com/github/vscode-github-actions/issues/222. it's annoying.
+        image: ${{ env.image }}
+
+    - name: Update service
+      run: docker service update atx --image '${{ env.image }}' | tee /tmp/capture-update.out
+      env:
+        # work around https://github.com/github/vscode-github-actions/issues/222. it's annoying.
+        image: ${{ env.image }}
+
+    - name: Error if rollback occurred
+      run: if [ "$(cat /tmp/capture-update.out | grep -c '^rollback:')" -ge 1 ]; then echo 'Rollback occurred'; exit 1; fi
