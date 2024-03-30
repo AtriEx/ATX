@@ -8,6 +8,7 @@
 	import { supabase, onLogin, onLogout } from '$lib/supabase';
 	import { PUBLIC_ENVIRONMENT } from '$env/static/public';
 	import DebugMenu from '$lib/components/DebugMenu.svelte';
+	import { Toaster } from 'svelte-french-toast';
 
 	onMount(() => {
 		supabase.auth.onAuthStateChange((event, session) => {
@@ -63,3 +64,5 @@
 		</button>
 	</div>
 {/if}
+
+<Toaster />
