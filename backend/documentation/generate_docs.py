@@ -4,7 +4,7 @@ import os
 import re
 
 import requests
-from dotenv import find_dotenv, load_dotenv
+from dotenv import load_dotenv
 
 load_dotenv(os.getenv("ENV_FILE", "env/.env"))
 
