@@ -10,28 +10,11 @@ const adminSupabase = createClient<Database>(
 	PRIVATE_SUPABASE_SERVICE_ROLE_KEY
 );
 
-export type Query = {
-	query?: string;
-	orderBy?: 'name' | 'description' | 'image' | 'price' | 'total_shares';
-	order?: 'asc' | 'desc';
-};
-
-export const load = (async ({ url }) => {
-	const query = url.searchParams.get('query');
-	const orderBy = (url.searchParams.get('orderBy') as Query['orderBy']) || 'name';
-	const order = (url.searchParams.get('order') as Query['order']) || 'asc';
-
-	let builder = adminSupabase
+export const load = (async () => {
+	const { data } = await adminSupabase
 		.from('stock_info')
 		.select('name, image, stock_price(stock_price), total_shares');
 
-	if (query) builder = builder.ilike('name', `*${query}*`);
-
-	if (orderBy !== 'price') {
-		builder = builder.order(orderBy, { ascending: order === 'asc' });
-	}
-
-	let { data } = await builder;
 	if (!data) {
 		console.error('No data');
 		error(404, 'Not found');
@@ -40,14 +23,7 @@ export const load = (async ({ url }) => {
 	const hottest = await hottestStocks();
 	const losers = await biggestLosers();
 
-	if (orderBy === 'price')
-		data = data.sort((a, b) =>
-			order === 'asc'
-				? a.stock_price!.stock_price - b.stock_price!.stock_price
-				: b.stock_price!.stock_price - a.stock_price!.stock_price
-		);
-
-	return { stockInfo: data, hottest, losers };
+	return { stocks: data, hottest, losers };
 }) satisfies PageServerLoad;
 
 async function biggestLosers() {
