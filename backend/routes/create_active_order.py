@@ -31,30 +31,33 @@ def create_active_buy_sell_order(data: dict) -> str:
     expirey = datetime.fromisoformat(expirey)  # Convert expirey to datetime object
 
     if price < 1:
-        raise_http_exception(
-            status_code=HTTP_400_BAD_REQUEST,
-            error_code=400,
-            error_message="Price must be greater than 0",
-        )
+        # raise_http_exception(
+        #     status_code=HTTP_400_BAD_REQUEST,
+        #     error_code=400,
+        #     error_message="Price must be greater than 0",
+        # )
+        return "Price must be greater than 0"
     if quantity < 1:
-        raise_http_exception(
-            status_code=HTTP_400_BAD_REQUEST,
-            error_code=400,
-            error_message="Quantity must be greater than 0",
-        )
+        # raise_http_exception(
+        #     status_code=HTTP_400_BAD_REQUEST,
+        #     error_code=400,
+        #     error_message="Quantity must be greater than 0",
+        # )
+        return "Quantity must be greater than 0"
     if expirey < datetime.now(timezone.utc):
-        raise_http_exception(
-            status_code=HTTP_400_BAD_REQUEST,
-            error_code=400,
-            error_message="Expirey date cannot be in the past",
-        )
-
+        # raise_http_exception(
+        #     status_code=HTTP_400_BAD_REQUEST,
+        #     error_code=400,
+        #     error_message="Expirey date cannot be in the past",
+        # )
+        return "Expirey date cannot be in the past"
     if not supabase_middleman.fetch_stock_price(stock_id):
-        raise_http_exception(
-            status_code=HTTP_400_BAD_REQUEST,
-            error_code=400,
-            error_message="Stock not found",
-        )
+        # raise_http_exception(
+        #     status_code=HTTP_400_BAD_REQUEST,
+        #     error_code=400,
+        #     error_message="Stock not found",
+        # )
+        return "Stock not found"
 
     # validate user_id is a valid uuid and it exists
     try:
@@ -62,55 +65,62 @@ def create_active_buy_sell_order(data: dict) -> str:
         # user_profile = supabase_middleman.fetch_profile(user_id)
         user_profile = supabase_middleman.get_user_profile(user_id)
         if not user_profile:
-            raise_http_exception(
-                status_code=HTTP_400_BAD_REQUEST,
-                error_code=400,
-                error_message="User not found",
-            )
+            # raise_http_exception(
+            #     status_code=HTTP_400_BAD_REQUEST,
+            #     error_code=400,
+            #     error_message="User not found",
+            # )
+            return "User not found"
     except ValueError:
-        raise_http_exception(
-            status_code=HTTP_400_BAD_REQUEST,
-            error_code=400,
-            error_message="user_id is not in valid UUID format",
-        )
+        # raise_http_exception(
+        #     status_code=HTTP_400_BAD_REQUEST,
+        #     error_code=400,
+        #     error_message="user_id is not in valid UUID format",
+        # )
+        return "user_id is not in valid UUID format"
 
     # validate that if order is a buy order, user has enough balance,
     # or if order is a sell order, user has enough quantity
     if buy_or_sell:  # Buy order
         user_profile = supabase_middleman.get_user_profile(user_id)
         if not user_profile:
-            raise_http_exception(
-                status_code=HTTP_400_BAD_REQUEST,
-                error_code=400,
-                error_message="User not found",
-            )
+            # raise_http_exception(
+            #     status_code=HTTP_400_BAD_REQUEST,
+            #     error_code=400,
+            #     error_message="User not found",
+            # )
+            return "User not found"
         if user_profile["balance"] < price * quantity:
-            raise_http_exception(
-                status_code=HTTP_400_BAD_REQUEST,
-                error_code=400,
-                error_message="Insufficient balance",
-            )
+            # raise_http_exception(
+            #     status_code=HTTP_400_BAD_REQUEST,
+            #     error_code=400,
+            #     error_message="Insufficient balance",
+            # )
+            return "Insufficient balance"
     else:  # Sell order
         # portfolio = supabase_middleman.fetch_portfolio(user_id, stock_id)
         portfolio = supabase_middleman.get_user_portfolio(user_id)[stock_id]
         if not portfolio:
-            raise_http_exception(
-                status_code=HTTP_400_BAD_REQUEST,
-                error_code=400,
-                error_message="Portfolio not found",
-            )
+            # raise_http_exception(
+            #     status_code=HTTP_400_BAD_REQUEST,
+            #     error_code=400,
+            #     error_message="Portfolio not found",
+            # )
+            return "Stock not found in users portfolio"
         if portfolio["quantity"] < 1:
-            raise_http_exception(
-                status_code=HTTP_400_BAD_REQUEST,
-                error_code=400,
-                error_message="User does not own stock",
-            )
+            # raise_http_exception(
+            #     status_code=HTTP_400_BAD_REQUEST,
+            #     error_code=400,
+            #     error_message="User does not own stock",
+            # )
+            return "User does not own stock"
         if portfolio["quantity"] < quantity:
-            raise_http_exception(
-                status_code=HTTP_400_BAD_REQUEST,
-                error_code=400,
-                error_message="Insufficient quantity",
-            )
+            # raise_http_exception(
+            #     status_code=HTTP_400_BAD_REQUEST,
+            #     error_code=400,
+            #     error_message="Insufficient quantity",
+            # )
+            return "Insufficient quantity"
 
     time_posted = datetime.now().isoformat()
     # create_active_order.create_active_order(
