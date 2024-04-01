@@ -8,12 +8,14 @@ from util.expire_orders import lifespan
 
 app = FastAPI(lifespan=lifespan)
 
+
 @app.get("/health")
 def health():
     """API route for health checks."""
     return ""
 
 
+# testing
 @app.get("/buyOrder")
 def test_entry_1():
     """API route for creating a test buy order."""
@@ -35,7 +37,6 @@ def test_params(data: dict):
     """API route for testing parameters."""
     buy_order.test_params()
     return data
-
 
 
 # testing
@@ -72,9 +73,3 @@ def create_order(data: dict):
     return "Active order created"
 
 
-#prod
-@app.get("/createActiveOrder")
-def create_order(data: dict):
-    """API route for creating an active order."""
-    create_active_order.create_active_buy_sell_order(data)
-    return "Active order created"
