@@ -14,7 +14,6 @@
 	import type { Table } from '$lib/stores/tableState';
 	import { writable } from 'svelte/store';
 	import { rankItem } from '@tanstack/match-sorter-utils';
-	import { Info } from 'lucide-svelte';
 	import { goto } from '$app/navigation';
 
 	export let stockInfo: Table[];
@@ -114,11 +113,15 @@
 		>
 			{#each $table.getHeaderGroups() as headerGroup}
 				{#each headerGroup.headers as header}
-					<th colSpan={header.colSpan} class="px-6 py-3">
+					<th
+						colSpan={header.colSpan}
+						class="border-light-background dark:border-dark-background border-2 first:rounded-tl-lg last:rounded-tr-lg first:w-1/3 w-1/6"
+					>
 						{#if !header.isPlaceholder}
 							<button
-								class="flex items-center space-x-2 cursor-pointer select-none text-light-text dark:text-dark-text"
+								class="flex items-center space-x-2 cursor-pointer select-none text-light-text dark:text-dark-text px-6 py-3 w-full"
 								on:click={header.column.getToggleSortingHandler()}
+								class:cursor-default={!mainTable}
 							>
 								<svelte:component
 									this={flexRender(header.column.columnDef.header, header.getContext())}
@@ -174,7 +177,7 @@
 								<img
 									src={cell.row.original.image}
 									alt={cell.row.original.name}
-									class="w-8 h-8 rounded-full mr-5"
+									class="w-8 h-8 rounded-full mr-5 border-light-accent dark:border-dark-accent border-2"
 								/>
 								<svelte:component
 									this={flexRender(cell.column.columnDef.cell, cell.getContext())}
