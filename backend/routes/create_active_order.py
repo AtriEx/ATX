@@ -29,8 +29,8 @@ def create_active_buy_sell_order(data: dict) -> str:
         "Z", "+00:00"
     )  # Replace Z with +00:00 to make it ISO 8601 compliant
     expirey = datetime.fromisoformat(expirey)  # Convert expirey to datetime object
-
     if price < 1:
+        print("Price must be greater than 0")
         # raise_http_exception(
         #     status_code=HTTP_400_BAD_REQUEST,
         #     error_code=400,
@@ -62,7 +62,6 @@ def create_active_buy_sell_order(data: dict) -> str:
     # validate user_id is a valid uuid and it exists
     try:
         UUID(hex=user_id)  # throws value error if not a valid uuid
-        # user_profile = supabase_middleman.fetch_profile(user_id)
         user_profile = supabase_middleman.get_user_profile(user_id)
         if not user_profile:
             # raise_http_exception(
@@ -137,6 +136,7 @@ def create_active_buy_sell_order(data: dict) -> str:
         # supabase_middleman.escrow_stock(user_id, stock_id, quantity)
 
     expirey = str(expirey)
+    entries = []
     # Generate an entry for each quantity and insert those entries into the table
     for i in range(quantity):
         entry = {
@@ -150,8 +150,10 @@ def create_active_buy_sell_order(data: dict) -> str:
             "orderId": generated_order_id,
             "has_been_processed": False,
         }
+        entries.append(entry)
         # Insert the entry into the active_buy_sell table
-        supabase_middleman.insert_entry("active_buy_sell", entry)
+        # supabase_middleman.insert_entry("active_buy_sell", entry)
+    supabase_middleman.insert_entry("active_buy_sell", entries)
     return "Active order created"
 
 

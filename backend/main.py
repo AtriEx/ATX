@@ -15,7 +15,6 @@ def health():
     return ""
 
 
-
 # testing
 @app.get("/buyOrder")
 def test_entry_1():
@@ -32,14 +31,12 @@ def create_buy_order(data: dict):
     return ret_val
 
 
-
 # testing
 @app.get("/testParams")
 def test_params(data: dict):
     """API route for testing parameters."""
     buy_order.test_params()
     return data
-
 
 
 # testing
@@ -50,7 +47,6 @@ def insert_custom_order(data: dict):
     return "Custom order inserted"
 
 
-
 # testing
 @app.get("/changeBalanceTest")
 def change_balance_test(amount: int):
@@ -59,7 +55,6 @@ def change_balance_test(amount: int):
         "36d22a68-ca25-4110-b769-44cf5b4a1c89", amount
     )
     return output
-
 
 
 # prod
@@ -74,6 +69,5 @@ def fetch_net_worth(user_id: str):
 @app.get("/createActiveOrder")
 def create_order(data: dict):
     """API route for creating an active order."""
-    create_active_order.create_active_buy_sell_order(data)
-    return "Active order created"
-
+    result = create_active_order.create_active_buy_sell_order(data)
+    return result
