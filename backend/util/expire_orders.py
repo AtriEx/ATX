@@ -14,7 +14,7 @@ from database import supabase_middleman
 
 load_dotenv(os.getenv("ENV_FILE", find_dotenv()))
 
-SLEEP_TIME = int(os.getenv("EXPIRE_LOOP_DELAY", "10"))  # Default to 10s
+SLEEP_TIME = int(os.getenv("EXPIRE_LOOP_DELAY", "0"))  # If 0, don't do the loop
 
 
 @asynccontextmanager
@@ -40,6 +40,9 @@ class ExpireOrdersThread(threading.Thread):
 
     def run(self):
         """Infinetly runs a loop to expire orders."""
+
+        if SLEEP_TIME == 0:
+            return
 
         # Will complete db operations before shutting down
         while not self._stop_event.is_set():

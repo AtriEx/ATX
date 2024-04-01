@@ -217,14 +217,21 @@ def expire_order(order_id: int):
 
     else:
         # Sell order - refund stock
-        supabase.table("portfolio").insert(
+        current_amount = (
+            supabase.table("portfolio")
+            .select("quantity")
+            .eq("stockId", order["stockId"])
+            .eq("userId", order["userId"])
+            .single()
+            .execute()
+        ).data["quantity"]
+
+        supabase.table("portfolio").update(
             {
-                "stockId": order["stockId"],
-                "userId": order["userId"],
-                "quantity": order["quantity"],
+                "quantity": current_amount + order["quantity"],
                 "price_avg": order["price"],
             }
-        ).execute()
+        ).eq("stockId", order["stockId"]).eq("userId", order["userId"]).execute()
 
     # Insert record into inactive_buy_sell
     del order["has_been_processed"]

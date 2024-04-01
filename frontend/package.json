@@ -47,6 +47,7 @@
 		"clsx": "^2.1.0",
 		"lucide-svelte": "^0.321.0",
 		"svelte-fa": "^4.0.2",
+		"svelte-french-toast": "^1.2.0",
 		"tailwind-merge": "^2.2.1",
 		"tailwind-variants": "^0.1.20"
 	}
