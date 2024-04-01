@@ -8,22 +8,22 @@ from util.expire_orders import lifespan
 
 app = FastAPI(lifespan=lifespan)
 
+
 @app.get("/health")
 def health():
     """API route for health checks."""
     return ""
 
 
-#testing
+# testing
 @app.get("/buyOrder")
 def test_entry_1():
     """API route for creating a test buy order."""
-    #create_active_order.create_sell_order()
-    #create_active_order.create_sell_order()
+    # create_active_order.create_sell_order()
     return "Test entry inserted"
 
 
-#prod
+# prod
 @app.get("/qb")
 def create_buy_order(data: dict):
     """API route for creating a buy order for one share of a stock."""
@@ -31,7 +31,7 @@ def create_buy_order(data: dict):
     return ret_val
 
 
-#testing
+# testing
 @app.get("/testParams")
 def test_params(data: dict):
     """API route for testing parameters."""
@@ -39,7 +39,8 @@ def test_params(data: dict):
     return data
 
 
-#testing
+
+# testing
 @app.get("/insertCustomOrder")
 def insert_custom_order(data: dict):
     """API route for inserting a custom order."""
@@ -47,7 +48,7 @@ def insert_custom_order(data: dict):
     return "Custom order inserted"
 
 
-#testing
+# testing
 @app.get("/changeBalanceTest")
 def change_balance_test(amount: int):
     """API route for testing balance changes."""
@@ -56,16 +57,19 @@ def change_balance_test(amount: int):
     )
     return output
 
-#prod
+
+# prod
 @app.get("/netWorth")
 def fetch_net_worth(user_id: str):
     """API route for calculating the net worth of a user."""
     net_worth = net_worth_calculator.net_worth_calculator(user_id)
     return net_worth
 
-#prod
+
+# prod
 @app.get("/createActiveOrder")
 def create_order(data: dict):
     """API route for creating an active order."""
     create_active_order.create_active_buy_sell_order(data)
     return "Active order created"
+

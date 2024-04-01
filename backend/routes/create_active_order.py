@@ -1,17 +1,19 @@
 """Creates buy and sell orders"""
 
-from fastapi import FastAPI, HTTPException
 from datetime import datetime, timezone
-from pydantic import BaseModel
-from database import supabase_middleman
 from uuid import UUID, uuid4
+
+from fastapi import HTTPException
+from pydantic import BaseModel
 from starlette.status import HTTP_400_BAD_REQUEST
+
+from database import supabase_middleman
+
 
 class ErrorResponse(BaseModel):
     error_code: int
     error_message: str
     details: str = None  # Optional field
-
 
 
 def create_active_buy_sell_order(data: dict) -> str:
@@ -23,8 +25,10 @@ def create_active_buy_sell_order(data: dict) -> str:
     stock_id = data["stockId"]
     user_id = data["userId"]
 
-    expirey = expirey.replace("Z", "+00:00")  # Replace Z with +00:00 to make it ISO 8601 compliant
-    expirey = datetime.fromisoformat(expirey)   # Convert expirey to datetime object
+    expirey = expirey.replace(
+        "Z", "+00:00"
+    )  # Replace Z with +00:00 to make it ISO 8601 compliant
+    expirey = datetime.fromisoformat(expirey)  # Convert expirey to datetime object
 
     if price < 1:
         raise_http_exception(
@@ -55,7 +59,7 @@ def create_active_buy_sell_order(data: dict) -> str:
     # validate user_id is a valid uuid and it exists
     try:
         UUID(hex=user_id)  # throws value error if not a valid uuid
-        #user_profile = supabase_middleman.fetch_profile(user_id)
+        # user_profile = supabase_middleman.fetch_profile(user_id)
         user_profile = supabase_middleman.get_user_profile(user_id)
         if not user_profile:
             raise_http_exception(
@@ -70,9 +74,10 @@ def create_active_buy_sell_order(data: dict) -> str:
             error_message="user_id is not in valid UUID format",
         )
 
-    # validate that if order is a buy order, user has enough balance, or if order is a sell order, user has enough quantity
+    # validate that if order is a buy order, user has enough balance,
+    # or if order is a sell order, user has enough quantity
     if buy_or_sell:  # Buy order
-        user_profile = supabase_middleman.fetch_profile(user_id)
+        user_profile = supabase_middleman.get_user_profile(user_id)
         if not user_profile:
             raise_http_exception(
                 status_code=HTTP_400_BAD_REQUEST,
@@ -86,7 +91,7 @@ def create_active_buy_sell_order(data: dict) -> str:
                 error_message="Insufficient balance",
             )
     else:  # Sell order
-        #portfolio = supabase_middleman.fetch_portfolio(user_id, stock_id)
+        # portfolio = supabase_middleman.fetch_portfolio(user_id, stock_id)
         portfolio = supabase_middleman.get_user_portfolio(user_id)[stock_id]
         if not portfolio:
             raise_http_exception(
@@ -116,12 +121,12 @@ def create_active_buy_sell_order(data: dict) -> str:
 
     if buy_or_sell:
         supabase_middleman.update_user_balance(user_id, price * quantity * -1)
-        #supabase_middleman.escrow_funds(user_id, price, quantity)
+        # supabase_middleman.escrow_funds(user_id, price, quantity)
     else:
         supabase_middleman.update_user_portfolio(user_id, stock_id, quantity * -1)
-        #supabase_middleman.escrow_stock(user_id, stock_id, quantity)
+        # supabase_middleman.escrow_stock(user_id, stock_id, quantity)
 
-    expirey=str(expirey)
+    expirey = str(expirey)
     # Generate an entry for each quantity and insert those entries into the table
     for i in range(quantity):
         entry = {
