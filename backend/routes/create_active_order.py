@@ -30,7 +30,6 @@ def create_active_buy_sell_order(data: dict) -> str:
     )  # Replace Z with +00:00 to make it ISO 8601 compliant
     expirey = datetime.fromisoformat(expirey)  # Convert expirey to datetime object
     if price < 1:
-        print("Price must be greater than 0")
         # raise_http_exception(
         #     status_code=HTTP_400_BAD_REQUEST,
         #     error_code=400,
