@@ -263,7 +263,7 @@ def authenticate(jwt: str) -> str:
     unauth_error = HTTPException(status_code=401, detail="Invalid token")
 
     # separate case to prevent any kind of session leakage because of
-    # behaivior of get_user when there is no token passed.
+    # behavior of get_user when there is no token passed.
     if not jwt:
         raise unauth_error
 
