@@ -20,110 +20,61 @@ def create_active_buy_sell_order(data: dict) -> str:
     """Create a buy or sell order for a stock."""
     buy_or_sell = data["buy_or_sell"]
     price = data["price"]
-    expirey = data["expirey"]
+    expiry = data["expirey"]
     quantity = data["quantity"]
     stock_id = data["stockId"]
     user_id = data["userId"]
 
-    expirey = expirey.replace(
+    expiry = expiry.replace(
         "Z", "+00:00"
     )  # Replace Z with +00:00 to make it ISO 8601 compliant
-    expirey = datetime.fromisoformat(expirey)  # Convert expirey to datetime object
+    expiry = datetime.fromisoformat(expiry)  # Convert expiry to datetime object
+    errors = []
     if price < 1:
-        # raise_http_exception(
-        #     status_code=HTTP_400_BAD_REQUEST,
-        #     error_code=400,
-        #     error_message="Price must be greater than 0",
-        # )
-        return "Price must be greater than 0"
+        errors.append("Price must be greater than 0")
     if quantity < 1:
-        # raise_http_exception(
-        #     status_code=HTTP_400_BAD_REQUEST,
-        #     error_code=400,
-        #     error_message="Quantity must be greater than 0",
-        # )
-        return "Quantity must be greater than 0"
-    if expirey < datetime.now(timezone.utc):
-        # raise_http_exception(
-        #     status_code=HTTP_400_BAD_REQUEST,
-        #     error_code=400,
-        #     error_message="Expirey date cannot be in the past",
-        # )
-        return "Expirey date cannot be in the past"
+        errors.append("Quantity must be greater than 0")
+    if expiry < datetime.now(timezone.utc):
+        errors.append("Expiry date cannot be in the past")
     if not supabase_middleman.fetch_stock_price(stock_id):
-        # raise_http_exception(
-        #     status_code=HTTP_400_BAD_REQUEST,
-        #     error_code=400,
-        #     error_message="Stock not found",
-        # )
-        return "Stock not found"
+        errors.append("Stock not found")
+    if errors:
+        return ", ".join(errors)
 
     # validate user_id is a valid uuid and it exists
     try:
         UUID(hex=user_id)  # throws value error if not a valid uuid
         user_profile = supabase_middleman.get_user_profile(user_id)
         if not user_profile:
-            # raise_http_exception(
-            #     status_code=HTTP_400_BAD_REQUEST,
-            #     error_code=400,
-            #     error_message="User not found",
-            # )
-            return "User not found"
+            errors.append("User not found")
     except ValueError:
-        # raise_http_exception(
-        #     status_code=HTTP_400_BAD_REQUEST,
-        #     error_code=400,
-        #     error_message="user_id is not in valid UUID format",
-        # )
-        return "user_id is not in valid UUID format"
+        errors.append("user_id is not in valid UUID format")
+
+    if errors:
+        return ", ".join(errors)
 
     # validate that if order is a buy order, user has enough balance,
     # or if order is a sell order, user has enough quantity
     if buy_or_sell:  # Buy order
         user_profile = supabase_middleman.get_user_profile(user_id)
         if not user_profile:
-            # raise_http_exception(
-            #     status_code=HTTP_400_BAD_REQUEST,
-            #     error_code=400,
-            #     error_message="User not found",
-            # )
-            return "User not found"
+            errors.append("User not found")
         if user_profile["balance"] < price * quantity:
-            # raise_http_exception(
-            #     status_code=HTTP_400_BAD_REQUEST,
-            #     error_code=400,
-            #     error_message="Insufficient balance",
-            # )
-            return "Insufficient balance"
+            errors.append("Insufficient balance")
     else:  # Sell order
         # portfolio = supabase_middleman.fetch_portfolio(user_id, stock_id)
         portfolio = supabase_middleman.get_user_portfolio(user_id)[stock_id]
         if not portfolio:
-            # raise_http_exception(
-            #     status_code=HTTP_400_BAD_REQUEST,
-            #     error_code=400,
-            #     error_message="Portfolio not found",
-            # )
-            return "Stock not found in users portfolio"
+            errors.append("Stock not found in users portfolio")
         if portfolio["quantity"] < 1:
-            # raise_http_exception(
-            #     status_code=HTTP_400_BAD_REQUEST,
-            #     error_code=400,
-            #     error_message="User does not own stock",
-            # )
-            return "User does not own stock"
+            errors.append("User does not own stock")
         if portfolio["quantity"] < quantity:
-            # raise_http_exception(
-            #     status_code=HTTP_400_BAD_REQUEST,
-            #     error_code=400,
-            #     error_message="Insufficient quantity",
-            # )
-            return "Insufficient quantity"
+            errors.append("Insufficient quantity")
+
+    if errors:
+        return ", ".join(errors)
 
     time_posted = datetime.now().isoformat()
-    # create_active_order.create_active_order(
-    #     time_posted, buy_or_sell, price, expirey, quantity, stock_id, user_id
-    # )
 
     generated_order_id = str(uuid4())
 
@@ -134,24 +85,24 @@ def create_active_buy_sell_order(data: dict) -> str:
         supabase_middleman.update_user_portfolio(user_id, stock_id, quantity * -1)
         # supabase_middleman.escrow_stock(user_id, stock_id, quantity)
 
-    expirey = str(expirey)
+    expiry = str(expiry)
     entries = []
     # Generate an entry for each quantity and insert those entries into the table
-    for i in range(quantity):
-        entry = {
+    entries = [
+        {
             "time_posted": time_posted,
             "buy_or_sell": buy_or_sell,
             "price": price,
-            "expirey": expirey,
-            "quantity": 1,
+            "expirey": expiry,
+            "quantity": quantity,
             "stockId": stock_id,
             "userId": user_id,
             "orderId": generated_order_id,
             "has_been_processed": False,
         }
-        entries.append(entry)
-        # Insert the entry into the active_buy_sell table
-        # supabase_middleman.insert_entry("active_buy_sell", entry)
+        for _ in range(quantity)
+    ]
+    # Insert the entry into the active_buy_sell table
     supabase_middleman.insert_entry("active_buy_sell", entries)
     return "Active order created"
 
