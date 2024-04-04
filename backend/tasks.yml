@@ -1,0 +1,53 @@
+# this is a taskfile, but it's not called Taskfile.yml because it is included in the main Taskfile.yml.
+version: '3'
+
+vars:
+  TRACKED_FILES_NL:
+    sh: git ls-files "*.py"
+  TRACKED_FILES: "{{.TRACKED_FILES_NL | catLines}}"
+
+tasks:
+  fmt:
+    desc:    Format all tracked python files
+    summary: |
+      This task runs isort and black on all tracked python files.
+      Dependencies:
+      - "python" (https://www.python.org/downloads/)
+      - dev requirements (python -m pip install -r requirements-dev.txt) or (task backend:install)
+    cmds:
+    - python -m isort --profile black {{.TRACKED_FILES}}
+    - python -m black {{.TRACKED_FILES}}
+
+  format:
+    cmds:
+    - task: fmt
+
+  lint-only:
+    cmds:
+    - python -m pylint {{.TRACKED_FILES}}
+
+  lint:
+    desc:    Lint all tracked python files (also runs fmt)
+    summary: |
+      This task runs pylint on all tracked python files.
+      Dependencies:
+      - "python" (https://www.python.org/downloads/)
+      - dev requirements (python -m pip install -r requirements-dev.txt) or (task backend:install)
+    cmds:
+    - task: fmt
+    - task: lint-only
+
+  check-format:
+    cmds:
+    - python -m isort --profile black --check {{.TRACKED_FILES}}
+    - python -m black --check {{.TRACKED_FILES}}
+
+  install:
+    desc:    Install all requirements
+    summary: |
+      This task installs all requirements.
+      Dependencies:
+      - "python" (https://www.python.org/downloads/)
+    cmds:
+    - python -m pip install -r requirements.txt
+    - python -m pip install -r requirements-dev.txt

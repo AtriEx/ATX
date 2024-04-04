@@ -4,9 +4,9 @@ import os
 import re
 
 import requests
-from dotenv import find_dotenv, load_dotenv
+from dotenv import load_dotenv
 
-load_dotenv(find_dotenv())
+load_dotenv(os.getenv("ENV_FILE", "env/.env"))
 
 BASE_URL = os.getenv("PUBLIC_SUPABASE_URL")
 API_KEY = os.getenv("SUPABASE_KEY")
@@ -89,12 +89,12 @@ for table_name, db_table in schema["definitions"].items():
     output_md += table_md
 
 # Finally, rewrite the database file
-with open("database.md", "r", encoding="UTF-8") as f:
+with open("documentation/database.md", "r", encoding="UTF-8") as f:
     database_docs = f.read()
 
 database_docs = database_docs.split("## Tables")[0]
 
 database_docs += f"## Tables\n\n{output_md}"
 
-with open("database.md", "w", encoding="UTF-8") as f:
+with open("documentation/database.md", "w", encoding="UTF-8") as f:
     f.write(database_docs)

@@ -8,22 +8,28 @@
 	import { supabase, onLogin, onLogout } from '$lib/supabase';
 	import { PUBLIC_ENVIRONMENT } from '$env/static/public';
 	import DebugMenu from '$lib/components/DebugMenu.svelte';
+	import { Toaster } from 'svelte-french-toast';
 
 	onMount(() => {
 		supabase.auth.onAuthStateChange((event, session) => {
-			if (event === 'SIGNED_IN') {
-				try {
-					onLogin();
-				} catch (error) {
-					console.error('Error in onAuthStateChange', error);
-				}
-			}
-			if (event === 'SIGNED_OUT') {
-				try {
-					onLogout();
-				} catch (error) {
-					console.error();
-				}
+			switch (event) {
+				case 'INITIAL_SESSION':
+					if(session === null)break;
+				case 'SIGNED_IN':
+					try {
+						onLogin();
+					} catch (error) {
+						console.error('Error in onAuthStateChange', error);
+					}
+					break;
+
+				case 'SIGNED_OUT':
+					try {
+						onLogout();
+					} catch (error) {
+						console.error();
+					}
+					break;
 			}
 		});
 	});
@@ -58,3 +64,5 @@
 		</button>
 	</div>
 {/if}
+
+<Toaster />

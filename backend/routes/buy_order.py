@@ -9,7 +9,7 @@ from supabase import Client, create_client
 
 from database import supabase_middleman
 
-load_dotenv("env/.env")
+load_dotenv(os.getenv("ENV_FILE", "env/.env"))
 
 
 url = os.getenv("PUBLIC_SUPABASE_URL")
