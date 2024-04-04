@@ -29,6 +29,25 @@ def insert_entry(table_name: str, entry: dict) -> None:
     supabase.table(table_name).insert(entry).execute()
 
 
+def fetch_id_from_order_id(order_id: str) -> list:
+    """
+    Returns the individual IDs of an order given the order id
+
+    Args:
+        order_id (str): The order id
+
+    Returns: list(int) - The individual IDs of the order, empty list if there are no orders with given order id
+    """
+    ids = (
+        supabase.table("active_buy_sell")
+        .select("Id")
+        .eq("orderId", order_id)
+        .execute()
+        .data
+    )
+    return ids
+
+
 def is_market_open() -> bool:
     """
     Checks if the market is open

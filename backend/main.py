@@ -9,14 +9,14 @@ from util.expire_orders import lifespan
 app = FastAPI(lifespan=lifespan)
 
 
-@app.get("/buyOrder")
+@app.post("/buyOrder")
 def test_entry_1():
     """API route for creating a test buy order."""
     create_active_order.create_sell_order()
     return "Test entry inserted"
 
 
-@app.get("/qb")
+@app.post("/qb")
 def create_buy_order(data: dict):
     """API route for creating a buy order for one share of a stock."""
     ret_val = buy_order.buy_order(data)
@@ -30,14 +30,14 @@ def test_params(data: dict):
     return data
 
 
-@app.get("/insertCustomOrder")
+@app.post("/insertCustomOrder")
 def insert_custom_order(data: dict):
     """API route for inserting a custom order."""
     supabase_middleman.insert_entry("active_buy_sell", data)
     return "Custom order inserted"
 
 
-@app.get("/changeBalanceTest")
+@app.put("/changeBalanceTest")
 def change_balance_test(amount: int):
     """API route for testing balance changes."""
     output = supabase_middleman.update_user_balance(
