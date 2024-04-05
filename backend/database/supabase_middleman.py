@@ -39,12 +39,9 @@ def fetch_id_from_order_id(order_id: str) -> list:
     Returns: list(int) - The individual IDs of the order, empty list if there are no orders with given order id
     """
     ids = (
-        supabase.table("active_buy_sell")
-        .select("Id")
-        .eq("orderId", order_id)
-        .execute()
-        .data
+        supabase.table("active_buy_sell").select("Id").eq("orderId", order_id).execute()
     )
+
     return ids
 
 
