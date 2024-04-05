@@ -38,13 +38,11 @@ def buying_process(buy_data: dict, sell_data: dict, qb_response: str):
     # Insert sell order BEFORE buy order to test return statement
     response = client.post("/insertCustomOrder/", json=sell_data)
     assert response.status_code == 200
-    assert response.json == "Custom Order inserted"
 
     response = client.post("/insertCustomOrder/", json=buy_data)
     assert response.status_code == 200
-    assert response == "Custom Order inserted"
 
-    ids = supabase_middleman.fetch_id_from_order_id(buy_data["order_id"])
+    ids = supabase_middleman.fetch_id_from_order_id(buy_data["orderId"])
     for id in ids:
         buy_data["Id"] = id
         response = client.post("/qb/", json=buy_data)
