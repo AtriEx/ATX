@@ -1,4 +1,3 @@
-import json
 from tarfile import data_filter
 from fastapi.testclient import TestClient
 
@@ -10,7 +9,7 @@ client = TestClient(app)
 
 
 def test_create_buy_order():
-    data = {"stockId": 1, "price": 20, "quantity": 1}
+    data = {"stockId": 1, "price": 20, "quantity": 10}
     buy_data = test_data.buy_entry(data=data)
     # Check if market_open check works
     # Check if buy order receives proper data
@@ -43,11 +42,12 @@ def buying_process(buy_data: dict, sell_data: dict, qb_response: str):
     assert response.status_code == 200
 
     ids = supabase_middleman.fetch_id_from_order_id(buy_data["orderId"])
+    # assert ids == 1
     for id in ids:
         buy_data["Id"] = id
         response = client.post("/qb/", json=buy_data)
         assert response.status_code == 200
-        assert response == qb_response
+        assert response.json() == qb_response
 
 
 def match_price_buyer_side(data):
