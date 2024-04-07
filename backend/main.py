@@ -23,6 +23,7 @@ def test_entry_1():
 
 
 @app.post("/qb", response_model=str)
+@app.post("/qb", response_model=str)
 def create_buy_order(data: dict):
     """API route for creating a buy order for one share of a stock."""
     ret_val = buy_order.buy_order(data)
