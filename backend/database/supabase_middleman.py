@@ -286,3 +286,17 @@ def get_user_active_orders(user_id: str) -> list[dict]:
         .execute()
         .data
     )
+
+
+def validate_user(user_id: str):
+    """
+    Validate that a user exists in the database
+
+    Args:
+        user_id (str): The user's ID
+
+    Returns: the user_id if the user exists, an error message otherwise
+    """
+    return bool(
+        supabase.table("profiles").select("*").eq("userId", user_id).execute().data
+    )

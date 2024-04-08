@@ -66,7 +66,7 @@ def fetch_net_worth(user_id: str):
 
 
 # prod
-@app.get("/createActiveOrder")
+@app.post("/createActiveOrder")
 def create_order(data: dict):
     """API route for creating an active order."""
     result = create_active_order.create_active_buy_sell_order(data)

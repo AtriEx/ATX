@@ -3,17 +3,7 @@
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from fastapi import HTTPException
-from pydantic import BaseModel
-from starlette.status import HTTP_400_BAD_REQUEST
-
 from database import supabase_middleman
-
-
-class ErrorResponse(BaseModel):
-    error_code: int
-    error_message: str
-    details: str = None  # Optional field
 
 
 def create_active_buy_sell_order(data: dict) -> str:
@@ -105,12 +95,3 @@ def create_active_buy_sell_order(data: dict) -> str:
     # Insert the entry into the active_buy_sell table
     supabase_middleman.insert_entry("active_buy_sell", entries)
     return "Active order created"
-
-
-def raise_http_exception(status_code, error_code, error_message, details=None):
-    error_response = ErrorResponse(
-        error_code=error_code, error_message=error_message, details=details
-    )
-    raise HTTPException(
-        status_code=status_code, detail=error_response.model_dump_json()
-    )
