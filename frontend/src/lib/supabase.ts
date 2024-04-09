@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
 import { loggedIn, user, profile } from './stores/userData';
-import { loginDialog } from './stores/uiStates';
+import { loginDialog, rewardsDialog } from './stores/uiStates';
 import { get } from 'svelte/store';
 
 // Initialize Supabase client
@@ -101,4 +101,11 @@ export async function onLogout() {
 		user.set(null);
 		profile.set(null);
 	}
+}
+
+// Function to handle to rewards in post login if applicable
+export async function claimReward() {
+	rewardsDialog.set(false);
+	console.log("user has claimed reward");
+	
 }

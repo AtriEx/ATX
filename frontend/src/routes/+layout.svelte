@@ -3,7 +3,8 @@
 	import Header from '$lib/components/Header.svelte';
 	import MobileNavigationBar from '$lib/components/MobileNavigationBar.svelte';
 	import Login from '$lib/components/Login.svelte';
-	import { loginDialog, debugMenu } from '$lib/stores/uiStates';
+	import DailyReward from '$lib/components/RewardsPopup.svelte'
+	import { loginDialog, debugMenu, rewardsDialog } from '$lib/stores/uiStates';
 	import { onMount } from 'svelte';
 	import { supabase, onLogin, onLogout } from '$lib/supabase';
 	import { PUBLIC_ENVIRONMENT } from '$env/static/public';
@@ -40,7 +41,7 @@
 	<meta name="description" content="Get addicted to selling stocks." />
 </svelte:head>
 
-<div class="w-full" class:blur-sm={$loginDialog || $debugMenu}>
+<div class="w-full" class:blur-sm={$loginDialog || $debugMenu || $rewardsDialog}>
 	<Header />
 	<slot />
 	<MobileNavigationBar />
@@ -50,9 +51,14 @@
 	<Login />
 {/if}
 
+{#if $rewardsDialog}
+	<DailyReward />
+{/if}
+
 {#if $debugMenu}
 	<DebugMenu />
 {/if}
+
 
 {#if PUBLIC_ENVIRONMENT === 'development'}
 	<div class="fixed bottom-0 right-0 p-2">
