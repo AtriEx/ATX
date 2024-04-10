@@ -7,9 +7,10 @@ import os
 import threading
 from contextlib import asynccontextmanager
 
-from database import supabase_middleman
 from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI
+
+from database import supabase_middleman
 
 load_dotenv(os.getenv("ENV_FILE", find_dotenv()))
 

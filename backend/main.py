@@ -1,5 +1,7 @@
 """API routes declaration"""
 
+from uuid import UUID
+
 from fastapi import FastAPI
 
 from database import supabase_middleman
@@ -57,3 +59,9 @@ def fetch_net_worth(user_id: str):
     """API route for calculating the net worth of a user."""
     net_worth = net_worth_calculator.net_worth_calculator(user_id)
     return net_worth
+
+
+@app.put("/cancelOrder")
+def cancel_order(order_uuid: UUID):
+    """Cancel and refund all active buy/sell orders with the given order uuid"""
+    supabase_middleman.cancel_buy_orders(str(order_uuid))

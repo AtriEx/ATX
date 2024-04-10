@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
-
 from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
@@ -286,3 +285,28 @@ def get_user_active_orders(user_id: str) -> list[dict]:
         .execute()
         .data
     )
+
+
+def cancel_buy_orders(order_uuid: str):
+    """
+    Cancels and refund all the active orders with the order uuid specified
+
+    Args:
+        order_uuid (str): The order uuid
+    """
+
+    order_ids = [
+        i["Id"]
+        for i in (
+            supabase.table("active_buy_sell")
+            .select("Id")
+            .eq("orderId", order_uuid)
+            .execute()
+            .data
+        )
+    ]
+
+    # TODO: change refund_order to do 1 large requests
+    # instead of a bunch of little ones
+    for order_id in order_ids:
+        refund_order(order_id)
