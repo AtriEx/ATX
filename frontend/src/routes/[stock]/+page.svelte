@@ -24,7 +24,7 @@
 			class="w-12 h-12 mb-2 border-light-accent dark:border-dark-accent border-2 bg-slate-50 rounded-full shadow-lg"
 		/>
 		<h1 class="text-4xl font-bold dark:text-dark-text text-light-text text-center">
-			{data.stock}
+			{data.stock.replaceAll('_', ' ')}
 		</h1>
 	</div>
 
