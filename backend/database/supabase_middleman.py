@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
+
 from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
@@ -185,7 +186,7 @@ def get_expired() -> list[dict]:
     return orders.data
 
 
-def expire_order(order_id: int):
+def refund_order(order_id: int):
     """
     Move order_id from active to inactive order table
     Refunds stocks or money
