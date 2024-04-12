@@ -371,10 +371,10 @@ def migrate_price_changes(hour: datetime):
             stock_weekly_default = ( 
                 supabase.table("stock_price_history_daily")
                 .select("price")
-                .single()
                 .eq("stockId", hour_check[0])
                 .order("changed_at", desc = False)
                 .limit(1)
+                .single()
                 .execute()
                 .data
             )
