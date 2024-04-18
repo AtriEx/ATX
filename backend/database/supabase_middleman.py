@@ -13,7 +13,7 @@ from util.date_extensions import from_supabase_date, to_supabase_date
 load_dotenv(os.getenv("ENV_FILE", "env/.env"))
 url = os.getenv("PUBLIC_SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+supabase: Client = create_client(url, key) # type: ignore
 
 
 # needs a lot more checks and error handling
@@ -112,7 +112,7 @@ def update_user_portfolio(user_id: str, stock_id: int, quantity: int) -> int:
     return payload
 
 
-def fetch_stock_price(stock_id: int) -> int:
+def fetch_stock_price(stock_id: int) -> int | None:
     """
     Gets the current stock price of the given stock_id
 
@@ -473,7 +473,7 @@ def migrate_price_changes(hour: datetime):
                 total_price_sum += weekly_entry["average_price"] * weekly_entry["volume_of_sales"]
 
                 highest_price = max(highest_price, weekly_entry["highest_price"])
-                lowets_price = min(lowest_price, weekly_entry["lowest_price"])
+                lowest_price = min(lowest_price, weekly_entry["lowest_price"])
             
             monthly_entries += [{
                 "starting_hour": current_hour_time,

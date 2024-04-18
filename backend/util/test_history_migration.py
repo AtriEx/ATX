@@ -4,7 +4,7 @@ import traceback
 from datetime import timedelta, datetime
 from dotenv import load_dotenv
 from database import supabase_middleman
-from util.date_extensions import from_supabase_date, to_supabase_date
+from util.date_extensions import to_supabase_date
 import random
 
 from supabase import Client, create_client
@@ -12,7 +12,8 @@ from supabase import Client, create_client
 load_dotenv("env/.env")
 url = os.getenv("PUBLIC_SUPABASE_URL")
 key = os.getenv("SUPABASE_KEY")
-supabase: Client = create_client(url, key)
+
+supabase: Client = create_client(url, key) # type: ignore
 
 def test_migrate_history_middle_day(clean):
 
@@ -96,6 +97,6 @@ def test_migrate_history_end_of_day():
             "price": random.randint(1,100),
             "stockId": 1,
         })
-    supabase_middleman.migrate_price_changes()
+    supabase_middleman.migrate_price_changes(current_hour_time)
 
 
