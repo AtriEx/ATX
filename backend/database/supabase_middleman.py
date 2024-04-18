@@ -2,8 +2,8 @@
 interactions in high-level generic functions."""
 
 import os
+import pprint
 from datetime import datetime, timedelta
-from pprint import pprint
 from dotenv import load_dotenv
 from supabase import Client, create_client
 from util.date_extensions import from_supabase_date, to_supabase_date
@@ -47,6 +47,29 @@ def is_market_open() -> bool:
     )
     return is_open["state"]
 
+def last_market_change_since(since_date: datetime) -> dict | None:
+    """
+    Gets the last time the market_State table changed to a particular state.
+
+    Args:
+        since_date: Will check for market changes before this date 
+
+    Returns: datetime - The datetime of the last market_State change since the specified date. None if no datetime exists
+    """
+
+    last_change = (
+        supabase.table("market_State")
+        .select("changed_last, state")
+        .lt("changed_last", to_supabase_date(since_date))
+        .order("changed_last", desc=True)
+        .limit(1)
+        .single()
+        .execute()
+        .data
+    )
+
+
+    return last_change
 
 def update_user_balance(user_id: str, amount: int) -> int:
     """
@@ -304,6 +327,12 @@ def validate_user(user_id: str):
 
 
 def migrate_price_changes(hour: datetime):
+    """
+    Migrates order history
+
+    Args: hour (datetime): The end of the range of time to look at orders. 
+    For migration into the weekly table, daily table entries with timestamp in the range [hour -1, hour] are looked at.
+    """
 
     current_hour_time = hour.replace(minute=0, second=0, microsecond=0)
     last_hour_time = current_hour_time - timedelta(hours=1)
@@ -365,9 +394,10 @@ def migrate_price_changes(hour: datetime):
         hour_change_table[weekly_entry["stockId"]]["lowest_price"] = weekly_entry["closing_price"]
         hour_change_table[weekly_entry["stockId"]]["average_price"] = weekly_entry["closing_price"]
 
-    # If there was no weekly entry for the stock, then the stock must be new. In this case, check for the earliest daily entry. Stocks are created with a entry via a trigger.
+    pprint.pprint(hour_check_table)
+    # If there was no weekly entry for the stock, then the stock must be new. In this case, check for the earliest daily entry. Stocks are created with an entry via a database trigger.
     for hour_check in hour_check_table.items():
-        if hour_check[1]:
+        if not hour_check[1]:
             stock_weekly_default = ( 
                 supabase.table("stock_price_history_daily")
                 .select("price")
@@ -387,8 +417,6 @@ def migrate_price_changes(hour: datetime):
 
     for fulfilled_order in all_hour_fulfilled:
         hour_volume_table[fulfilled_order["stockId"]] += (fulfilled_order["quantity"], fulfilled_order["quantity"] * fulfilled_order["price"])
-
-    print(hour_volume_table)
 
     current_stock = all_hour_price_changes[0]["stockId"]
     hour_highest = all_hour_price_changes[0]["price"] 
@@ -424,14 +452,6 @@ def migrate_price_changes(hour: datetime):
     hour_change_table[current_stock]["lowest_price"] = hour_lowest
     hour_change_table[current_stock]["closing_price"] = hour_last_price
     hour_change_table[current_stock]["volume_of_sales"] = hour_volume_table[current_stock][0]
-
-    print("\nHourly Volume Table \n\n")
-    print(hour_volume_table)
-    print("\nHourly Change Table \n\n")
-    pprint(hour_change_table[1])
-    print("\n\n")
-    pprint(all_hour_price_changes)
-
 
     supabase.table("stock_price_history_weekly").insert(list(hour_change_table.values())).execute();
 
@@ -489,10 +509,28 @@ def migrate_price_changes(hour: datetime):
         supabase.table("stock_price_history_monthly").insert(monthly_entries).execute
 
         # Delete old weekly entries
-        seven_days_before = current_hour_time - timedelta(days=7)
-        (
-            supabase.table("stock_price_history_weekly")
-            .delete()
-            .lt("starting_hour", to_supabase_date(seven_days_before))
+        old_weekly_hours = (
+            supabase.table("stock_price_history_weelkly")
+            .select("starting_hour")
+            .lt("starting_hour", to_supabase_date(current_hour_time))
             .execute()
+            .data
         )
+
+        old_days = set() 
+        for old_weekly_hour in old_weekly_hours:
+            test_day = from_supabase_date(old_weekly_hour).replace(hour=0)
+            if test_day not in old_days:
+                old_days.add(test_day)
+
+        if len(old_days) > 7:
+            oldest_day = last_day_time 
+            for old_day in old_days:
+                oldest_day = min(oldest_day, old_day)
+            
+            (
+                supabase.table("stock_price_history_weekly")
+                .delete()
+                .lt("starting_hour", to_supabase_date(oldest_day + timedelta(days=1)))
+                .execute()
+            )

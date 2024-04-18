@@ -17,19 +17,6 @@ load_dotenv(os.getenv("ENV_FILE", find_dotenv()))
 
 SLEEP_TIME = int(os.getenv("EXPIRE_LOOP_DELAY", "0"))  # If 0, don't do the loop
 
-MIGRATION_SLEEP_TIME = int(os.getenv("MIGRATION_LOOP_DELAY", "0"))
-
-
-@asynccontextmanager
-async def lifespan(_: FastAPI):
-    """Runs before and after the server starts and closes"""
-    thread = ExpireOrdersThread()
-
-    thread.start()
-    yield  # Anything after here runs when server is shutting down
-    thread.stop()
-
-
 class ExpireOrdersThread(threading.Thread):
     """Infinetly running thread to expire orders."""
 
