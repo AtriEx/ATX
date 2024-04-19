@@ -2,10 +2,12 @@
 Creates threads that start running before the server starts and shutdown after the server closes.
 """
 
-from fastapi import FastAPI
 from contextlib import asynccontextmanager
+
 from expire_orders import ExpireOrdersThread
+from fastapi import FastAPI
 from migrate_history import MigrateOrderHistoryThread
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
