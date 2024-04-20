@@ -2,9 +2,8 @@
 
 from uuid import UUID
 
-from fastapi import FastAPI
-
 from database import supabase_middleman
+from fastapi import FastAPI
 from routes import buy_order, create_active_order, net_worth_calculator
 from util.expire_orders import lifespan
 
@@ -64,4 +63,4 @@ def fetch_net_worth(user_id: str):
 @app.put("/cancelOrder")
 def cancel_order(order_uuid: UUID):
     """Cancel and refund all active buy/sell orders with the given order uuid"""
-    supabase_middleman.cancel_buy_orders(str(order_uuid))
+    supabase_middleman.refund_order(str(order_uuid))
