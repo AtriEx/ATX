@@ -2,7 +2,6 @@
 interactions in high-level generic functions."""
 
 import os
-import pprint
 from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
@@ -57,7 +56,8 @@ def last_market_change_since(since_date: datetime) -> dict | None:
     Args:
         since_date: Will check for market changes before this date
 
-    Returns: datetime - The datetime of the last market_State change since the specified date. None if no datetime exists
+    Returns: datetime - The datetime of the last market_State change since the specified date.
+    None if no datetime exists
     """
 
     last_change = (
@@ -334,7 +334,8 @@ def migrate_price_changes(hour: datetime):
     Migrates order history
 
     Args: hour (datetime): The end of the range of time to look at orders.
-    For migration into the weekly table, daily table entries with timestamp in the range [hour -1, hour] are looked at.
+    For migration into the weekly table, daily table entries with
+    a timestamp in the range [hour -1, hour] are looked at.
     """
 
     current_hour_time = hour.replace(minute=0, second=0, microsecond=0)
@@ -373,10 +374,14 @@ def migrate_price_changes(hour: datetime):
         .data
     )
 
-    hour_volume_table = {}
-    hour_change_table = {}
-    hour_check_table = {}
+    hour_volume_table = {}  # Tracks volume and total value of stocks exchanged
+    hour_change_table = {}  # Maps each stock id to a new entry in the weekly table
+    hour_check_table = (
+        {}
+    )  # Maps each stock id to a boolean of whether or not it has a weekly entry
 
+    # Setup all existing stocks to have an entry even if no price change has occurred
+    # or no weekly_entry exists for that stock
     for stock_id in all_stock_ids:
         hour_volume_table[stock_id["id"]] = (0, 0)
         hour_check_table[stock_id["id"]] = False
@@ -391,7 +396,8 @@ def migrate_price_changes(hour: datetime):
             "volume_of_sales": 0,
         }
 
-    # Use last the last hours close as the default for this hours open, close, highest, lowest, and average price.
+    # Use last the last hours close as the default for this hours open, close, highest, lowest,
+    # and average price.
     for weekly_entry in last_weekly_history:
         hour_check_table[weekly_entry["stockId"]] = True
         hour_change_table[weekly_entry["stockId"]]["opening_price"] = weekly_entry[
@@ -410,7 +416,8 @@ def migrate_price_changes(hour: datetime):
             "closing_price"
         ]
 
-    # If there was no weekly entry for the stock, then the stock must be new. In this case, check for the earliest daily entry. Stocks are created with an entry via a database trigger.
+    # If there was no weekly entry for the stock, then the stock must be new. In this case,
+    # check for the earliest daily entry. Stocks are created with an entry via a database trigger.
     for hour_check in hour_check_table.items():
         if not hour_check[1]:
             stock_weekly_default = (
@@ -514,7 +521,7 @@ def migrate_price_changes(hour: datetime):
             .data
         )
 
-        # We do a little grouping
+        # Group weekly entries by stockId
         weekly_group_table = {}
 
         for weekly_entry in todays_weekly_entries:
@@ -523,9 +530,6 @@ def migrate_price_changes(hour: datetime):
             else:
                 weekly_group_table[weekly_entry["stockId"]] += [weekly_entry]
 
-        print(weekly_group_table)
-        print(weekly_group_table.keys())
-        pprint.pprint(weekly_group_table)
         for stock_group in list(weekly_group_table.values()):
             current_stock_id = stock_group[0]["stockId"]
             open_price = stock_group[0]["opening_price"]
@@ -582,7 +586,7 @@ def migrate_price_changes(hour: datetime):
             )
             if test_day not in old_days:
                 old_days.add(test_day)
-        print(old_days)
+
         if len(old_days) > 7:
             oldest_day = last_day_time
             for old_day in old_days:

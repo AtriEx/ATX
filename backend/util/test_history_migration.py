@@ -24,7 +24,7 @@ def test_migrate_history_middle_day(test_time: datetime, clean: bool):
     Tests middle of day migration of order history, creates test data and cleans it if requested.
 
     Args:
-        test_time (datetime): End of hour time, test data will be created between this and one hour before this.
+        test_time (datetime): Test data will be created using test_time as the end of the range
         clean (bool): Specifies whether or not data is cleaned after testing
     """
 
@@ -155,7 +155,7 @@ def test_migrate_history_end_of_day(test_time: datetime, clean: bool):
     Tests end of day migration of order history, creates test data and cleans it if requested.
 
     Args:
-        test_time (datetime): End of day time, test data will be created between this and one day before this.
+        test_time (datetime): Test data will be created using test_time as the end of the range.
         clean (bool): Specifies whether or not data is cleaned after testing
     """
     default_opening_price = 300

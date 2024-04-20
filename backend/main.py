@@ -71,5 +71,3 @@ def create_order(data: dict):
     """API route for creating an active order."""
     result = create_active_order.create_active_buy_sell_order(data)
     return result
-    buy_order.buy_order()
-    return "Quick buy executed"
