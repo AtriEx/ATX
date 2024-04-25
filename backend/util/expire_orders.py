@@ -7,10 +7,9 @@ import os
 import threading
 from contextlib import asynccontextmanager
 
+from database import supabase_middleman
 from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI
-
-from database import supabase_middleman
 
 load_dotenv(os.getenv("ENV_FILE", find_dotenv()))
 
@@ -47,8 +46,9 @@ class ExpireOrdersThread(threading.Thread):
         # Will complete db operations before shutting down
         while not self._stop_event.is_set():
             orders = supabase_middleman.get_expired()
+            print(orders)
 
-            for order in orders:
-                supabase_middleman.expire_order(order["Id"])
+            for order_uuid in orders:
+                supabase_middleman.refund_order(order_uuid)
 
             self._stop_event.wait(SLEEP_TIME)

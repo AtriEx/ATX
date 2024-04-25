@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 
 from dotenv import load_dotenv
+
 from supabase import Client, create_client
 
 # pylint: disable=import-error,no-name-in-module # it's looking in the supabase folder in project root
@@ -169,24 +170,28 @@ def log_transaction(buy_info: dict, sell_info: dict) -> None:
     supabase.table("inactive_buy_sell").insert(sell_info).execute()
 
 
-def get_expired() -> list[dict]:
+def get_expired() -> set[str]:
     """
-    Return a list of active orders that have expired.
-    Only contains the order id.
+    Return a set of active orders that have expired.
+    Only contains the order uuid's.
     """
 
-    orders = (
-        supabase.table("active_buy_sell")
-        .select("Id")
+    orders = set(
+        i["orderId"]
+        for i in supabase.table("active_buy_sell")
+        .select("orderId")
         .lte("expirey", datetime.now().isoformat())
         .order("expirey", desc=False)
         .execute()
+        .data
     )
 
-    return orders.data
+    print(orders)
+
+    return orders
 
 
-def expire_order(order_id: int):
+def refund_order(order_uuid: str):
     """
     Move order_id from active to inactive order table
     Refunds stocks or money
@@ -194,15 +199,28 @@ def expire_order(order_id: int):
         order_id (int): The active order id
     """
 
+    # Get the number of buy orders
+    # For some reason the 'count' return from .delete() is None
+    count = len(
+        supabase.table("active_buy_sell")
+        .select("Id")
+        .eq("orderId", order_uuid)
+        .execute()
+        .data
+    )
+
     # Delete order
-    order = (
-        supabase.table("active_buy_sell").delete().eq("Id", order_id).execute()
-    ).data[0]
+    orders, _ = (
+        supabase.table("active_buy_sell").delete().eq("orderId", order_uuid).execute()
+    )
+
+    # All orders are the same, so just need to get first order then mult by count
+    order = orders[1][0]
 
     # Refund stocks/money
     if order["buy_or_sell"]:
         # Buy order - refund money
-        order_cost = order["quantity"] * order["price"]
+        order_cost = order["quantity"] * order["price"] * count
 
         current_balance = (
             supabase.table("profiles")
@@ -229,7 +247,7 @@ def expire_order(order_id: int):
 
         supabase.table("portfolio").update(
             {
-                "quantity": current_amount + order["quantity"],
+                "quantity": current_amount + order["quantity"] * count,
                 "price_avg": order["price"],
             }
         ).eq("stockId", order["stockId"]).eq("userId", order["userId"]).execute()
