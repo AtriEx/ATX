@@ -42,7 +42,7 @@
 								alt={player.username}
 								class="w-8 h-8 rounded-full inline-block mr-2 bg-slate-500"
 							/>
-							<a href="/user/{player.username}">
+							<a href="/profile/{player.username}">
 								{player.username}
 							</a>
 						</td>

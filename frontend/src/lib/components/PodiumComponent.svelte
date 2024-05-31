@@ -12,7 +12,7 @@
 
 <div class="flex w-full h-96 items-end justify-center gap-4 md:gap-8 pb-3 text-center">
 	<a
-		href="/user/{users[1].username}"
+		href="/profile/{users[1].username}"
 		class="w-1/3 md:w-1/5 bg-light-accent dark:bg-dark-accent/60 rounded-t-3xl shadow-2xl flex flex-col items-center justify-center md:p-6 h-[75%] transform transition duration-500 hover:-translate-y-2"
 	>
 		<img
@@ -33,7 +33,7 @@
 		</div>
 	</a>
 	<a
-		href="/user/{users[0].username}"
+		href="/profile/{users[0].username}"
 		class="w-1/3 md:w-1/5 bg-light-primary dark:bg-dark-primary rounded-t-3xl shadow-2xl flex flex-col items-center justify-center p-6 h-full transform transition duration-500 hover:scale-110"
 	>
 		<img
@@ -54,7 +54,7 @@
 		</div>
 	</a>
 	<a
-		href="/user/{users[2].username}"
+		href="/profile/{users[2].username}"
 		class="w-1/3 md:w-1/5 bg-light-accent dark:bg-dark-accent/50 rounded-t-3xl shadow-lg flex flex-col items-center justify-center p-6 h-[60%] transform transition duration-500 hover:-translate-y-2"
 	>
 		<img
