@@ -15,6 +15,16 @@ export const load = (async ({ params, url }) => {
 
 	const period = searchParams.get('period') || 'daily';
 	const stockName = params.stock;
+
+	// Check if stock exists
+	const { data: exists } = await adminSupabase
+		.from('stock_info')
+		.select('name')
+		.eq('name', stockName)
+		.single();
+
+	if (!exists) error(404, `Stock ${stockName} not found`);
+
 	if (period === 'daily') {
 		const { data, error: pgError } = await dailyInfo(stockName);
 		if (!data || pgError) {

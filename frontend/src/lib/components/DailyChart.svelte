@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Chart, type ChartArea, type CoreScaleOptions } from 'chart.js/auto';
+	import { Chart } from 'chart.js/auto';
 	import { onMount } from 'svelte';
 
 	type Props = {
@@ -36,7 +36,11 @@
 						data: data.map((d) => d.price),
 						backgroundColor: 'rgba(75, 192, 192, 0.2)',
 						borderColor:
-							first.price < last.price ? 'green' : first.price > last.price ? 'red' : 'white',
+							first.price < last.price
+								? 'rgba(34, 197, 94, 1)'
+								: first.price > last.price
+									? 'rgba(239, 68, 68, 1)'
+									: 'rgba(255, 255, 255, 1)',
 						borderWidth: 2,
 						tension: 0.1
 					}
@@ -44,6 +48,7 @@
 			},
 			options: {
 				responsive: true,
+				maintainAspectRatio: false,
 				scales: {
 					y: {
 						beginAtZero: false,
@@ -94,4 +99,8 @@
 	});
 </script>
 
-<canvas bind:this={chart} width={400} height={200} class="bg-slate-900" />
+<div class="flex justify-center items-center p-4">
+	<div class="relative w-full max-w-4xl">
+		<canvas bind:this={chart} class="bg-slate-900 p-2 rounded-lg shadow-lg w-full h-96" />
+	</div>
+</div>
