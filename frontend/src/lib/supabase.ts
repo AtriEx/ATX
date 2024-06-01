@@ -3,9 +3,13 @@ import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/publi
 import { loggedIn, user, profile } from './stores/userData';
 import { loginDialog } from './stores/uiStates';
 import { get } from 'svelte/store';
+import type { Database } from './supabase.types';
+
+export type Row<T extends keyof Database['public']['Tables']> =
+	Database['public']['Tables'][T]['Row'];
 
 // Initialize Supabase client
-export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
+export const supabase = createClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
 
 // Function to handle login
 export async function login() {
@@ -61,7 +65,13 @@ export async function getProfile() {
 			.throwOnError();
 
 		console.log('User profile:', userProfile);
-		profile.set(userProfile);
+		if (!userProfile) return profile;
+		profile.set({
+			...userProfile,
+			image: userProfile.image || '',
+			username: userProfile.username || '',
+			joined_at: new Date(userProfile.joined_at) || new Date()
+		});
 		return profile;
 	} catch (error) {
 		console.error('Error getting profile:', error);
@@ -79,7 +89,7 @@ export async function onLogin() {
 	if (currentUser) {
 		const currentProfile = await getProfile();
 
-		if(!currentProfile) loggedIn.set(false);
+		if (!currentProfile) loggedIn.set(false);
 	}
 }
 
