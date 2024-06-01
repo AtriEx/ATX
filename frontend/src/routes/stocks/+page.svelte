@@ -13,18 +13,18 @@
 	>
 		Markets
 	</h1>
-	<div class="overflow-x-auto rounded-lg">
+	<div class="overflow-x-auto rounded-lg shadow-lg">
 		<StockTable stockInfo={data.stocks} mainTable />
 	</div>
-	<div class="md:flex justify-evenly p-2 pt-5">
-		<div class="md:mr-4 md:w-1/2">
-			<h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+	<div class="md:flex justify-evenly p-2 pt-5 space-y-6 md:space-y-0 md:space-x-6">
+		<div class="p-4 md:w-1/2">
+			<h2 class="text-2xl font-bold text-center text-light-primary dark:text-dark-accent mb-6">
 				Hottest Stocks
 			</h2>
 			<StockTable stockInfo={data.hottest} />
 		</div>
-		<div class="md:mr-4 md:w-1/2">
-			<h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 text-center">
+		<div class="p-4 md:w-1/2">
+			<h2 class="text-2xl font-bold text-center text-light-primary dark:text-dark-accent mb-6">
 				Biggest Losers
 			</h2>
 			<StockTable stockInfo={data.losers} />

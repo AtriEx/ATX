@@ -20,7 +20,16 @@
 	export let mainTable = false;
 
 	const defaultColumns: ColumnDef<Table>[] = [
-		{ accessorKey: 'name', enableSorting: mainTable, header: 'Name', id: 'name' },
+		{
+			accessorKey: 'name',
+			enableSorting: mainTable,
+			header: 'Name',
+			id: 'name',
+			cell: (item) => {
+				const value = item.getValue() as string;
+				return value.replaceAll('_', ' ');
+			}
+		},
 		{
 			accessorFn: (row) => row.stock_price?.stock_price || 0,
 			enableSorting: mainTable,
@@ -85,13 +94,13 @@
 		<input
 			type="text"
 			on:keyup={handleKeyUp}
-			class="w-full p-3 pl-10 rounded-lg shadow-sm text-light-text dark:text-dark-text dark:bg-dark-secondary bg-light-secondary focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200 ease-in-out"
+			class="w-full p-3 pl-10 rounded-lg shadow-sm text-light-text dark:text-dark-text dark:bg-dark-secondary bg-light-secondary focus:outline-none focus:ring-2 focus:ring-light-primary dark:focus:ring-dark-primary focus:ring-opacity-50 transition-colors duration-200 ease-in-out"
 			placeholder="Search for a stock"
 		/>
 		<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
-				class="h-5 w-5 text-gray-500"
+				class="h-5 w-5 text-gray-500 dark:text-gray-400"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
@@ -166,12 +175,12 @@
 		{#each $table.getRowModel().rows as row}
 			<tr
 				class="{mainTable
-					? 'bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800'
-					: 'bg-gray-50 dark:bg-gray-800 hover:bg-white dark:hover:bg-gray-900'} transition duration-150 ease-in-out border-b border-gray-200 dark:border-gray-700 cursor-pointer"
+					? 'bg-light-background dark:bg-dark-background hover:bg-light-accent dark:hover:bg-dark-accent'
+					: 'bg-light-secondary dark:bg-dark-secondary hover:bg-light-accent dark:hover:bg-dark-accent'} transition duration-150 ease-in-out border-b border-light-background dark:border-dark-background cursor-pointer"
 				on:click={() => onClick(row.original.name)}
 			>
 				{#each row.getVisibleCells() as cell}
-					<td class="px-6 py-4 whitespace-no-wrap text-sm leading-5">
+					<td class="px-6 py-4 whitespace-no-wrap text-sm leading-5 cursor-pointer">
 						{#if cell.column.columnDef.id === 'name'}
 							<div class="flex items-center space-x-2">
 								<img
